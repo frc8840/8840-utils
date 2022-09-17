@@ -15,7 +15,7 @@ Then, you can import the classes you want to use in your code by doing `import f
 We also have examples in the `/examples` folder, and they should work.  
   
 **IMPORTANT:**  
-In your `Main` class, in `Main#main`, you will have to have this code in order for it to work:  
+In your `Main` class, you will have to have this code in order for it to work:  
 ```java
 class Main {
     private Main() {}
