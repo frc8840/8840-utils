@@ -11,6 +11,25 @@ We recognize that a decent amount of these tools are just reinventing the wheel/
 
 This section will probably not be updated until the start of the season when we start using the library for development, but if you *really* want to use this (sort of scuffed) library, I recommend that you download the repository and put the `/team_8840_lib` folder in your `/src/main/java/frc` folder.  
 Then, you can import the classes you want to use in your code by doing `import frc.team_8840_lib.*;` or `import frc.team_8840_lib.<class_name>;`
+  
+We also have examples in the `/examples` folder, and they should work.  
+  
+**IMPORTANT:**  
+In your `Main` class, in `Main#main`, you will have to have this code in order for it to work:  
+```java
+class Main {
+    private Main() {}
+
+    public static void main(String[] args) {
+        //Assign the listener to the robot. See Examples/TankDrive.java for more info.
+        frc.team_8840_lib.listeners.Robot.assignListener(new TankDrive());
+
+        //Start the robot - Don't change this line
+        RobotBase.startRobot(frc.team_8840_lib.listeners.Robot::new);
+    }
+}
+```
+Check `Main` for more info.
 
 ## What's in it?
 
