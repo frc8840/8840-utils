@@ -1,0 +1,145 @@
+package frc.team_8840_lib.utils.http;
+
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import frc.team_8840_lib.utils.http.html.Element;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class Route implements HttpHandler {
+
+    private String path;
+    private Constructor callback;
+
+    public Route(String path, Constructor callback) {
+        this.path = path;
+        this.callback = callback;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    @Override
+    public void handle(HttpExchange exchange) throws IOException {
+        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        if (exchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
+            exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, OPTIONS");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type,Authorization");
+            exchange.sendResponseHeaders(204, -1);
+            return;
+        }
+
+        Resolution res = this.callback.finish(exchange, new Resolution());
+        String body = res.getBody();
+        int status = res.getStatus();
+
+        System.out.println("GOT Request \"" + this.getPath() + "\" " + status);
+
+        exchange.sendResponseHeaders(status, body.length());
+        OutputStream os = exchange.getResponseBody();
+        os.write(body.getBytes());
+        os.flush();
+        os.close();
+    }
+
+    public static enum ContentType {
+        HTML, JSON, TEXT
+    }
+
+    public static class Resolution {
+        private int status;
+        private Element body;
+        private String json;
+        private String text;
+        private HashMap<String, String> headers;
+        private ContentType contentType;
+
+        public Resolution() {
+            status = 200;
+            body = Element.CreatePage(Element.CreateHead(), Element.CreateBody());
+            headers = new HashMap<>();
+            contentType = ContentType.HTML;
+        }
+
+        public Resolution(int status, Element body) {
+            this.status = status;
+            this.body = body;
+            this.headers = new HashMap<>();
+            contentType = ContentType.HTML;
+        }
+
+        public Resolution send(Element body) {
+            this.body = body;
+            contentType = ContentType.HTML;
+            setHeader("Content-Type", "text/html");
+            status(200);
+            return this;
+        }
+
+        public Resolution json(String json) {
+            this.json = json;
+            this.contentType = ContentType.JSON;
+            setHeader("Content-Type", "application/json");
+            status(200);
+            return this;
+        }
+
+        public Resolution text(String text) {
+            this.text = text;
+            this.contentType = ContentType.TEXT;
+            setHeader("Content-Type", "text/plain");
+            status(200);
+            return this;
+        }
+
+        public Resolution setHeader(String header, String value) {
+            headers.put(header, value);
+            return this;
+        }
+
+        public Resolution status(int status) {
+            this.status = status;
+            return this;
+        }
+
+        //This is used to decide whether to not use all settings for the response. This is primarily used for the WebSocket server.
+        private boolean overrideResolutionAndUseBody = false;
+
+        public Resolution wsHandshake(String path, String host, String key) {
+            text = "GET " + path + " HTTP/1.1\r\n" +
+                    "Host: " + host + "\r\n" +
+                    "Upgrade: websocket\r\n" +
+                    "Connection: Upgrade\r\n" +
+                    "Sec-WebSocket-Key: " + key + "\r\n" +
+                    "Sec-WebSocket-Version: 13\r\n" +
+                    "Sec-WebSocket-Protocol: binary\r\n" +
+                    "\r\n";
+            overrideResolutionAndUseBody = true;
+            return this;
+        }
+
+        public Resolution wsUpgradeConnection() {
+            return null;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public String getBody() {
+            return contentType == ContentType.HTML ? body.getHTML() : (contentType == ContentType.JSON ? json : text);
+        }
+
+        public HashMap<String, String> getHeaders() {
+            return headers;
+        }
+    }
+}
