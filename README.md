@@ -29,7 +29,7 @@ class Main {
     }
 }
 ```
-Check `Main` for more info.
+Check [Main](https://github.com/frc8840/8840-utils/blob/main/src/main/java/frc/team_8840_lib/Main.java) for more info.
 
 ## What's in it?
 
