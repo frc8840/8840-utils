@@ -15,12 +15,12 @@ public class Robot extends RobotBase {
     private static EventListener listener;
 
     public static void assignListener(EventListener listener) {
+        //using system.out.println just in case the logger hasn't been initialized yet
         if (Robot.listener != null) {
-            Logger.Log("(Robot#assignListener, Line 13): Warning! Unsafe operation: assigning a new event listener. Old listener will be overwritten. In the future, please only assign the listener once.");
+            System.out.println("(Robot#assignListener, Line 13): Warning! Unsafe operation: assigning a new event listener. Old listener will be overwritten. In the future, please only assign the listener once.");
         }
 
-        SmartDashboard.putString("EventListener", "Assigned to " + listener.toString());
-        SmartDashboard.updateValues();
+        System.out.println("(Robot#assignListener, Line 17): Assigning listener: " + listener.getClass().getName());
 
         Robot.listener = listener;
     }
