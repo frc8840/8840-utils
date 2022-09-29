@@ -43,6 +43,8 @@ If you do want to train an AI, refer to our [8840-app](https://github.com/frc884
 This is where we put all of our speed controller code.
 It contains two files, one being the `ControllerGroup` class. This class was made to be used with a multitude of different speed controllers, but it doesn't really support CAN yet (coming in near future), only PWM.
 We also have a `SwerveGroup` class, an extension of the `ControllerGroup` specifically for swerve drive. A lot of the code was adapted from [Team 364's Swerve Drive](https://github.com/Team364/BaseFalconSwerve) and [Team 3512's Swerve Drive](https://github.com/frc3512/SwerveBot-2022). Credit goes to them!
+  
+TODO: Add support for NEOs for `SwerveGroup`.
 
 Refer to `frc.team_8840_lib.examples.*` for some usage of them.
 
@@ -144,6 +146,8 @@ This library is licensed under the MIT License, but adheres to the WPI-License a
 ## Credits
 
 This library was made by [Team 8840, Bay Robotics](https://team8840.org)'s programming lead [Jaiden Grimminck](https://github.com/jaidenagrimminck). This library also uses WPILib and any library used by them.
+For swerve drive, a great deal of credit goes to Team 364 and Team 3512 for their swerve drive code which was adapted for this library.
+Credit is also due to any other libraries that this project uses.
 
 ## Contact
 
