@@ -8,4 +8,12 @@ public class MathUtils {
     public static double sigmoidDerivative(double x) {
         return sigmoid(x) * (1 - sigmoid(x));
     }
+
+    public static double degreesToRadians(double degrees) {
+        return degrees * Math.PI / 180;
+    }
+
+    public static double radiansToDegrees(double radians) {
+        return radians * 180 / Math.PI;
+    }
 }

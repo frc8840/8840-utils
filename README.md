@@ -1,6 +1,5 @@
 # 8840 Utils
-## Made by [Team 8840](https://team8840.org) 
-### Credits: Jaiden Grimminck
+####[Team 8840](https://team8840.org) - [Jaiden Grimminck](https://github.com/jaidenagrimminck)
 
 ## What is this?
 
@@ -42,12 +41,15 @@ If you do want to train an AI, refer to our [8840-app](https://github.com/frc884
 ### `frc.team_8840_lib.controllers`
 
 This is where we put all of our speed controller code.
-It contains one file, the `ControllerGroup` class. This class was made to be used with a multitude of different speed controllers, but it doesn't really support CAN yet (coming in near future), only PWM.
-Refer to `frc.team_8840_lib.examples.TankDrive` for some usage of it.
+It contains two files, one being the `ControllerGroup` class. This class was made to be used with a multitude of different speed controllers, but it doesn't really support CAN yet (coming in near future), only PWM.
+We also have a `SwerveGroup` class, an extension of the `ControllerGroup` specifically for swerve drive. A lot of the code was adapted from [Team 364's Swerve Drive](https://github.com/Team364/BaseFalconSwerve) and [Team 3512's Swerve Drive](https://github.com/frc3512/SwerveBot-2022). Credit goes to them!
+
+Refer to `frc.team_8840_lib.examples.*` for some usage of them.
 
 ### `frc.team_8840_lib.examples`
 This is where we put all of our examples. 
-We only have one example right now, `TankDrive`, which is a simple replica of our code from last year. It's a simple setup using Spark Speed Controllers and a Logitech Joystick to control it. It's one of the most documented files, so if you're looking for a good amount of documentation, this is the place to go.
+`TankDrive`, which is a simple replica of our code from last year. It's a simple setup using Spark Speed Controllers and a Logitech Joystick to control it. It's one of the most documented files, so if you're looking for a good amount of documentation, this is the place to go.
+`SwerveDrive` is also in this folder which is an example of possible swerve drive code. We haven't done much testing though, so it might not work!
 
 ### `frc.team_8840_lib.info`
 
@@ -87,7 +89,13 @@ This folder contains all the more general utility classes, mostly enums, interfa
 #### • `frc.team_8840_lib.utils.controllers`
 
 This folder contains the `EncoderInformation` and `MotorInfo` class which are used to reformat some information from motor/encoder sensors. (A bit useless now, but can be expanded on in the future to provide better info.)
-It also contains the `SCType` enum, which is used to specify the type of speed controller. This is used in the `ControllerGroup` class. (I need a better name for it, but yeah.)
+It also contains the `SCType` enum, which is used to specify the type of speed controller. This is used in the `ControllerGroup` class. (I need a better name for it, but yeah.)  
+More centered on swerve drive, it has the Pigeon class which can support both the Pigeon IMU and the Pigeon 2.0.
+
+#### · · `frc.team_8840_lib.utils.controllers.swerve`
+
+This folder contains all utility classes for swerve drive. A lot of code from this was adapted/is from 
+[Team 364's Swerve Drive](https://github.com/Team364/BaseFalconSwerve) and [Team 3512's Swerve Drive](https://github.com/frc3512/SwerveBot-2022). Credit goes to them for much of the code.
 
 #### • `frc.team_8840_lib.utils.controls`
 

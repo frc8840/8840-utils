@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.motorcontrol.*;
 
 public enum SCType {
     PWM_SparkMax,
+    SWERVE_SparkMax, //Specifically used for swerve drive
     CAN_SparkMaxBrushless,
     CAN_SparkMaxBrushed,
     Spark,
@@ -12,6 +13,7 @@ public enum SCType {
     Jaguar,
     NidecBrushless,
     PWM_Talon_FX,
+    SWERVE_Talon_FX, //Specifically used for swerve drive
     PWM_Talon_SRX,
     PWM_Venom,
     PWM_Victor_SPX,
@@ -61,7 +63,7 @@ public enum SCType {
     public static boolean isPWM(SCType type) {
         if (type == CAN_SparkMaxBrushed || type == CAN_SparkMaxBrushless) {
             return false;
-        } else if (type == PWM_SparkMax || type == Spark || type == DMC60 || type == Jaguar || type == NidecBrushless || type == PWM_Talon_FX || type == PWM_Talon_SRX || type == PWM_Venom || type == PWM_Victor_SPX || type == SD540 || type == Talon || type == Victor || type == Victor_SP) {
+        } else if (type == PWM_SparkMax || type == Spark || type == DMC60 || type == Jaguar || type == NidecBrushless || type == PWM_Talon_FX || type == PWM_Talon_SRX || type == PWM_Venom || type == PWM_Victor_SPX || type == SD540 || type == Talon || type == Victor || type == Victor_SP || type == SWERVE_Talon_FX) {
             return true;
         } else {
             throw new UnsupportedOperationException("This controller type is not supported by this function.");

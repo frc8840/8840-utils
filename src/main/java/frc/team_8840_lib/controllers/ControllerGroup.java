@@ -156,7 +156,7 @@ public class ControllerGroup {
 
         private boolean initialized = false;
 
-        private SpeedController(int port, SCType type) {
+        public SpeedController(int port, SCType type) {
             this.port = port;
             this.type = type;
             this.controller = null;
@@ -166,6 +166,17 @@ public class ControllerGroup {
             speed = 0;
 
             initialize();
+        }
+
+        public SpeedController(SCType type) {
+            this.type = type;
+            this.controller = null;
+
+            isPWM = type.isPWM();
+
+            speed = 0;
+
+            initialized = true; //ignore initialization for this one.
         }
 
         private void initialize() {
