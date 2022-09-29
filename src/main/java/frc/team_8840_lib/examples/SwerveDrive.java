@@ -1,6 +1,7 @@
 package frc.team_8840_lib.examples;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -95,15 +96,20 @@ public class SwerveDrive extends EventListener {
         //Calculate the direction of the robot
         double direction = Math.atan2(vertical, horizontal);
 
-        //Calculate the magnitude of the robot
-        double magnitude = Math.sqrt(Math.pow(vertical, 2) + Math.pow(horizontal, 2));
+        //Create a new Translation2d with the x and y values of the controller multiplied by the max speed.
+        Translation2d translation = new Translation2d(vertical, horizontal).times(swerveDrive.getSettings().maxSpeed);
 
-        //Create a swerve state with the direction and magnitude
-        SwerveModuleState state = new SwerveModuleState(
-                direction,
-                Rotation2d.fromDegrees(MathUtils.radiansToDegrees(magnitude))
-        );
+        swerveDrive.drive(translation, direction, false, false);
 
+        /*
+        VALUES: (0.4, 0.9)
+        _____________
+        |       0   |  Example of the joystick GameController values
+        |      //   |  In this example, the robot will go in the direction of the top right corner
+        |     /_/   |  (but might not be relative, you may want to do some adjustments if you want it to be relative!)
+        |           |  The robot will also go at the speed of how much it's pushed.
+        |___________|  Note: This may not be exact example of what will happen. A lot of stuff needs to be tested still since we don't have swerve modules yet (lol).
+        */
     }
 
     @Override

@@ -138,4 +138,8 @@ public class SwerveGroup extends ControllerGroup {
     public Pose2d getPose() {
         return odometry.getPoseMeters();
     }
+
+    public SwerveSettings getSettings() {
+        return settings;
+    }
 }
