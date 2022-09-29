@@ -1,5 +1,5 @@
 # 8840 Utils
-####[Team 8840](https://team8840.org) - [Jaiden Grimminck](https://github.com/jaidenagrimminck)
+### [Team 8840](https://team8840.org) - [Jaiden Grimminck](https://github.com/jaidenagrimminck)
 
 ## What is this?
 
