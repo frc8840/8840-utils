@@ -1,4 +1,4 @@
-package frc.team_8840_lib.utils.controllers.swerve;
+package frc.team_8840_lib.utils.controllers.swerve.conversions;
 
 //https://github.com/Team364/BaseFalconSwerve/blob/main/src/main/java/frc/lib/math/Conversions.java
 //All credit goes to their team for this code.

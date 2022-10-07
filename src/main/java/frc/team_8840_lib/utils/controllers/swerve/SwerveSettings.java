@@ -1,11 +1,14 @@
 package frc.team_8840_lib.utils.controllers.swerve;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.utils.controllers.SCType;
+import frc.team_8840_lib.utils.controllers.swerve.structs.CurrentLimit;
+import frc.team_8840_lib.utils.controllers.swerve.structs.PIDStruct;
 
 //A lot of these values are taken from Team 364's Constants.java file, esp the PID values: these can be fine-tuned since it's an instantiable class though, so it's not a big deal
 public class SwerveSettings {
@@ -57,11 +60,13 @@ public class SwerveSettings {
     public CurrentLimit turnCurrentLimit = new CurrentLimit(25, 40, 0.1);
 
     public double driveKS = (0.667 / 12);
-    public double driveKV = (0.667 / 12);
+    public double driveKV = (2.44 / 12);
     public double driveKA = (0.27 / 12);
 
     public NeutralMode driveNeutralMode = NeutralMode.Brake;
     public NeutralMode turnNeutralMode = NeutralMode.Coast;
+    public CANSparkMax.IdleMode driveIdleMode = CANSparkMax.IdleMode.kBrake;
+    public CANSparkMax.IdleMode turnIdleMode = CANSparkMax.IdleMode.kBrake;
 
     public double[] angleOffsets = new double[]{0, 0, 0, 0};
 
@@ -98,7 +103,8 @@ public class SwerveSettings {
                         new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
                         new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
                         new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
-                        new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
+                        new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0)
+                );
     }
 
     /**
@@ -107,9 +113,23 @@ public class SwerveSettings {
      * */
     public void defaultAdjustToType() {
         if (this.type == SCType.SWERVE_Talon_FX) {
+            //Drive KS, KV, and KA values are different for the TalonFX
+            driveKS = 0.667 / 12;
+            driveKV = 2.44 / 12;
+            driveKA = 0.27 / 12;
 
+            //The PID values are different for the TalonFX
+            turnPID = new PIDStruct(0.6, 0.0, 12.0, 0.0);
+            drivePID = new PIDStruct(0.10, 0.0, 0.0, 0.0);
         } else if (this.type == SCType.SWERVE_SparkMax) {
+            //Drive KS, KV, and KA values are different for the SparkMax
+            driveKS = 0.667;
+            driveKV = 2.44;
+            driveKA = 0.27;
 
+            //The PID values are different for the SparkMax
+            turnPID = new PIDStruct(0.99, 0.0, 0.0, 0.0);
+            drivePID = new PIDStruct(0.10, 0.0, 0.0, 0.0);
         }
     }
 }

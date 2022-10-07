@@ -1,4 +1,4 @@
-package frc.team_8840_lib.utils.controllers.swerve;
+package frc.team_8840_lib.utils.controllers.swerve.structs;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 

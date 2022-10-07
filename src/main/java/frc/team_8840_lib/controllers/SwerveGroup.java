@@ -1,6 +1,7 @@
 package frc.team_8840_lib.controllers;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -9,8 +10,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.team_8840_lib.utils.controllers.Pigeon;
 import frc.team_8840_lib.utils.controllers.SCType;
 import frc.team_8840_lib.utils.controllers.swerve.CTREConfig;
-import frc.team_8840_lib.utils.controllers.swerve.SwerveModule;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
+import frc.team_8840_lib.utils.interfaces.SwerveLoop;
 
 /**
  * Based on the wonderful work of Team 364
@@ -35,9 +36,17 @@ public class SwerveGroup extends ControllerGroup {
 
     private SwerveModule[] modules;
 
+    /**
+     * Creates a new swerve group (4 modules)
+     * @param name Name of the swerve group
+     * @param settings Settings for the swerve group
+     * @param driveIDs Drive motor IDs
+     * @param steerIDs Steering/turning motor IDs
+     * @param encoderIDs Encoder IDs
+     * @param pigeon Gyroscope (Pigeon 2.0 or IMU, use Pigeon class)
+     * */
     public SwerveGroup(String name, SwerveSettings settings, int[] driveIDs, int[] steerIDs, int[] encoderIDs, Pigeon pigeon) {
-        //TODO: Allow for different types of swerve modules (between talon fx and neos)
-        super(name, SCType.SWERVE_Talon_FX /* settings.getType() */ ); //init w/ no ports so it doesn't create any objects.
+        super(name, settings.getType()); //init w/ no ports so it doesn't create any objects.
 
         if (driveIDs.length != steerIDs.length && driveIDs.length != encoderIDs.length) {
             throw new IllegalArgumentException("Drive and steer ports must be the same length");
@@ -61,10 +70,10 @@ public class SwerveGroup extends ControllerGroup {
         this.gyro = pigeon;
         this.gyro.config(); //Config for pigeon has to be called after the pigeon is created unlike others which are called in the constructor
 
-        odometry = new SwerveDriveOdometry(settings.getKinematics(), gyro.getAngle());
+        odometry = new SwerveDriveOdometry(settings.getKinematics(), getAngle());
 
         for (int i = 0; i < 4; i++) {
-            modules[i] = new SwerveModule(driveIDs[i], steerIDs[i], i, config);
+            modules[i] = new SwerveModule(driveIDs[i], steerIDs[i], encoderIDs[i], i, config);
         }
     }
 
@@ -90,7 +99,7 @@ public class SwerveGroup extends ControllerGroup {
             ChassisSpeeds.fromFieldRelativeSpeeds(
                 translation.getX(),
                 translation.getY(),
-                rotation, gyro.getAngle()
+                rotation, getAngle()
             ) :
             new ChassisSpeeds(
                 translation.getX(),
@@ -121,18 +130,22 @@ public class SwerveGroup extends ControllerGroup {
 
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
-        for (int i = 0; i < 4; i++) {
-            states[i] = modules[i].getState();
-        }
+        loop((module, i) -> states[i] = module.getState());
         return states;
     }
 
+    public void loop(SwerveLoop s_loop) {
+        for (int i = 0; i < 4; i++) {
+            s_loop.run(modules[i], i);
+        }
+    }
+
     public void resetOdometry(Pose2d pose) {
-        odometry.resetPosition(pose, gyro.getAngle());
+        odometry.resetPosition(pose, getAngle());
     }
 
     public void updateOdometry() {
-        odometry.update(gyro.getAngle(), getModuleStates());
+        odometry.update(getAngle(), getModuleStates());
     }
 
     public Pose2d getPose() {
@@ -141,5 +154,9 @@ public class SwerveGroup extends ControllerGroup {
 
     public SwerveSettings getSettings() {
         return settings;
+    }
+
+    private Rotation2d getAngle() {
+        return gyro.getAngle(this.settings.invertGyro);
     }
 }

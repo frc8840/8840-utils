@@ -103,6 +103,9 @@ public class ControllerGroup {
     }
 
     public boolean isCombination() {
+        if (subGroups == null) {
+            return false;
+        }
         return subGroups.size() > 0;
     }
 

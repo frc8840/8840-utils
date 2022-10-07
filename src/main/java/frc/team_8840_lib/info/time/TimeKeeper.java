@@ -40,6 +40,12 @@ public class TimeKeeper {
         subscriptions = new HashMap<>();
     }
 
+    public void resetGameTimers() {
+        resetTimer("auto");
+        resetTimer("teleop");
+        resetTimer("test");
+    }
+
     public void createTimer(String name) {
         timers.put(name, new Timer());
     }
@@ -98,6 +104,7 @@ public class TimeKeeper {
         stopTimer("auto");
         stopTimer("teleop");
         stopTimer("test");
+        resetGameTimers();
         if (phase != GamePhase.Disabled) resetAndStartTimer(phase.getTimerName());
     }
 
@@ -112,9 +119,10 @@ public class TimeKeeper {
     public void subscribe(String key, String timer, double time, SubscriptionType type, Callback callback, Callback onceFinished) {
         if (type != SubscriptionType.BeforeTime) throw new IllegalArgumentException("Only BeforeTime subscriptions are supported for a OnceFinished subscription.");
         subscriptions.put(key, new Subscription(key, timer, time, type, callback));
-        subscriptions.put(key + "_onceFinished", new Subscription(key, timer, time, SubscriptionType.AwaitForTime, onceFinished));
+        //need to add some case to prevent the above being called again after the onceFinished is called
+        subscriptions.put(key + "_onceFinished", new Subscription(key + "_onceFinished", timer, time, SubscriptionType.AwaitForTime, onceFinished));
 
-        Logger.Log("Subscribed event '" + key + "' for " + timer + ".");
+        Logger.Log("Subscribed event '" + key + "' and '" + key + "_onceFinished' for " + timer + ".");
     }
 
     public void checkSubscribers(GamePhase currentPhase) {
@@ -131,7 +139,6 @@ public class TimeKeeper {
 
     public void resubscribe(String key) {
         subscriptions.get(key).hasRun = false;
-        subscriptions.get(key).time = 0.0;
         subscriptions.get(key).timesRan = 0;
     }
 
@@ -144,6 +151,9 @@ public class TimeKeeper {
 
         private boolean isPeriodic;
         private boolean hasRun = false;
+
+        public boolean ignoreNextRun = false;
+
         private int timesRan = 0;
 
         public Subscription(String name, String timer, double time, SubscriptionType type, Callback callback) {
@@ -159,14 +169,18 @@ public class TimeKeeper {
         public void run() {
             if (!isPeriodic && hasRun) return;
 
+            if (ignoreNextRun) return;
+
+            double currentTime = TimeKeeper.getInstance().get(timer);
+
             if (type == SubscriptionType.AwaitForTime || type == SubscriptionType.AfterTime) {
-                if (timers.get(timer).get() >= time) {
+                if (currentTime >= time) {
                     hasRun = true;
                     timesRan++;
                     callback.run();
                 }
             } else if (type == SubscriptionType.BeforeTime) {
-                if (timers.get(timer).get() <= time) {
+                if (currentTime <= time) {
                     hasRun = true;
                     timesRan++;
                     callback.run();

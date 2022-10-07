@@ -1,11 +1,8 @@
 package frc.team_8840_lib.utils.controllers;
 
-import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.Pigeon2;
-import com.ctre.phoenix.sensors.Pigeon2Configuration;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.team_8840_lib.utils.controllers.swerve.FalconConversions;
 
 public class Pigeon {
     private PigeonIMU pigeonIMU;

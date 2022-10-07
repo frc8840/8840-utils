@@ -62,6 +62,8 @@ public class TankDrive extends EventListener {
         </code>
         */
 
+        //TODO: Fix auto since it's not updating the info - check if it's a bug with the communication manager.
+
         //Create a subscription that will run the intake for 2 seconds, then stop.
         TimeKeeper.getInstance().subscribe("shoot_ball", GamePhase.Autonomous.getTimerName(), 2d, SubscriptionType.BeforeTime, () -> {
             intake.setSpeed(1);

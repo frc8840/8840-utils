@@ -52,7 +52,7 @@ public class CTREConfig {
         //Drive Talon FX Configurations
         this.driveTalonFXConfiguration = new TalonFXConfiguration();
 
-        this.turnTalonFXConfiguration.slot0 = this.settings.drivePID.toCTRE(this.turnTalonFXConfiguration.slot0);
+        this.driveTalonFXConfiguration.slot0 = this.settings.drivePID.toCTRE(this.driveTalonFXConfiguration.slot0);
         this.driveTalonFXConfiguration.supplyCurrLimit = this.settings.driveCurrentLimit.toCTRE(this.settings.useCurrentLimits);
         this.driveTalonFXConfiguration.initializationStrategy = SensorInitializationStrategy.BootToZero;
         this.driveTalonFXConfiguration.openloopRamp = this.settings.driveOpenRampRate;

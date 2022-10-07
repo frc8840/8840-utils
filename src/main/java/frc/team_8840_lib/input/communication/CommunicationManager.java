@@ -7,6 +7,7 @@ import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team_8840_lib.controllers.ControllerGroup;
+import frc.team_8840_lib.controllers.SwerveGroup;
 import frc.team_8840_lib.input.communication.server.HTTPServer;
 import frc.team_8840_lib.utils.http.Constructor;
 import frc.team_8840_lib.utils.http.IP;
@@ -207,6 +208,17 @@ public class CommunicationManager {
         updateInfo("Status", service, status);
     }
 
+    public void updateSwerveInfo(SwerveGroup swerveGroup) {
+        String name = swerveGroup.getName();
+
+        swerveGroup.loop(((module, index) -> {
+            updateInfo(name, "module_" + index + "_last_angle", module.getLastAngle());
+            updateInfo(name, "module_" + index + "_speed", module.getSpeed());
+            updateInfo(name, "module_" + index + "_velocity_ms", module.getState().speedMetersPerSecond);
+            updateInfo(name, "module_" + index + "_rotation", module.getRotation().getDegrees());
+        }));
+    }
+
     public void updateSpeedControllerInfo(ControllerGroup group) {
         String name = group.getName();
         if (group.isCombination()) {
@@ -218,7 +230,7 @@ public class CommunicationManager {
             }
         } else {
             double avgSpeed = group.getAverageSpeed();
-            updateInfo("SpeedControllertabs", name + "_AvgSpeed", avgSpeed);
+            updateInfo("SpeedController", name + "_AvgSpeed", avgSpeed);
         }
     }
 

@@ -6,6 +6,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import frc.team_8840_lib.controllers.SwerveGroup;
+import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.input.controls.GameController;
 import frc.team_8840_lib.listeners.EventListener;
 import frc.team_8840_lib.utils.controllers.Pigeon;
@@ -34,6 +35,7 @@ public class SwerveDrive extends EventListener {
 
         //This value is also the default
         settings.wheelBase = Units.inchesToMeters(21.73);
+
         //If you do change the wheelBase in the settings, you will need to call this function to update the kinematics.
         //This is because the kinematics are based on the wheelBase.
         settings.updateKinematics();
@@ -67,7 +69,8 @@ public class SwerveDrive extends EventListener {
 
     @Override
     public void robotPeriodic() {
-
+        //Update info on the SmartDashboard/NetworkTables about the swerve drive
+        CommunicationManager.getInstance().updateSwerveInfo(swerveDrive);
     }
 
     @Override
@@ -85,8 +88,13 @@ public class SwerveDrive extends EventListener {
 
     }
 
+    /**
+     * By the way, this method is very scuffed, so I would make major adjustments before using it.
+     * Also, I have no clue if swerve works. Test it before using it. (heheheha)
+     * */
     @Override
     public void onTeleopPeriodic() {
+        //Get the game controller
         GameController mainController = GameController.get(0);
 
         //Get the vertical axis and the horizontal axis of the controller.
@@ -95,6 +103,8 @@ public class SwerveDrive extends EventListener {
 
         //Calculate the direction of the robot
         double direction = Math.atan2(vertical, horizontal);
+        //Convert the direction to degrees from radians
+        direction = Units.radiansToDegrees(direction);
 
         //Create a new Translation2d with the x and y values of the controller multiplied by the max speed.
         Translation2d translation = new Translation2d(vertical, horizontal).times(swerveDrive.getSettings().maxSpeed);
