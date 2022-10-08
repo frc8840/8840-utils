@@ -3,10 +3,11 @@ package frc.team_8840_lib.utils.time;
 public enum SubscriptionType {
     AwaitForTime,
     AfterTime,
-    BeforeTime;
+    BeforeTime,
+    BetweenTimes;
 
     public static boolean isPeriodic(SubscriptionType type) {
-        return type == BeforeTime || type == AfterTime;
+        return type == BeforeTime || type == AfterTime || type == BetweenTimes;
     }
 
     public boolean isPeriodic() {

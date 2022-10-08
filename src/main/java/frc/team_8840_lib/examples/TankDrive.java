@@ -63,36 +63,35 @@ public class TankDrive extends EventListener {
         */
 
         //Create a subscription that will run the intake for 2 seconds, then stop.
-        TimeKeeper.getInstance().subscribe("shoot_ball", GamePhase.Autonomous.getTimerName(), 2d, SubscriptionType.BeforeTime, () -> {
-            intake.setSpeed(1);
+        TimeKeeper.getInstance()
+                .subscribe("shoot_ball", GamePhase.Autonomous.getTimerName(), 2d, SubscriptionType.BeforeTime, () -> {
+                    intake.setSpeed(1);
 
-            //Update the communication manager that the intake is running.
-            CommunicationManager.getInstance().updateInfo("auto", "intake", "running");
-        }, () -> {
-            //Once it's finished, stop the intake.
-            //A second callback (stored under <key>_onceFinished) can be supplied to the TimeKeeper#subscribe method if you're using SubscriptionType.BeforeTime.
-            intake.setSpeed(0);
+                    //Update the communication manager that the intake is running.
+                    CommunicationManager.getInstance().updateInfo("auto", "intake", "running");
+                }, () -> {
+                    //Once it's finished, stop the intake.
+                    //A second callback (stored under <key>_onceFinished) can be supplied to the TimeKeeper#subscribe method if you're using SubscriptionType.BeforeTime.
+                    intake.setSpeed(0);
 
-            //Send to the dashboard that the intake has stopped.
-            CommunicationManager.getInstance().updateInfo("auto", "intake", "stopped");
-        });
+                    //Send to the dashboard that the intake has stopped.
+                    CommunicationManager.getInstance().updateInfo("auto", "intake", "stopped");
+                })
 
+                //Create a subscription that'll move the robot back slowly for 10 seconds at 2 seconds
+                .subscribe("move_back", GamePhase.Autonomous.getTimerName(), 2d, 12d, SubscriptionType.BetweenTimes, () -> {
+                    //Go slowly backwards
+                    drive.setSpeed(-0.1);
 
-        //Create a subscription that'll move the robot back slowly for 10 seconds at 2 seconds
-        //TODO: Add time keeper method for BetweenTimes
-        TimeKeeper.getInstance().subscribe("move_back", GamePhase.Autonomous.getTimerName(), 2d, SubscriptionType.AfterTime, () -> {
-            String movement = "";
-            if (TimeKeeper.getInstance().getPhaseTime(GamePhase.Autonomous) > 12d) {
-                drive.setSpeed(0);
-                movement = "stopped";
-            } else {
-                drive.setSpeed(-0.1);
-                movement = "backwards";
-            }
+                    //Update the communication manager that the robot is moving back.
+                    CommunicationManager.getInstance().updateInfo("auto", "movement", "backwards");
+                }, () -> {
+                    //Once it's finished, stop the robot.
+                    drive.setSpeed(0);
 
-            //Update the communication manager that the robot is moving back.
-            CommunicationManager.getInstance().updateInfo("auto", "movement", movement);
-        });
+                    //Send to the dashboard that the robot has stopped.
+                    CommunicationManager.getInstance().updateInfo("auto", "movement", "stopped");
+                });
     }
 
     @Override
@@ -104,6 +103,7 @@ public class TankDrive extends EventListener {
     public void onAutonomousEnable() {
         //In actual competitions, this method will only be called once.
         //This is here for testing purposes, so we can run auto multiple times without having to restart the robot.
+        //This will also resub the onceFinished events (which are only called once without resets!), so it's important to call this method.
         TimeKeeper.getInstance().resubscribe("shoot_ball");
         TimeKeeper.getInstance().resubscribe("move_back");
     }
@@ -126,7 +126,7 @@ public class TankDrive extends EventListener {
         GameController mainController = GameController.get(0);
 
         //Get the vertical axis and the horizontal axis of the controller.
-        double speed = mainController.getAxis(Axis.Vertical);
+        double speed = -mainController.getAxis(Axis.Vertical);
         double turn = mainController.getAxis(Axis.Horizontal);
 
         //Set the drive speed and turn speed.
