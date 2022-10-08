@@ -62,8 +62,6 @@ public class TankDrive extends EventListener {
         </code>
         */
 
-        //TODO: Fix auto since it's not updating the info - check if it's a bug with the communication manager.
-
         //Create a subscription that will run the intake for 2 seconds, then stop.
         TimeKeeper.getInstance().subscribe("shoot_ball", GamePhase.Autonomous.getTimerName(), 2d, SubscriptionType.BeforeTime, () -> {
             intake.setSpeed(1);
@@ -80,12 +78,20 @@ public class TankDrive extends EventListener {
         });
 
 
-        //Create a subscription that'll move the robot back slowly for 10 seconds.
-        TimeKeeper.getInstance().subscribe("move_back", GamePhase.Autonomous.getTimerName(), 10d, SubscriptionType.AfterTime, () -> {
-            drive.setSpeed(-0.1);
+        //Create a subscription that'll move the robot back slowly for 10 seconds at 2 seconds
+        //TODO: Add time keeper method for BetweenTimes
+        TimeKeeper.getInstance().subscribe("move_back", GamePhase.Autonomous.getTimerName(), 2d, SubscriptionType.AfterTime, () -> {
+            String movement = "";
+            if (TimeKeeper.getInstance().getPhaseTime(GamePhase.Autonomous) > 12d) {
+                drive.setSpeed(0);
+                movement = "stopped";
+            } else {
+                drive.setSpeed(-0.1);
+                movement = "backwards";
+            }
 
             //Update the communication manager that the robot is moving back.
-            CommunicationManager.getInstance().updateInfo("auto", "movement", "backwards");
+            CommunicationManager.getInstance().updateInfo("auto", "movement", movement);
         });
     }
 

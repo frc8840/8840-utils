@@ -208,7 +208,7 @@ public class CommunicationManager {
         updateInfo("Status", service, status);
     }
 
-    public void updateSwerveInfo(SwerveGroup swerveGroup) {
+    public CommunicationManager updateSwerveInfo(SwerveGroup swerveGroup) {
         String name = swerveGroup.getName();
 
         swerveGroup.loop(((module, index) -> {
@@ -217,9 +217,11 @@ public class CommunicationManager {
             updateInfo(name, "module_" + index + "_velocity_ms", module.getState().speedMetersPerSecond);
             updateInfo(name, "module_" + index + "_rotation", module.getRotation().getDegrees());
         }));
+
+        return this;
     }
 
-    public void updateSpeedControllerInfo(ControllerGroup group) {
+    public CommunicationManager updateSpeedControllerInfo(ControllerGroup group) {
         String name = group.getName();
         if (group.isCombination()) {
             String[] subGroupNames = group.getSubGroups();
@@ -232,9 +234,11 @@ public class CommunicationManager {
             double avgSpeed = group.getAverageSpeed();
             updateInfo("SpeedController", name + "_AvgSpeed", avgSpeed);
         }
+
+        return this;
     }
 
-    public void updateInfo(String tab, String key, String value) {
+    public CommunicationManager updateInfo(String tab, String key, String value) {
         if (usingShuffleboard || useBoth) {
             if (createdTitles.contains(f(tab, key))) {
                 entries.get(f(tab, key)).setValue(value);
@@ -249,9 +253,11 @@ public class CommunicationManager {
             SmartDashboard.updateValues();
         }
         if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
+
+        return this;
     }
 
-    public void updateInfo(String tab, String key, double value) {
+    public CommunicationManager updateInfo(String tab, String key, double value) {
         if (usingShuffleboard || useBoth) {
             if (createdTitles.contains(f(tab, key))) {
                 entries.get(f(tab, key)).setValue(value);
@@ -266,9 +272,11 @@ public class CommunicationManager {
             SmartDashboard.updateValues();
         }
         if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
+
+        return this;
     }
 
-    public void updateInfo(String tab, String key, int value) {
+    public CommunicationManager updateInfo(String tab, String key, int value) {
         if (usingShuffleboard || useBoth) {
             if (createdTitles.contains(f(tab, key))) {
                 entries.get(f(tab, key)).setValue(value);
@@ -283,9 +291,11 @@ public class CommunicationManager {
             SmartDashboard.updateValues();
         }
         if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
+
+        return this;
     }
 
-    public void updateInfo(String tab, String key, boolean value) {
+    public CommunicationManager updateInfo(String tab, String key, boolean value) {
         if (usingShuffleboard || useBoth) {
             if (createdTitles.contains(f(tab, key))) {
                 entries.get(f(tab, key)).setValue(value);
@@ -300,6 +310,8 @@ public class CommunicationManager {
             SmartDashboard.updateValues();
         }
         if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
+
+        return this;
     }
 
     public NetworkTableEntry get(String tab, String key) {

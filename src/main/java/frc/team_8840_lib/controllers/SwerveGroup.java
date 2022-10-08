@@ -72,6 +72,8 @@ public class SwerveGroup extends ControllerGroup {
 
         odometry = new SwerveDriveOdometry(settings.getKinematics(), getAngle());
 
+        modules = new SwerveModule[4];
+
         for (int i = 0; i < 4; i++) {
             modules[i] = new SwerveModule(driveIDs[i], steerIDs[i], encoderIDs[i], i, config);
         }

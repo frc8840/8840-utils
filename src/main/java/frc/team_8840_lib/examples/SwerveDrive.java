@@ -98,13 +98,22 @@ public class SwerveDrive extends EventListener {
         GameController mainController = GameController.get(0);
 
         //Get the vertical axis and the horizontal axis of the controller.
-        double vertical = mainController.getAxis(Axis.Vertical);
+        double vertical = -mainController.getAxis(Axis.Vertical); //Invert the vertical axis since it's usually inverted (at least for us).
         double horizontal = mainController.getAxis(Axis.Horizontal);
 
         //Calculate the direction of the robot
         double direction = Math.atan2(vertical, horizontal);
-        //Convert the direction to degrees from radians
-        direction = Units.radiansToDegrees(direction);
+        //Convert the direction to degrees from radians, but subtract 90 degrees for up to be 0 degrees.
+        direction = Units.radiansToDegrees(direction) - 90;
+
+        //Convert direction to be between 0 and 360
+        direction = MathUtils.normalizeAngle(direction);
+
+        //Send the controller info to the SmartDashboard/NetworkTables
+        CommunicationManager.getInstance()
+                .updateInfo("Controller", "direction", direction)
+                .updateInfo("Controller", "vertical", vertical)
+                .updateInfo("Controller", "horizontal", horizontal);
 
         //Create a new Translation2d with the x and y values of the controller multiplied by the max speed.
         Translation2d translation = new Translation2d(vertical, horizontal).times(swerveDrive.getSettings().maxSpeed);

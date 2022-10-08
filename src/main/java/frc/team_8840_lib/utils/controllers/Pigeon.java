@@ -3,6 +3,9 @@ package frc.team_8840_lib.utils.controllers;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
+import frc.team_8840_lib.info.console.Logger;
 
 public class Pigeon {
     private PigeonIMU pigeonIMU;
@@ -14,10 +17,20 @@ public class Pigeon {
 
     private boolean inverted;
 
+    private double dummyAngle = 0;
+    public void setDummyAngle(double angle) {
+        dummyAngle = angle;
+    }
+
     public Pigeon(Type pigeonType, int pigeonID, boolean inverted) {
         type = pigeonType;
 
         id = pigeonID;
+
+        if (RobotBase.isSimulation()) {
+            Logger.Log("Warning: Pigeon is not supported in simulation yet, using a dummy Pigeon");
+            type = Type.DUMMY;
+        }
 
         if (type == Type.IMU) {
             pigeonIMU = new PigeonIMU(pigeonID);
@@ -47,6 +60,8 @@ public class Pigeon {
             pigeonIMU.setYaw(0);
         } else if (type == Type.TWO) {
             pigeon2.setYaw(0);
+        } else if (type == Type.DUMMY) {
+            dummyAngle = 0;
         }
     }
 
@@ -59,6 +74,8 @@ public class Pigeon {
             angle = ypr[0];
         } else if (type == Type.TWO) {
             angle = pigeon2.getYaw();
+        } else if (type == Type.DUMMY) {
+            angle = dummyAngle;
         }
 
         return inverted ? Rotation2d.fromDegrees(360 - angle) : Rotation2d.fromDegrees(angle);
@@ -75,6 +92,10 @@ public class Pigeon {
             pigeonIMU.getYawPitchRoll(rotation);
         } else if (type == Type.TWO) {
             pigeon2.getYawPitchRoll(rotation);
+        } else if (type == Type.DUMMY) {
+            rotation[0] = dummyAngle;
+            rotation[1] = 0;
+            rotation[2] = 0;
         }
 
         return rotation;
@@ -82,6 +103,7 @@ public class Pigeon {
 
     public static enum Type {
         TWO,
-        IMU
+        IMU,
+        DUMMY
     }
 }

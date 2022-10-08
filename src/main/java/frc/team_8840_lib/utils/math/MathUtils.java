@@ -16,4 +16,20 @@ public class MathUtils {
     public static double radiansToDegrees(double radians) {
         return radians * 180 / Math.PI;
     }
+
+    public static double normalizeAngle(double angle) {
+        if (angle <= 360 && angle >= 0) {
+            return angle;
+        }
+
+        double newAngle = angle % 360;
+
+        if (newAngle < 0) {
+            newAngle += 360;
+        } else if (newAngle > 360) {
+            newAngle -= 360;
+        }
+
+        return newAngle;
+    }
 }
