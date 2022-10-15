@@ -2,11 +2,13 @@ package frc.team_8840_lib.listeners;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.info.time.TimeKeeper;
 import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.utils.GamePhase;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Robot extends RobotBase {
     private static Robot instance;
@@ -36,8 +38,75 @@ public class Robot extends RobotBase {
         } else throw new RuntimeException("Robot already instantiated.");
     }
 
-    private volatile boolean m_exit;
+    //Volatile since can be assessed by stuff outside the program
+    private volatile boolean exit;
+
     private GamePhase lastPhase;
+
+    public static final double DELTA_TIME = 0.03125; //32 times per sec
+
+    private TimerTask fixedAutonomous;
+    private TimerTask fixedTeleop;
+    private TimerTask fixedTest;
+
+    private Timer fixedTimer;
+
+    /**
+     * Due to the nature of periodic tasks (called 3500 to 4000 times per second), it's hard to get an accurate time for timing each call.
+     * By using a fixed rate, we can get a more accurate time for each call, which is extremely useful for things like PID and other control loops.
+     * This also puts less strain on the CPU since it's only called every 0.03125 seconds (32 times per second), about 1/100th of the time it's called in the other loop.
+     * This is also useful for things like logging, AI and other things that don't need to be called as often.
+     */
+    public void subscribeFixedPhase(TimerTask timerTask, GamePhase phase) {
+        if (!hasListener()) {
+            Logger.Log("No listener assigned. Cannot subscribe to fixed phase.");
+            return;
+        }
+
+        switch (phase) {
+            case Autonomous:
+                fixedAutonomous = timerTask;
+                break;
+            case Teleop:
+                fixedTeleop = timerTask;
+                break;
+            case Test:
+                fixedTest = timerTask;
+                break;
+        }
+    }
+
+    /**
+     * This method is called when the GamePhase changes.
+     * This will queue up the fixed rate tasks for the new phase.
+     * @param newPhase The new GamePhase.
+     **/
+    private void onGamePhaseChange(GamePhase newPhase) {
+        if (fixedTimer != null) {
+            fixedTimer.cancel();
+            fixedTimer.purge();
+            fixedTimer = null;
+        }
+
+        TimerTask task = null;
+        switch (newPhase) {
+            case Autonomous:
+                task = fixedAutonomous;
+                break;
+            case Teleop:
+                task = fixedTeleop;
+                break;
+            case Test:
+                task = fixedTest;
+                break;
+        }
+
+        if (task != null) {
+            fixedTimer = new Timer();
+            fixedTimer.scheduleAtFixedRate(task, 0, (long) (DELTA_TIME * 1000));
+            Logger.Log("Started fixed rate task for " + newPhase.name());
+        }
+    }
 
     @Override
     public void startCompetition() {
@@ -57,7 +126,7 @@ public class Robot extends RobotBase {
         }
 
         // Loop forever, calling the appropriate mode-dependent function
-        while (!m_exit) {
+        while (!exit) {
             GamePhase currentPhase = GamePhase.getCurrentPhase();
 
             if (GamePhase.isEnabled()) {
@@ -66,6 +135,7 @@ public class Robot extends RobotBase {
 
             if (lastPhase != currentPhase) {
                 TimeKeeper.getInstance().changePhaseTimers(currentPhase);
+                onGamePhaseChange(currentPhase);
             }
 
             listener.robotPeriodic();
@@ -109,6 +179,6 @@ public class Robot extends RobotBase {
     @Override
     public void endCompetition() {
         Logger.logCompetitionEnd();
-        m_exit = true;
+        exit = true;
     }
 }

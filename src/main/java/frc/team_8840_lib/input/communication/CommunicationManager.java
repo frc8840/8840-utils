@@ -13,6 +13,7 @@ import frc.team_8840_lib.utils.http.Constructor;
 import frc.team_8840_lib.utils.http.IP;
 import frc.team_8840_lib.utils.http.Route;
 import frc.team_8840_lib.utils.http.html.Element;
+import frc.team_8840_lib.utils.http.html.EncodingUtil;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -209,7 +210,10 @@ public class CommunicationManager {
     }
 
     public CommunicationManager updateSwerveInfo(SwerveGroup swerveGroup) {
-        String name = swerveGroup.getName();
+        final String name = "swerve_drive";
+        final String groupName = EncodingUtil.encodeURIComponent(swerveGroup.getName());
+
+        updateInfo(name, "swerve_name", groupName);
 
         swerveGroup.loop(((module, index) -> {
             updateInfo(name, "module_" + index + "_last_angle", module.getLastAngle());

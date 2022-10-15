@@ -6,14 +6,20 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import frc.team_8840_lib.controllers.SwerveGroup;
+import frc.team_8840_lib.info.console.Logger;
+import frc.team_8840_lib.info.time.TimeKeeper;
 import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.input.controls.GameController;
 import frc.team_8840_lib.listeners.EventListener;
+import frc.team_8840_lib.listeners.Robot;
+import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.controllers.Pigeon;
 import frc.team_8840_lib.utils.controllers.SCType;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
 import frc.team_8840_lib.utils.controls.Axis;
 import frc.team_8840_lib.utils.math.MathUtils;
+
+import java.util.TimerTask;
 
 public class SwerveDrive extends EventListener {
     private SwerveGroup swerveDrive;
@@ -65,6 +71,14 @@ public class SwerveDrive extends EventListener {
 
         //Automatically add the controllers that are connected.
         GameController.autoConnect();
+
+        //Add a fixed autonomous to the Robot
+        Robot.getInstance().subscribeFixedPhase(new TimerTask() {
+            @Override
+            public void run() {
+                onFixedAutonomous();
+            }
+        }, GamePhase.Autonomous);
     }
 
     @Override
@@ -81,6 +95,25 @@ public class SwerveDrive extends EventListener {
     @Override
     public void onAutonomousPeriodic() {
 
+    }
+
+    double lastSecond = 0;
+    int counter = 0;
+
+    public void onFixedAutonomous() {
+        //This method is called every ~1/32 of a second (32/33 times a second, I would assume 32 times a second due to 1/32 = 0.03125 [Robot.DELTA_TIME])
+        //You can do whatever you want in here, but it is recommended to use this method instead of onAutonomousPeriodic() because it is more accurate with timing.
+        //You can also use this method for teleop if you want to.
+
+        double currentSecond = TimeKeeper.getInstance().getPhaseTime();
+        if (currentSecond >= lastSecond + 1 - Robot.DELTA_TIME) { //subtract a bit, so it's consistent 32 lol
+            //Print the current speed of the swerve drive every second
+            Logger.Log("Times called in the last second: " + counter);
+            lastSecond = currentSecond;
+            counter = 0;
+        }
+
+        counter++;
     }
 
     @Override

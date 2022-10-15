@@ -101,6 +101,10 @@ public class TimeKeeper {
         }
     }
 
+    public double getPhaseTime() {
+        return getPhaseTime(GamePhase.getCurrentPhase());
+    }
+
     public void changePhaseTimers(GamePhase phase) {
         stopTimer("auto");
         stopTimer("teleop");
