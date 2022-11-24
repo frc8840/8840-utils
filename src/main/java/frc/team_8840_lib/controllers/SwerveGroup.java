@@ -2,13 +2,17 @@ package frc.team_8840_lib.controllers;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
+import frc.team_8840_lib.input.communication.CommunicationManager;
+import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.controllers.Pigeon;
-import frc.team_8840_lib.utils.controllers.SCType;
 import frc.team_8840_lib.utils.controllers.swerve.CTREConfig;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
 import frc.team_8840_lib.utils.interfaces.SwerveLoop;
@@ -35,6 +39,9 @@ public class SwerveGroup extends ControllerGroup {
     private CTREConfig config;
 
     private SwerveModule[] modules;
+
+    //Sim is sort of broken when it's simulated, so we'll just use this to make sure it's not as broken.
+    private Pose2d simPose;
 
     /**
      * Creates a new swerve group (4 modules)
@@ -124,6 +131,8 @@ public class SwerveGroup extends ControllerGroup {
         for (int i = 0; i < 4; i++) {
             modules[i].setDesiredState(states[i], isOpenLoop);
         }
+
+        updateOdometry();
     }
 
     public void setModuleStates(SwerveModuleState[] states) {
@@ -160,5 +169,19 @@ public class SwerveGroup extends ControllerGroup {
 
     private Rotation2d getAngle() {
         return gyro.getAngle(this.settings.invertGyro);
+    }
+
+    public void updateFieldRobot() {
+        if (!CommunicationManager.getInstance().fieldExists()) return;
+
+        //Module positions
+        Translation2d[] modulePositions = getSettings().getPositions();
+
+        Pose2d pose = getPose();
+
+        for (int i = 0; i < 4; i++) {
+            Pose2d position = new Pose2d(pose.getX() + modulePositions[i].getX(), pose.getY() + modulePositions[i].getY(), new Rotation2d(modules[i].getLastAngle()));
+            CommunicationManager.getInstance().updateFieldObjectPose(getName() + " Module " + i, position);
+        }
     }
 }

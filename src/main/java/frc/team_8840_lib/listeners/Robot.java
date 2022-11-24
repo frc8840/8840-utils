@@ -91,13 +91,34 @@ public class Robot extends RobotBase {
         TimerTask task = null;
         switch (newPhase) {
             case Autonomous:
-                task = fixedAutonomous;
+                task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (fixedAutonomous != null) {
+                            fixedAutonomous.run();
+                        }
+                    }
+                };
                 break;
             case Teleop:
-                task = fixedTeleop;
+                task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (fixedTeleop != null) {
+                            fixedTeleop.run();
+                        }
+                    }
+                };
                 break;
             case Test:
-                task = fixedTest;
+                task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (fixedTest != null) {
+                            fixedTest.run();
+                        }
+                    }
+                };
                 break;
         }
 

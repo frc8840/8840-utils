@@ -63,7 +63,7 @@ public enum SCType {
     public static boolean isPWM(SCType type) {
         if (type == CAN_SparkMaxBrushed || type == CAN_SparkMaxBrushless) {
             return false;
-        } else if (type == PWM_SparkMax || type == Spark || type == DMC60 || type == Jaguar || type == NidecBrushless || type == PWM_Talon_FX || type == PWM_Talon_SRX || type == PWM_Venom || type == PWM_Victor_SPX || type == SD540 || type == Talon || type == Victor || type == Victor_SP || type == SWERVE_Talon_FX) {
+        } else if (type == PWM_SparkMax || type == Spark || type == DMC60 || type == Jaguar || type == NidecBrushless || type == PWM_Talon_FX || type == PWM_Talon_SRX || type == PWM_Venom || type == PWM_Victor_SPX || type == SD540 || type == Talon || type == Victor || type == Victor_SP || type == SWERVE_Talon_FX || type == SWERVE_SparkMax) {
             return true;
         } else {
             throw new UnsupportedOperationException("This controller type is not supported by this function.");

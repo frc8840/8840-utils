@@ -5,6 +5,7 @@
 package frc.team_8840_lib;
 
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.team_8840_lib.examples.AutonomousExample;
 import frc.team_8840_lib.examples.TankDrive;
 
 public final class Main {
@@ -29,7 +30,7 @@ public final class Main {
         frc.team_8840_lib.listeners.Robot.assignListener(new Robot()); // frc.robot.Robot is a class that extends EventListener (NOT frc.robot.listeners.Robot)
         </code>
         * */
-        frc.team_8840_lib.listeners.Robot.assignListener(new TankDrive());
+        frc.team_8840_lib.listeners.Robot.assignListener(new AutonomousExample());
 
         //Start the robot - Don't change this line
         RobotBase.startRobot(frc.team_8840_lib.listeners.Robot::new);

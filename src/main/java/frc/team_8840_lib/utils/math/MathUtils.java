@@ -32,4 +32,11 @@ public class MathUtils {
 
         return newAngle;
     }
+
+    public static double inchesToMeters(double inches) {
+        return inches * 0.0254;
+    }
+    public static double metersToInches(double meters) {
+        return meters * 39.3701;
+    }
 }

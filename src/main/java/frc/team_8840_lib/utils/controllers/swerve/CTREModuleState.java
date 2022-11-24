@@ -38,7 +38,7 @@ public class CTREModuleState {
      */
     private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
         double lowerOffset = scopeReference % 360;
-        double lowerBound = scopeReference + -(lowerOffset >= 0 ? lowerOffset : 360 + lowerOffset);
+        double lowerBound = scopeReference - (lowerOffset >= 0 ? lowerOffset : 360 + lowerOffset);
         double upperBound = scopeReference + (lowerOffset >= 0 ? 360 - lowerOffset : -lowerOffset);
         while (newAngle < lowerBound) {
             newAngle += 360;

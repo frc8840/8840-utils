@@ -1,26 +1,36 @@
 package frc.team_8840_lib.input.communication;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team_8840_lib.controllers.ControllerGroup;
 import frc.team_8840_lib.controllers.SwerveGroup;
+import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.input.communication.server.HTTPServer;
 import frc.team_8840_lib.utils.http.Constructor;
 import frc.team_8840_lib.utils.http.IP;
 import frc.team_8840_lib.utils.http.Route;
 import frc.team_8840_lib.utils.http.html.Element;
 import frc.team_8840_lib.utils.http.html.EncodingUtil;
+import frc.team_8840_lib.utils.pathplanner.PathCallback;
+import frc.team_8840_lib.utils.pathplanner.TimePoint;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class CommunicationManager {
     private static CommunicationManager instance;
@@ -193,6 +203,54 @@ public class CommunicationManager {
                 }
             }));
 
+            server.route(new Route("/auto_path", new Constructor() {
+                /**
+                 * Examples of requests for the /auto_path endpoint:
+                 * /auto_path, POST Request with payload from 8840-app
+                 */
+                @Override
+                public Route.Resolution finish(HttpExchange req, Route.Resolution res) {
+                    if (!req.getRequestMethod().equalsIgnoreCase("POST")) {
+                        return res.json(this.error("Only POST requests are supported for this endpoint.")).status(400);
+                    }
+
+                    InputStream is = req.getRequestBody();
+                    String body = new BufferedReader(new InputStreamReader(is)).lines().collect(Collectors.joining("\n"));
+
+                    Logger.Log("Received new autonomous path.");
+
+                    //TODO: Store the path to the roboRIO and create a new option to select the autonomous
+
+                    JSONObject json = new JSONObject(body);
+
+                    JSONArray timeline = json.getJSONArray("generatedTimeline");
+
+                    TimePoint[] points = new TimePoint[timeline.length()];
+                    for (int i = 0; i < timeline.length(); i++) {
+                        JSONArray point = timeline.getJSONArray(i);
+
+                        TimePoint timePoint = new TimePoint();
+
+                        try {
+                            timePoint.parseFromJSON(point);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return res.json(this.error("There was an issue parsing the JSON.")).status(500);
+                        }
+
+                        points[i] = timePoint;
+                    }
+
+                    Logger.Log("Read through each point.");
+
+                    pathCallback.onPathComplete(points);
+
+                    Logger.Log("Finished reading the path.");
+
+                    return res.json("{\"success\": true, \"message\": \"Received path with " + points.length + " data points.\"}");
+                }
+            }));
+
             server.listen();
 
             String ip_addr = IP.getIP();
@@ -203,6 +261,15 @@ public class CommunicationManager {
         }
 
         updateStatus("Network Communication", "Connected");
+    }
+
+    private PathCallback pathCallback = (points -> {
+        Logger.Log("Received new autonomous path (default callback).");
+    });
+
+    public void waitForAutonomousPath(PathCallback callback) {
+        pathCallback = callback;
+        Logger.Log("Registered new autonomous path callback.");
     }
 
     public void updateStatus(String service, String status) {
@@ -318,6 +385,45 @@ public class CommunicationManager {
         return this;
     }
 
+    public CommunicationManager putSendable(String tab, String key, Sendable value) {
+        if (usingShuffleboard || useBoth) {
+            if (createdTitles.contains(f(tab, key))) {
+                entries.get(f(tab, key)).setValue(value);
+            }
+            Shuffleboard.update();
+        }
+        if (!usingShuffleboard || useBoth) {
+            SmartDashboard.putData(key, value);
+            SmartDashboard.updateValues();
+        }
+        if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
+
+        return this;
+    }
+
+    private Field2d field = null;
+
+    public boolean fieldExists() {
+        return field != null;
+    }
+
+    public void createField() {
+        field = new Field2d();
+        SmartDashboard.putData("Field", field);
+    }
+
+    public void updateRobotPose(Pose2d pose) {
+        if (!fieldExists()) return;
+        field.setRobotPose(pose);
+        SmartDashboard.updateValues();
+    }
+
+    public void updateFieldObjectPose(String name, Pose2d pose) {
+        if (!fieldExists()) return;
+        field.getObject(name).setPose(pose);
+        SmartDashboard.updateValues();
+    }
+
     public NetworkTableEntry get(String tab, String key) {
         return entries.getOrDefault(f(tab, key), null);
     }
@@ -326,6 +432,7 @@ public class CommunicationManager {
     //Also can modify this in the future.
     private final String t_k_separator = ".";
     private String f(String tab, String key) {
+        if (key == "") return tab;
         return tab + t_k_separator + key;
     }
 
