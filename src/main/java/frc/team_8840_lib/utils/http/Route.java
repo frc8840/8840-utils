@@ -41,7 +41,7 @@ public class Route implements HttpHandler {
         String body = res.getBody();
         int status = res.getStatus();
 
-        System.out.println("GOT Request \"" + this.getPath() + "\" " + status);
+        System.out.println(exchange.getRequestMethod().toUpperCase() + " Request \"" + this.getPath() + "\" " + status);
 
         exchange.sendResponseHeaders(status, body.length());
         OutputStream os = exchange.getResponseBody();

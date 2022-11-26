@@ -40,9 +40,6 @@ public class SwerveGroup extends ControllerGroup {
 
     private SwerveModule[] modules;
 
-    //Sim is sort of broken when it's simulated, so we'll just use this to make sure it's not as broken.
-    private Pose2d simPose;
-
     /**
      * Creates a new swerve group (4 modules)
      * @param name Name of the swerve group

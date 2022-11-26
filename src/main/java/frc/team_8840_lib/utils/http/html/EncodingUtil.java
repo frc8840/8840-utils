@@ -52,4 +52,8 @@ public class EncodingUtil {
 
         return result;
     }
+
+    public static String fileProofName(String name) {
+        return name.replaceAll("[^a-zA-Z0-9]", "_");
+    }
 }

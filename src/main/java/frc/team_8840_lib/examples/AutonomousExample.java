@@ -55,6 +55,10 @@ public class AutonomousExample extends EventListener {
 
         //This is the new method that'll be used for waiting for the dashboard to send the path from 8840-app
         CommunicationManager.getInstance().waitForAutonomousPath(points -> {
+            if (points.length == 0) {
+                //Ignore it. This can happen to request the autonomous to be set to nothing, but we can ignore it.
+                return;
+            }
             pathPlanner = new PathPlanner();
             pathPlanner.updateTimePoints(points);
         });

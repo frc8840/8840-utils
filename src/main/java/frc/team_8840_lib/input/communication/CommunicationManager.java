@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -210,8 +211,38 @@ public class CommunicationManager {
                  */
                 @Override
                 public Route.Resolution finish(HttpExchange req, Route.Resolution res) {
+                    String homePath = System.getProperty("user.home");
+                    File folder = new File(homePath + "/8840appdata");
+
                     if (!req.getRequestMethod().equalsIgnoreCase("POST")) {
-                        return res.json(this.error("Only POST requests are supported for this endpoint.")).status(400);
+                        if (req.getRequestMethod().equalsIgnoreCase("GET")) {
+                            //Read folder and return list of files
+                            if (folder.exists()) {
+                                File[] files = folder.listFiles();
+
+                                String fileNames = "";
+                                int skipped = 0;
+                                for (File file : files) {
+                                    if (file.getName().startsWith(".")) { skipped += 1; continue; }
+
+                                    fileNames += "\"" + file.getName().replace(".json", "") + "\", ";
+                                }
+
+                                if (skipped >= files.length) {
+                                    Logger.Log("Only found hidden files, returning empty list.");
+                                    return res.json("{\"success\": true, \"files\": [], \"selected\": \"" + currentAutoPath + "\"}");
+                                }
+
+                                fileNames = fileNames.length() > 0 ? fileNames.substring(0, fileNames.length() - 2) : "";
+                                Logger.Log("Successfully read files from folder.");
+                                return res.json("{\"success\": true, \"files\": [" + fileNames + "], \"selected\": \"" + currentAutoPath + "\"}");
+                            } else {
+                                Logger.Log("/auto_path did not find a folder to read from - send a POST request to create one. It's fine though, no concerns here.");
+                                return res.json("{\"success\": true, \"files\": [], \"selected\": \"" + currentAutoPath + "\"}");
+                            }
+                        }
+                        Logger.Log("Received malformed request, only POST/GET requests are supported for /auto_path. Please check your request and try again.");
+                        return res.json(this.error("Only POST/GET requests are supported for this endpoint.")).status(400);
                     }
 
                     InputStream is = req.getRequestBody();
@@ -219,35 +250,109 @@ public class CommunicationManager {
 
                     Logger.Log("Received new autonomous path.");
 
-                    //TODO: Store the path to the roboRIO and create a new option to select the autonomous
-
+                    //Store to file
                     JSONObject json = new JSONObject(body);
 
-                    JSONArray timeline = json.getJSONArray("generatedTimeline");
+                    if (json.has("selection")) {
+                        String selection = json.getString("selection");
 
-                    TimePoint[] points = new TimePoint[timeline.length()];
-                    for (int i = 0; i < timeline.length(); i++) {
-                        JSONArray point = timeline.getJSONArray(i);
-
-                        TimePoint timePoint = new TimePoint();
-
-                        try {
-                            timePoint.parseFromJSON(point);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return res.json(this.error("There was an issue parsing the JSON.")).status(500);
+                        if (selection == null || selection.equals("")) {
+                            Logger.Log("Received empty selection, clearing current auto path.");
+                            currentAutoPath = "";
+                            pathCallback.onPathComplete(new TimePoint[0]);
+                            return res.json("{\"success\": true, \"message\": \"Selection was empty, cleared current auto path.\"}");
                         }
 
-                        points[i] = timePoint;
+                        if (folder.exists()) {
+                            File[] files = folder.listFiles();
+                            for (File file : files) {
+                                //Ignore any hidden files.
+                                if (file.toString().startsWith(".")) continue;
+
+                                if (file.getName().equals(selection + ".json")) {
+                                    String fileContents;
+
+                                    //Read file
+                                    try {
+                                        fileContents = new String(Files.readAllBytes(file.toPath()));
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        Logger.Log("There was an error while reading the file. Did the file get corrupted?");
+                                        return res.json(this.error("There was an issue reading the file.")).status(500);
+                                    }
+
+                                    JSONObject fileJson = new JSONObject(fileContents);
+
+                                    int points = readAndParsePath(fileJson);
+
+                                    if (points == -1) {
+                                        Logger.Log("There was an error while parsing the file. Did you edit the JSON?");
+                                        return res.json(this.error("There was an issue parsing the JSON.")).status(500);
+                                    }
+
+                                    currentAutoPath = EncodingUtil.fileProofName(fileJson.getString("name"));
+
+                                    Logger.Log("Successfully loaded autonomous path " + currentAutoPath + " with " + points + " points from file.");
+
+                                    return res.json("{\"success\": true, \"message\": \"Set to path with " + points + " data points.\"}");
+                                }
+                            }
+
+                            Logger.Log("The file " + selection + " was not found. Was the file deleted, or was the request malformed?");
+                            return res.json(this.error("The selected autonomous path was not found.")).status(404);
+                        } else {
+                            Logger.Log("The folder " + folder.getAbsolutePath() + " was not found. Maybe you haven't saved any paths yet?");
+                            return res.json(this.error("No autonomous paths were found.")).status(404);
+                        }
                     }
 
-                    Logger.Log("Read through each point.");
+                    //Create folder if it doesn't exist
+                    if (!folder.exists()) {
+                        boolean b = folder.mkdir();
+                        if (!b) {
+                            Logger.Log("Failed to create folder for autonomous paths.");
+                            return res.json(this.error("Failed to create folder for autonomous paths.")).status(500);
+                        }
+                    }
 
-                    pathCallback.onPathComplete(points);
+                    String autoName = EncodingUtil.fileProofName(json.getString("name"));
 
-                    Logger.Log("Finished reading the path.");
+                    Logger.Log("Received " + autoName + " path.");
 
-                    return res.json("{\"success\": true, \"message\": \"Received path with " + points.length + " data points.\"}");
+                    //Create file if it doesn't exist
+                    File file = new File(homePath + "/8840appdata/" + autoName + ".json");
+                    if (!file.exists()) {
+                        try {
+                            boolean b = file.createNewFile();
+                            if (!b) {
+                                Logger.Log("Failed to create file for autonomous path.");
+                                return res.json(this.error("Failed to create file for autonomous path.")).status(500);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            return res.json(this.error("Failed to create file for autonomous path.")).status(500);
+                        }
+                    }
+
+                    try {
+                        FileWriter fw = new FileWriter(file);
+                        fw.write(json.toString());
+                        fw.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return res.json(this.error("Failed to write to file for autonomous path.")).status(500);
+                    }
+
+                    int points = readAndParsePath(json);
+
+                    if (points == -1) {
+                        Logger.Log("There was an error while parsing the JSON.");
+                        return res.json(this.error("There was an issue parsing the JSON.")).status(500);
+                    }
+
+                    currentAutoPath = autoName;
+
+                    return res.json("{\"success\": true, \"message\": \"Received path with " + points + " data points.\"}");
                 }
             }));
 
@@ -267,9 +372,39 @@ public class CommunicationManager {
         Logger.Log("Received new autonomous path (default callback).");
     });
 
+    private String currentAutoPath = "";
+
     public void waitForAutonomousPath(PathCallback callback) {
         pathCallback = callback;
         Logger.Log("Registered new autonomous path callback.");
+    }
+
+    private int readAndParsePath(JSONObject json) {
+        JSONArray timeline = json.getJSONArray("generatedTimeline");
+
+        TimePoint[] points = new TimePoint[timeline.length()];
+        for (int i = 0; i < timeline.length(); i++) {
+            JSONArray point = timeline.getJSONArray(i);
+
+            TimePoint timePoint = new TimePoint();
+
+            try {
+                timePoint.parseFromJSON(point);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return -1;
+            }
+
+            points[i] = timePoint;
+        }
+
+        Logger.Log("Read through each point.");
+
+        pathCallback.onPathComplete(points);
+
+        Logger.Log("Finished reading the path.");
+
+        return points.length;
     }
 
     public void updateStatus(String service, String status) {

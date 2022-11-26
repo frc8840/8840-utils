@@ -13,7 +13,43 @@ public class Logger {
             "Have fun",
             "Have a good time",
             "Support your alliance",
-            "Be very cool"
+            "Be very cool",
+            "Idk what to say. Good luck I guess",
+            "Don't break the robot. Please",
+            "This is a game. This is a simulation. Wake up wake up wake up wake up wake up wak k",
+            "What do you call a robot pirate? Arrgghhh2-D2.\n",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's sad? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when you take away its batteries? I'll be back.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say after a long day? I'm exhausted.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's angry? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very happy? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very sad? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very angry? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very happy? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very sad? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very angry? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very happy? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very sad? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very angry? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very happy? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very sad? I'm feeling a bit down.",
+            "This robot joke was written by copilot: What "
+                    + "does a robot say when it's very... uh... angry? I'm feeling a bit down.\n sorry that got a bit long -jaiden. sorry",
     };
 
     public static void logCompetitionStart() {
@@ -28,7 +64,7 @@ public class Logger {
             "Your Alliance: " + alliance,
             "Match Number: " + matchNumber,
             "Match Type: " + matchType,
-            funStartingMessages[(int) Math.floor(Math.random() * funStartingMessages.length)] + ", " + alliance + "! Go 8840!"
+            funStartingMessages[(int) Math.floor(Math.random() * funStartingMessages.length)] + ", " + alliance + "! Go team! Program made by FRC 8840 Bay Robotics (https://team8840.org)."
         }, TimeStamp.None);
     }
 
@@ -63,13 +99,13 @@ public class Logger {
     }
 
     public static void Log(String message, TimeStamp timeStamp, boolean newLine) {
-        if (newLine) System.out.println();
+        if (newLine) System.out.println("");
 
         System.out.print(formatTimePrefix(getTimeLogString(timeStamp)) + message);
     }
 
     public static void Log(String[] messages, TimeStamp timeStamp, boolean newLine) {
-        if (newLine) System.out.println();
+        if (newLine) System.out.println("");
         System.out.print(formatTimePrefix(getTimeLogString(timeStamp)));
         for (String message : messages) System.out.println(message);
     }
