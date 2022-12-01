@@ -418,10 +418,10 @@ public class CommunicationManager {
         updateInfo(name, "swerve_name", groupName);
 
         swerveGroup.loop(((module, index) -> {
-            updateInfo(name, "module_" + index + "_last_angle", module.getLastAngle());
-            updateInfo(name, "module_" + index + "_speed", module.getSpeed());
-            updateInfo(name, "module_" + index + "_velocity_ms", module.getState().speedMetersPerSecond);
-            updateInfo(name, "module_" + index + "_rotation", module.getRotation().getDegrees());
+            updateInfo(name, "module_" + index + "/last_angle", module.getLastAngle());
+            updateInfo(name, "module_" + index + "/speed", module.getSpeed());
+            updateInfo(name, "module_" + index + "/velocity_ms", module.getState().speedMetersPerSecond);
+            updateInfo(name, "module_" + index + "/rotation", module.getRotation().getDegrees());
         }));
 
         return this;
@@ -434,11 +434,18 @@ public class CommunicationManager {
 
             for (String subGroup : subGroupNames) {
                 double avgSpeed = group.getAverageSpeed(subGroup);
-                updateInfo("SpeedControllers", name + "_" + subGroup + "_AvgSpeed", avgSpeed);
+                updateInfo("SpeedControllers", name + "/" + subGroup + "/AvgSpeed", avgSpeed);
+                for (int port : group.subgroupSpeeds(subGroup).keySet()) {
+                    updateInfo("SpeedControllers", name + "/" + subGroup + "/Controller_" + port + "_Speed", group.subgroupSpeeds(subGroup).get(port));
+                }
             }
         } else {
             double avgSpeed = group.getAverageSpeed();
-            updateInfo("SpeedController", name + "_AvgSpeed", avgSpeed);
+            updateInfo("SpeedController", name + "/AvgSpeed", avgSpeed);
+            for (int i = 0; i < group.getControllers().length; i++) {
+                ControllerGroup.SpeedController controller = group.getControllers()[i];
+                updateInfo("SpeedController", name + "/Controller_" + controller.getPort() + "_Speed", controller.getSpeed());
+            }
         }
 
         return this;

@@ -101,11 +101,7 @@ public class TankDrive extends EventListener {
 
     @Override
     public void onAutonomousEnable() {
-        //In actual competitions, this method will only be called once.
-        //This is here for testing purposes, so we can run auto multiple times without having to restart the robot.
-        //This will also resub the onceFinished events (which are only called once without resets!), so it's important to call this method.
-        TimeKeeper.getInstance().resubscribe("shoot_ball");
-        TimeKeeper.getInstance().resubscribe("move_back");
+        
     }
 
     @Override

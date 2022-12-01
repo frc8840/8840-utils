@@ -73,15 +73,26 @@ public class Robot extends RobotBase {
             case Test:
                 fixedTest = timerTask;
                 break;
+            default:
+                break;
         }
     }
 
     /**
      * This method is called when the GamePhase changes.
-     * This will queue up the fixed rate tasks for the new phase.
+     * This will queue up the fixed rate tasks for the new phase, and resubscribe TimeKeeper subscriptions.
      * @param newPhase The new GamePhase.
      **/
     private void onGamePhaseChange(GamePhase newPhase) {
+        try {
+            if (TimeKeeper.getInstance().automaticallyResubscribeEvents) {
+                TimeKeeper.getInstance().resubscribeAll(newPhase.getTimerName());
+            }
+        } catch (Exception e) {
+            Logger.Log("There was an error resubscribing events.");
+            e.printStackTrace();
+        }
+
         if (fixedTimer != null) {
             fixedTimer.cancel();
             fixedTimer.purge();
@@ -119,6 +130,8 @@ public class Robot extends RobotBase {
                         }
                     }
                 };
+                break;
+            default:
                 break;
         }
 

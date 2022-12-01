@@ -3,7 +3,6 @@ package frc.team_8840_lib.controllers;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxRelativeEncoder;
 import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.utils.controllers.EncoderInformation;
@@ -90,6 +89,23 @@ public class ControllerGroup {
         return controllers.get(port);
     }
 
+    public SpeedController[] getControllers() {
+        return controllers.values().toArray(new SpeedController[0]);
+    }
+
+    public HashMap<Integer, Double> subgroupSpeeds(String key) {
+        if (!isCombination()) throw new IllegalArgumentException("This is not a combination of speed controller groups.");
+        if (!subGroups.containsKey(key)) throw new IllegalArgumentException("Group " + key + " is not in use");
+
+        ArrayList<Integer> ports = subGroups.get(key);
+        HashMap<Integer, Double> speeds = new HashMap<>();
+        for (Integer port : ports) {
+            speeds.put(port, controllers.get(port).getSpeed());
+        }
+
+        return speeds;
+    }
+
     public void externalSet(int port, SpeedController controller) {
         controllers.put(port, controller);
     }
@@ -146,6 +162,10 @@ public class ControllerGroup {
 
     public static SpeedController createSC(int port, SCType type) {
         return new SpeedController(port, type);
+    }
+
+    public void stop() {
+        setSpeed(0);
     }
 
     public static class SpeedController {
@@ -206,6 +226,10 @@ public class ControllerGroup {
             }
         }
 
+        public void stop() {
+            setSpeed(0);
+        }
+
         /**
          * Evolves the speed controller into a speed controller group. Speed Controller Groups send the info to the NetworkTables, so doing this will allow the info to send.
          */
@@ -251,6 +275,8 @@ public class ControllerGroup {
         public CANSpeedController(int port, boolean isBrushed, SCType type) {
             super(port, type);
             this.isBrushed = isBrushed;
+
+            this.initialize();
         }
 
         private void initialize() {

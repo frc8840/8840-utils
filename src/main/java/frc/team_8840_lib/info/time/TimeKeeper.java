@@ -7,7 +7,6 @@ import frc.team_8840_lib.utils.interfaces.Callback;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.time.SubscriptionType;
 
-import java.sql.Time;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -25,6 +24,8 @@ public class TimeKeeper {
     }
 
     private HashMap<String, Timer> timers;
+
+    public boolean automaticallyResubscribeEvents = true;
 
     private TimeKeeper() {
         timers = new HashMap<>();
@@ -182,6 +183,14 @@ public class TimeKeeper {
             subscriptions.get(key + "_onceFinished").hasRun = false;
             subscriptions.get(key + "_onceFinished").timesRan = 0;
         }
+    }
+
+    public void resubscribeAll(String timer) {
+        subscriptions.keySet().forEach(key -> {
+            if (subscriptions.get(key).timer.equals(timer)) {
+                resubscribe(key);
+            }
+        });
     }
 
     public class Subscription {

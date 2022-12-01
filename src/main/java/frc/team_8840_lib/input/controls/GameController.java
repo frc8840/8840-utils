@@ -24,6 +24,10 @@ public class GameController {
         controllers.put(port, new GameController(port));
     }
 
+    public static void expectController(int port, Type type) {
+        controllers.put(port, new GameController(port, type));
+    }
+
     public static void autoConnect() {
         for (int port = 0; port < 6; port++) {
             if (DriverStation.isJoystickConnected(port)) {
@@ -53,22 +57,51 @@ public class GameController {
         } else System.out.println("Controller " + port + " is not connected");
     }
 
+    private boolean awaitingForConnection = false;
+
+    public GameController(int port, Type type) {
+        this.port = port;
+        this.type = type;
+        this.awaitingForConnection = true;
+
+        controller = type == Type.Xbox ? new XboxController(port) : (type == Type.Joystick ? new Joystick(port) : new GenericHID(port));
+
+        if (type == Type.Joystick) {
+            inverted = true;
+            threshold = 0.15;
+        }
+
+        if (checkIfConnected()) {
+            Logger.Log("Successfully connected to controller (type " + type.name().toUpperCase() + ") on port " + port + "!");
+        } else {
+            Logger.Log("Controller " + port + " is not connected.");
+        }
+    }
+
     public boolean getButton(int button) {
+        if (awaitingForConnection && !connected) checkIfConnected();
+
         if (!connected) return false;
         return controller.getRawButton(button);
     }
 
     public boolean getButtonPressed(int button) {
+        if (awaitingForConnection && !connected) checkIfConnected();
+
         if (!connected) return false;
         return controller.getRawButtonPressed(button);
     }
 
     public boolean getButtonReleased(int button) {
+        if (awaitingForConnection && !connected) checkIfConnected();
+
         if (!connected) return false;
         return controller.getRawButtonReleased(button);
     }
 
     public double getAxis(Axis axis) {
+        if (awaitingForConnection && !connected) checkIfConnected();
+
         if (!connected) return 0;
         int axisNum = -1;
 
@@ -103,6 +136,8 @@ public class GameController {
     }
 
     public double getAxis(Axis.Side side, Axis axis) {
+        if (awaitingForConnection && !connected) checkIfConnected();
+
         if (!connected) return 0;
         if (type != Type.Xbox) throw new IllegalArgumentException("Only Xbox controllers have sides, unless using custom controllers. If using custom controllers, use getRawAxis() instead.");
 
@@ -146,14 +181,23 @@ public class GameController {
     }
 
     public double getRawAxis(int axis) {
+        if (awaitingForConnection && !connected) checkIfConnected();
+        if (!connected) return 0;
+
         return controller.getRawAxis(axis);
     }
 
     public double getPOV(int pov) {
+        if (awaitingForConnection && !connected) checkIfConnected();
+        if (!connected) return 0;
+
         return controller.getPOV(pov);
     }
 
     public double getPOV() {
+        if (awaitingForConnection && !connected) checkIfConnected();
+        if (!connected) return 0;
+
         return controller.getPOV();
     }
 
