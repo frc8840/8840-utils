@@ -1,8 +1,9 @@
 package frc.team_8840_lib.controllers;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.utils.controllers.EncoderInformation;
@@ -17,6 +18,10 @@ public class ControllerGroup {
 
     private String name;
 
+    /**
+     * Name of controller group
+     * @return name
+     */
     public String getName() {
         return name;
     }
@@ -25,6 +30,12 @@ public class ControllerGroup {
 
     private HashMap<String, ArrayList<Integer>> subGroups;
 
+    /**
+     * Creates a new controller group
+     * @param name Name of the group
+     * @param mainType Type of the ports
+     * @param ports PWM Ports/CAN IDs of the controllers
+     */
     public ControllerGroup(String name, SCType mainType, int... ports) {
         this.name = name;
 
@@ -39,6 +50,11 @@ public class ControllerGroup {
         //this.updateComms();
     }
 
+    /**
+     * Adds a new controller to the controller group.
+     * @param port Port of controller
+     * @param type Type of controller
+     */
     public void addPort(int port, SCType type) {
         if (controllers.containsKey(port)) {
             throw new IllegalArgumentException("Port " + port + " is already in use");
@@ -50,14 +66,25 @@ public class ControllerGroup {
         }
     }
 
+    /**
+     * Adds a port with default type of group
+     * @param port
+     */
     public void addPort(int port) {
         addPort(port, defaultType);
     }
 
+    /**
+     * Invert every controller part of group.
+     */
     public void invert() {
         controllers.values().forEach(SpeedController::invert);
     }
 
+    /**
+     * Invert only certain ports of the group
+     * @param ports Ports
+     */
     public void invert(int... ports) {
         for (int port : ports) {
             if (!controllers.containsKey(port)) throw new IllegalArgumentException("Port " + port + " is not in use");
@@ -65,12 +92,21 @@ public class ControllerGroup {
         }
     }
 
+    /**
+     * Sets the speed of the entire group
+     * @param speed Speed (-1 to 1)
+     */
     public void setSpeed(double speed) {
         controllers.values().forEach(sc -> sc.setSpeed(speed));
         updateComms();
     }
 
-    public void setGroupSpeed(String name, double speed) {
+    /**
+     * Sets the speed of a subgroup of the group
+     * @param name Name of subgroup
+     * @param speed Speed of subgroup (-1 to 1)
+     */
+    public void setSubGroupSpeed(String name, double speed) {
         if (!isCombination()) throw new IllegalArgumentException("This is not a combination of speed controller groups.");
         if (!subGroups.containsKey(name)) throw new IllegalArgumentException("Group " + name + " is not in use");
         for (int port : subGroups.get(name)) {
@@ -79,20 +115,39 @@ public class ControllerGroup {
         updateComms();
     }
 
+    /**
+     * Sets the speed of a certain port
+     * @param port SpeedController port
+     * @param speed Speed (-1, 1)
+     */
     public void setPortSpeed(int port, double speed) {
         if (!controllers.containsKey(port)) throw new IllegalArgumentException("Port " + port + " is not in use");
         controllers.get(port).setSpeed(speed);
         updateComms();
     }
 
+    /**
+     * Gets the speed controller object of a port
+     * @param port port
+     * @return SpeedController on port
+     */
     public SpeedController getSpeedController(int port) {
         return controllers.get(port);
     }
 
+    /**
+     * Returns a list of the controllers that are part of the group
+     * @return list of speed controller objects
+     */
     public SpeedController[] getControllers() {
         return controllers.values().toArray(new SpeedController[0]);
     }
 
+    /**
+     * Returns a list of speeds in subgroup matched up to their ports
+     * @param key Subgroup name
+     * @return HashMap<Port, Speed>
+     */
     public HashMap<Integer, Double> subgroupSpeeds(String key) {
         if (!isCombination()) throw new IllegalArgumentException("This is not a combination of speed controller groups.");
         if (!subGroups.containsKey(key)) throw new IllegalArgumentException("Group " + key + " is not in use");
@@ -106,10 +161,21 @@ public class ControllerGroup {
         return speeds;
     }
 
+    /**
+     * Externally put in the port and speed controller object
+     * @param port Port of controller
+     * @param controller SpeedController object
+     */
     public void externalSet(int port, SpeedController controller) {
         controllers.put(port, controller);
     }
 
+    /**
+     * Externally put in the controller of a subgroup
+     * @param port Port of speed controller
+     * @param controller SpeedController object
+     * @param subGroup Subgroup key of controller
+     */
     public void externalSet(int port, SpeedController controller, String subGroup) {
         controllers.put(port, controller);
         if (subGroups == null) subGroups = new HashMap<>();
@@ -118,6 +184,10 @@ public class ControllerGroup {
         subGroups.get(subGroup).add(port);
     }
 
+    /**
+     * Returns whether the group has subgroups or not
+     * @return has subgroups/is combination of groups?
+     */
     public boolean isCombination() {
         if (subGroups == null) {
             return false;
@@ -125,6 +195,10 @@ public class ControllerGroup {
         return subGroups.size() > 0;
     }
 
+    /**
+     * Gets the average speed of the controllers
+     * @return Average speed.
+     */
     public double getAverageSpeed() {
         double sum = 0;
         for (SpeedController sc : controllers.values()) {
@@ -133,7 +207,15 @@ public class ControllerGroup {
         return sum / controllers.size();
     }
 
+    /**
+     * Returns the average speed of a subgroup
+     * @param group Subgroup name
+     * @return Average speed of subgroup
+     */
     public double getAverageSpeed(String group) {
+        if (!isCombination()) throw new IllegalArgumentException("Cannot call, ControllerGroup is not a combination of groups");
+        if (!subGroups.containsKey(group)) throw new IllegalArgumentException("Group " + group + " is not in use");
+
         double sum = 0;
         for (int port : subGroups.get(group)) {
             sum += controllers.get(port).getSpeed();
@@ -141,29 +223,36 @@ public class ControllerGroup {
         return sum / subGroups.get(group).size();
     }
 
+    /**
+     * Gets the speed of a specific controller at port
+     * @param port
+     * @return Speed of controller
+     */
     public double getSpeed(int port) {
         return controllers.get(port).getSpeed();
     }
 
-    public double getSubGroupSpeed(String name) {
-        if (!isCombination()) throw new IllegalArgumentException("Group is not a combination");
-        if (!subGroups.containsKey(name)) throw new IllegalArgumentException("Group " + name + " is not in use");
-
-        double sum = 0;
-        for (int port : subGroups.get(name)) {
-            sum += getSpeed(port);
-        }
-        return sum / subGroups.get(name).size();
-    }
-
+    /**
+     * Gets a list of names of the subgroups.
+     * @return Subgroup names
+     */
     public String[] getSubGroups() {
         return subGroups.keySet().toArray(new String[0]);
     }
 
+    /**
+     * Creates a speed controller at port with type 
+     * @param port Port of speed controller
+     * @param type Type of speed controller
+     * @return SpeedController
+     */
     public static SpeedController createSC(int port, SCType type) {
         return new SpeedController(port, type);
     }
 
+    /**
+     * Stops the controller group by setting the speed to 0.
+     */
     public void stop() {
         setSpeed(0);
     }
@@ -283,7 +372,7 @@ public class ControllerGroup {
             if (this.isInitialized()) return;
 
             if (!this.isPWM()) {
-                this.controller = new CANSparkMax(this.getPort(), isBrushed ? CANSparkMaxLowLevel.MotorType.kBrushed : CANSparkMaxLowLevel.MotorType.kBrushless);
+                this.controller = new CANSparkMax(this.getPort(), isBrushed ? MotorType.kBrushed : MotorType.kBrushless);
             } else throw new UnsupportedOperationException("Cannot create CANSpeedController for PWM type, instead use class SpeedController.");
 
             this.setInitialized();
@@ -314,7 +403,15 @@ public class ControllerGroup {
         }
     }
 
+    /**
+     * Combines two or more groups to make another group
+     * @param name Name of combination
+     * @param groups Groups to be combined
+     * @return Combined controller group.
+     */
     public static ControllerGroup combine(String name, ControllerGroup... groups) {
+        if (groups.length < 2) throw new IllegalArgumentException("Need two or more groups to make a combination.");
+
         ControllerGroup base = new ControllerGroup(name, groups[0].defaultType);
         for (ControllerGroup group : groups) {
             for (int port : group.controllers.keySet()) {

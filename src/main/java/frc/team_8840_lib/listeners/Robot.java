@@ -1,11 +1,16 @@
 package frc.team_8840_lib.listeners;
 
-import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.hal.NotifierJNI;
+import edu.wpi.first.wpilibj.DSControlWord;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.team_8840_lib.IO.IOManager;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.info.time.TimeKeeper;
 import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.utils.GamePhase;
+import frc.team_8840_lib.utils.time.TimeStamp;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -19,10 +24,10 @@ public class Robot extends RobotBase {
     public static void assignListener(EventListener listener) {
         //using system.out.println just in case the logger hasn't been initialized yet
         if (Robot.listener != null) {
-            System.out.println("(Robot#assignListener, Line 13): Warning! Unsafe operation: assigning a new event listener. Old listener will be overwritten. In the future, please only assign the listener once.");
+            System.out.println("[Robot] Warning! Unsafe operation: assigning a new event listener. Old listener will be overwritten. In the future, please only assign the listener once.");
         }
 
-        System.out.println("(Robot#assignListener, Line 17): Assigning listener: " + listener.getClass().getName());
+        System.out.println("[Robot] Assigning listener: " + listener.getClass().getName());
 
         Robot.listener = listener;
     }
@@ -41,9 +46,13 @@ public class Robot extends RobotBase {
     //Volatile since can be assessed by stuff outside the program
     private volatile boolean exit;
 
+    private DSControlWord controlWord;
+
     private GamePhase lastPhase;
 
     public static final double DELTA_TIME = 0.03125; //32 times per sec
+
+    //private final int m_notifier = NotifierJNI.initializeNotifier();
 
     private TimerTask fixedAutonomous;
     private TimerTask fixedTeleop;
@@ -138,29 +147,45 @@ public class Robot extends RobotBase {
         if (task != null) {
             fixedTimer = new Timer();
             fixedTimer.scheduleAtFixedRate(task, 0, (long) (DELTA_TIME * 1000));
-            Logger.Log("Started fixed rate task for " + newPhase.name());
+            Logger.Log("[Robot] Started fixed rate task for " + newPhase.name());
         }
+    }
+
+    public DSControlWord getDSControlWord() {
+        return controlWord;
     }
 
     @Override
     public void startCompetition() {
-        // Tell the DS that the robot is ready to be enabled
-        HAL.observeUserProgramStarting();
+        controlWord = new DSControlWord();
+
+        //DriverStationJNI.observeUserProgramStarting();
+
+        Logger.addClassToBeAutoLogged(new Logger());
 
         CommunicationManager.init();
+        Logger.initWriter();
+        IOManager.init();
         TimeKeeper.init();
         Logger.logCompetitionStart();
 
         lastPhase = GamePhase.Disabled;
 
         if (!hasListener()) {
-            Logger.Log("(Robot#startCompetition, Line 26): Warning: No event listener assigned. Please assign a listener before starting the competition.");
+            Logger.Log("[Robot] Warning: No event listener assigned. Please assign a listener before starting the competition.");
+
+            Logger.Log("[Robot] Automatically stopping program due to no event listener.", TimeStamp.None);
+
+            exit = true;
         } else {
             listener.robotInit();
         }
 
         // Loop forever, calling the appropriate mode-dependent function
         while (!exit) {
+            DriverStation.refreshData();
+            controlWord.refresh();
+
             GamePhase currentPhase = GamePhase.getCurrentPhase();
 
             if (GamePhase.isEnabled()) {
@@ -180,6 +205,9 @@ public class Robot extends RobotBase {
                         listener.onDisabled();
                         lastPhase = currentPhase;
                     }
+
+                   // DriverStationJNI.observeUserProgramDisabled();
+
                     listener.onDisabledPeriodic();
                     break;
                 case Autonomous:
@@ -187,6 +215,9 @@ public class Robot extends RobotBase {
                         listener.onAutonomousEnable();
                         lastPhase = currentPhase;
                     }
+
+                   // DriverStationJNI.observeUserProgramAutonomous();
+
                     listener.onAutonomousPeriodic();
                     break;
                 case Teleop:
@@ -194,6 +225,9 @@ public class Robot extends RobotBase {
                         listener.onTeleopEnable();
                         lastPhase = currentPhase;
                     }
+
+                   // DriverStationJNI.observeUserProgramTeleop();
+
                     listener.onTeleopPeriodic();
                     break;
                 case Test:
@@ -201,18 +235,30 @@ public class Robot extends RobotBase {
                         listener.onTestEnable();
                         lastPhase = currentPhase;
                     }
+
+                    //DriverStationJNI.observeUserProgramTest();
+
                     listener.onTestPeriodic();
                     break;
                 default:
-                    Logger.Log("(Robot#startCompetition, Line 53): Warning: Unknown game phase. Please report this to the developers.");
+                    Logger.Log("[Robot] Warning: Unknown game phase. Please report this to the developers.");
                     break;
             }
         }
+
+        System.out.println("[Robot] Exiting the program...");
+
+        // DriverStationJNI.observeUserProgramDisabled();
+
+        // NotifierJNI.stopNotifier(m_notifier);
+        // NotifierJNI.cleanNotifier(m_notifier);
     }
 
     @Override
     public void endCompetition() {
         Logger.logCompetitionEnd();
+        Logger.closeLogger();
+
         exit = true;
     }
 }

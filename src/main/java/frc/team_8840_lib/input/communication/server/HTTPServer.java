@@ -1,6 +1,5 @@
 package frc.team_8840_lib.input.communication.server;
 
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import frc.team_8840_lib.utils.http.Route;
 

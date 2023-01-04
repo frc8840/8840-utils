@@ -41,7 +41,7 @@ public class SwerveSettings {
     public double angleGearRatio = 12.8;
 
     public double maxSpeed = 4.5; // m/s
-    public double maxAngularSpeed = 11.5; // rad/s
+    public double maxAngularSpeed = Math.PI; // rad/s
 
     public double driveOpenRampRate = 0.25;
     public double driveClosedRampRate = 0;
@@ -58,6 +58,9 @@ public class SwerveSettings {
     //Current limit follows (continuousCurrent, peakCurrent, currentDuration)
     public CurrentLimit driveCurrentLimit = new CurrentLimit(35, 60, 0.1);
     public CurrentLimit turnCurrentLimit = new CurrentLimit(25, 40, 0.1);
+    //For NEOs
+    public CurrentLimit secondaryDriveCurrentLimit = new CurrentLimit(25, 40, 0.1);
+    public CurrentLimit secondaryTurnCurrentLimit = new CurrentLimit(25, 40, 0.1);
 
     public double driveKS = (0.667 / 12);
     public double driveKV = (2.44 / 12);
@@ -90,10 +93,16 @@ public class SwerveSettings {
             getPositions()
     );
 
+    /**
+     * Returns the kinematics for the swerve drive
+     * */
     public SwerveDriveKinematics getKinematics() {
         return swerveKinematics;
     }
 
+    /**
+     * Returns the calculated positions of the modules with the given track width and wheel base
+     * */
     public Translation2d[] getPositions() {
         return new Translation2d[] {
                 new Translation2d(wheelBase / 2, -trackWidth / 2),
@@ -103,6 +112,9 @@ public class SwerveSettings {
         };
     }
 
+    /**
+     * Updates the kinematics with the new wheelbase and trackwidth
+     * */
     public void updateKinematics() {
         swerveKinematics =
                 new SwerveDriveKinematics(

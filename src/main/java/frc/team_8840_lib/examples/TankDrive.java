@@ -122,12 +122,12 @@ public class TankDrive extends EventListener {
         GameController mainController = GameController.get(0);
 
         //Get the vertical axis and the horizontal axis of the controller.
-        double speed = -mainController.getAxis(Axis.Vertical);
+        double speed = mainController.getAxis(Axis.Vertical);
         double turn = mainController.getAxis(Axis.Horizontal);
 
         //Set the drive speed and turn speed.
-        drive.setGroupSpeed("left", speed - turn);
-        drive.setGroupSpeed("right", -(speed + turn));
+        drive.setSubGroupSpeed("left", speed - turn);
+        drive.setSubGroupSpeed("right", -(speed + turn));
     }
 
     @Override

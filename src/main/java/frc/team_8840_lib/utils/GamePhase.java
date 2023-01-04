@@ -1,6 +1,10 @@
 package frc.team_8840_lib.utils;
 
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.wpilibj.DSControlWord;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.TimedRobot;
+import frc.team_8840_lib.listeners.Robot;
 
 public enum GamePhase {
     Autonomous,
@@ -9,11 +13,12 @@ public enum GamePhase {
     Disabled;
 
     public static GamePhase getCurrentPhase() {
-        if (DriverStation.isAutonomous() && DriverStation.isAutonomousEnabled()) {
+        DSControlWord dsControlWord = Robot.getInstance().getDSControlWord();
+        if (dsControlWord.isAutonomous() && dsControlWord.isAutonomousEnabled()) {
             return Autonomous;
-        } else if (DriverStation.isTeleop() && DriverStation.isTeleopEnabled()) {
+        } else if (dsControlWord.isTeleop() && dsControlWord.isTeleopEnabled()) {
             return Teleop;
-        } else if (DriverStation.isTest() && DriverStation.isEnabled()) {
+        } else if (dsControlWord.isTest() && dsControlWord.isEnabled()) {
             return Test;
         } else {
             return Disabled;

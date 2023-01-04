@@ -1,14 +1,19 @@
 package frc.team_8840_lib.input.communication;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.networktables.BooleanArrayPublisher;
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoubleArrayPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.IntegerArrayPublisher;
+import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.networktables.Publisher;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team_8840_lib.controllers.ControllerGroup;
@@ -43,24 +48,25 @@ public class CommunicationManager {
     }
 
     public static void init() {
-        instance = new CommunicationManager(true, false);
+        instance = new CommunicationManager();
 
         NetworkTableInstance.getDefault().flush(); //idk why this is here but yeah
     }
 
-    private final boolean usingShuffleboard;
-    private final boolean useBoth;
-
     private ArrayList<String> createdTitles;
-    private HashMap<String, NetworkTableEntry> entries;
+    private NetworkTable table;
+    private HashMap<String, Publisher> entries;
 
     private HTTPServer server;
 
-    private CommunicationManager(boolean usingShuffleboard, boolean useBoth) {
+    private CommunicationManager() {
         instance = this;
 
-        this.usingShuffleboard = usingShuffleboard;
-        this.useBoth = useBoth;
+        NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
+
+        ntinst.startServer();
+
+        table = ntinst.getTable("8840-lib");
 
         createdTitles = new ArrayList<>();
         entries = new HashMap<>();
@@ -374,9 +380,10 @@ public class CommunicationManager {
 
     private String currentAutoPath = "";
 
-    public void waitForAutonomousPath(PathCallback callback) {
+    public CommunicationManager waitForAutonomousPath(PathCallback callback) {
         pathCallback = callback;
         Logger.Log("Registered new autonomous path callback.");
+        return this;
     }
 
     private int readAndParsePath(JSONObject json) {
@@ -407,8 +414,9 @@ public class CommunicationManager {
         return points.length;
     }
 
-    public void updateStatus(String service, String status) {
+    public CommunicationManager updateStatus(String service, String status) {
         updateInfo("Status", service, status);
+        return this;
     }
 
     public CommunicationManager updateSwerveInfo(SwerveGroup swerveGroup) {
@@ -418,126 +426,193 @@ public class CommunicationManager {
         updateInfo(name, "swerve_name", groupName);
 
         swerveGroup.loop(((module, index) -> {
-            updateInfo(name, "module_" + index + "/last_angle", module.getLastAngle());
+            updateInfo(name, "module_" + index + "/last_angle", module.getLastAngle().getDegrees());
             updateInfo(name, "module_" + index + "/speed", module.getSpeed());
             updateInfo(name, "module_" + index + "/velocity_ms", module.getState().speedMetersPerSecond);
             updateInfo(name, "module_" + index + "/rotation", module.getRotation().getDegrees());
         }));
+
+        Pose2d swervePose = swerveGroup.getPose();
+
+        updateInfo(name, "pose/x", swervePose.getX());
+        updateInfo(name, "pose/y", swervePose.getY());
+        updateInfo(name, "pose/angle", swervePose.getRotation().getDegrees());
 
         return this;
     }
 
     public CommunicationManager updateSpeedControllerInfo(ControllerGroup group) {
         String name = group.getName();
+
+        push();
         if (group.isCombination()) {
             String[] subGroupNames = group.getSubGroups();
 
+            updateInfo(SpeedControllerKey, name + "/hasSubGroup", true);
+            updateInfo(SpeedControllerKey, name + "/subGroupNames", subGroupNames);
+
+            updateInfo(SpeedControllerKey, name + "/AvgSpeed", group.getAverageSpeed());
+
             for (String subGroup : subGroupNames) {
                 double avgSpeed = group.getAverageSpeed(subGroup);
-                updateInfo("SpeedControllers", name + "/" + subGroup + "/AvgSpeed", avgSpeed);
+                updateInfo(SpeedControllerKey, name + "/" + subGroup + "/AvgSpeed", avgSpeed);
+                updateInfo(SpeedControllerKey, name + "/" + subGroup + "/Name", name);
                 for (int port : group.subgroupSpeeds(subGroup).keySet()) {
-                    updateInfo("SpeedControllers", name + "/" + subGroup + "/Controller_" + port + "_Speed", group.subgroupSpeeds(subGroup).get(port));
+                    updateInfo(SpeedControllerKey, name + "/" + subGroup + "/Controller_" + port + "_Speed", group.subgroupSpeeds(subGroup).get(port));
                 }
             }
         } else {
             double avgSpeed = group.getAverageSpeed();
-            updateInfo("SpeedController", name + "/AvgSpeed", avgSpeed);
+            updateInfo(SpeedControllerKey, name + "/hasSubGroup", false);
+            updateInfo(SpeedControllerKey, name + "/AvgSpeed", avgSpeed);
+            updateInfo(SpeedControllerKey, name + "/Name", name);
             for (int i = 0; i < group.getControllers().length; i++) {
                 ControllerGroup.SpeedController controller = group.getControllers()[i];
-                updateInfo("SpeedController", name + "/Controller_" + controller.getPort() + "_Speed", controller.getSpeed());
+                updateInfo(SpeedControllerKey, name + "/Controller_" + controller.getPort() + "_Speed", controller.getSpeed());
             }
         }
+        pop();
 
         return this;
     }
 
+    private boolean pushingLargeAmount = false;
+
+    private void push() {
+        pushingLargeAmount = true;
+    }
+
+    private void pop() {
+        pushingLargeAmount = false;
+    }
+
     public CommunicationManager updateInfo(String tab, String key, String value) {
-        if (usingShuffleboard || useBoth) {
-            if (createdTitles.contains(f(tab, key))) {
-                entries.get(f(tab, key)).setValue(value);
-            } else {
-                NetworkTableEntry newEntry = Shuffleboard.getTab(tab).add(key, value).getEntry();
-                entries.put(f(tab, key), newEntry);
-            }
-            Shuffleboard.update();
+        if (createdTitles.contains(f(tab, key))) {
+            ((StringPublisher) entries.get(f(tab, key))).set(value);
+        } else {
+            StringPublisher pub = table.getStringTopic(f(tab, key)).publish();
+            entries.put(f(tab, key), pub);
+            pub.set(value);
         }
-        if (!usingShuffleboard || useBoth) {
-            SmartDashboard.putString(key, value);
-            SmartDashboard.updateValues();
+
+        if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
+
+        return this;
+    }
+
+    public CommunicationManager updateInfo(String tab, String key, String[] list) {
+        String[] encodedList = new String[list.length];
+
+        for (int i = 0; i < list.length; i++) {
+            encodedList[i] = EncodingUtil.encodeURIComponent(list[i]);
         }
+
+        String value = "[\"" + String.join("\",\"", encodedList) + "\"]";
+
+        if (createdTitles.contains(f(tab, key))) {
+            ((StringPublisher) entries.get(f(tab, key))).set(value);
+        } else {
+            StringPublisher pub = table.getStringTopic(f(tab, key)).publish();
+            entries.put(f(tab, key), pub);
+            pub.set(value);
+        }
+
         if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
 
         return this;
     }
 
     public CommunicationManager updateInfo(String tab, String key, double value) {
-        if (usingShuffleboard || useBoth) {
-            if (createdTitles.contains(f(tab, key))) {
-                entries.get(f(tab, key)).setValue(value);
-            } else {
-                NetworkTableEntry newEntry = Shuffleboard.getTab(tab).add(key, value).getEntry();
-                entries.put(f(tab, key), newEntry);
-            }
-            Shuffleboard.update();
+        if (createdTitles.contains(f(tab, key))) {
+            ((DoublePublisher) entries.get(f(tab, key))).set(value);
+        } else {
+            DoublePublisher pub = table.getDoubleTopic(f(tab, key)).publish();
+            entries.put(f(tab, key), pub);
+            pub.set(value);
         }
-        if (!usingShuffleboard || useBoth) {
-            SmartDashboard.putNumber(key, value);
-            SmartDashboard.updateValues();
-        }
+
         if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
 
         return this;
     }
 
     public CommunicationManager updateInfo(String tab, String key, int value) {
-        if (usingShuffleboard || useBoth) {
-            if (createdTitles.contains(f(tab, key))) {
-                entries.get(f(tab, key)).setValue(value);
-            } else {
-                NetworkTableEntry newEntry = Shuffleboard.getTab(tab).add(key, value).getEntry();
-                entries.put(f(tab, key), newEntry);
-            }
-            Shuffleboard.update();
+        if (createdTitles.contains(f(tab, key))) {
+            ((IntegerPublisher) entries.get(f(tab, key))).set(value);
+        } else {
+            IntegerPublisher pub = table.getIntegerTopic(f(tab, key)).publish();
+            entries.put(f(tab, key), pub);
+            pub.set(value);
         }
-        if (!usingShuffleboard || useBoth) {
-            SmartDashboard.putNumber(key, value);
-            SmartDashboard.updateValues();
-        }
+
         if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
 
         return this;
     }
 
     public CommunicationManager updateInfo(String tab, String key, boolean value) {
-        if (usingShuffleboard || useBoth) {
-            if (createdTitles.contains(f(tab, key))) {
-                entries.get(f(tab, key)).setValue(value);
-            } else {
-                NetworkTableEntry newEntry = Shuffleboard.getTab(tab).add(key, value).getEntry();
-                entries.put(f(tab, key), newEntry);
-            }
-            Shuffleboard.update();
+        if (createdTitles.contains(f(tab, key))) {
+            ((BooleanPublisher) entries.get(f(tab, key))).set(value);
+        } else {
+            BooleanPublisher pub = table.getBooleanTopic(f(tab, key)).publish();
+            entries.put(f(tab, key), pub);
+            pub.set(value);
         }
-        if (!usingShuffleboard || useBoth) {
-            SmartDashboard.putBoolean(key, value);
-            SmartDashboard.updateValues();
-        }
+
         if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
 
         return this;
     }
 
-    public CommunicationManager putSendable(String tab, String key, Sendable value) {
-        if (usingShuffleboard || useBoth) {
-            if (createdTitles.contains(f(tab, key))) {
-                entries.get(f(tab, key)).setValue(value);
-            }
-            Shuffleboard.update();
+    public CommunicationManager updateInfo(String tab, String key, byte[] value) {
+        String toBeUpdated = "";
+
+        for (byte b : value) {
+            toBeUpdated += (char) b;
         }
-        if (!usingShuffleboard || useBoth) {
-            SmartDashboard.putData(key, value);
-            SmartDashboard.updateValues();
+
+        updateInfo(tab, key, toBeUpdated);
+
+        return this;
+    }
+
+    public CommunicationManager updateInfo(String tab, String key, double[] value) {
+        if (createdTitles.contains(f(tab, key))) {
+            ((DoubleArrayPublisher) entries.get(f(tab, key))).set(value);
+        } else {
+            DoubleArrayPublisher pub = table.getDoubleArrayTopic(f(tab, key)).publish();
+            entries.put(f(tab, key), pub);
+            pub.set(value);
         }
+
+        if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
+
+        return this;
+    }
+
+    public CommunicationManager updateInfo(String tab, String key, long[] value) {
+        if (createdTitles.contains(f(tab, key))) {
+            ((IntegerArrayPublisher) entries.get(f(tab, key))).set(value);
+        } else {
+            IntegerArrayPublisher pub = table.getIntegerArrayTopic(f(tab, key)).publish();
+            entries.put(f(tab, key), pub);
+            pub.set(value);
+        }
+
+        if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
+
+        return this;
+    }
+
+    public CommunicationManager updateInfo(String tab, String key, boolean[] value) {
+        if (createdTitles.contains(f(tab, key))) {
+            ((BooleanArrayPublisher) entries.get(f(tab, key))).set(value);
+        } else {
+            BooleanArrayPublisher pub = table.getBooleanArrayTopic(f(tab, key)).publish();
+            entries.put(f(tab, key), pub);
+            pub.set(value);
+        }
+        
         if (!createdTitles.contains(f(tab, key))) createdTitles.add(f(tab, key));
 
         return this;
@@ -551,28 +626,34 @@ public class CommunicationManager {
 
     public void createField() {
         field = new Field2d();
-        SmartDashboard.putData("Field", field);
+        if (!pushingLargeAmount) SmartDashboard.putData("Field", field);
     }
 
     public void updateRobotPose(Pose2d pose) {
         if (!fieldExists()) return;
         field.setRobotPose(pose);
-        SmartDashboard.updateValues();
+        if (!pushingLargeAmount) SmartDashboard.updateValues();
     }
 
     public void updateFieldObjectPose(String name, Pose2d pose) {
         if (!fieldExists()) return;
         field.getObject(name).setPose(pose);
-        SmartDashboard.updateValues();
+        if (!pushingLargeAmount) SmartDashboard.updateValues();
     }
 
     public NetworkTableEntry get(String tab, String key) {
-        return entries.getOrDefault(f(tab, key), null);
+        return table.getEntry(f(tab, key));
+    }
+
+    public void closeComms() {
+        for (String key : entries.keySet()) {
+            entries.get(key).close();
+        }
     }
 
     //Just quicker to type than (tab + "." + key)
     //Also can modify this in the future.
-    private final String t_k_separator = ".";
+    private final String t_k_separator = "/";
     private String f(String tab, String key) {
         if (key == "") return tab;
         return tab + t_k_separator + key;

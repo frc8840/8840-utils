@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.team_8840_lib.info.console.Logger;
+import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.utils.controls.Axis;
 import frc.team_8840_lib.utils.controls.Buttons;
 
@@ -71,6 +72,21 @@ public class GameController {
             threshold = 0.15;
         }
 
+        if (type == Type.Simulated) {
+            this.awaitingForConnection = false;
+            this.connected = true;
+            threshold = 0.05;
+            Logger.Log("Initialized simulated controller.");
+
+            CommunicationManager.getInstance()
+                .updateInfo("simcontrols", "joystick/x", 0d)
+                .updateInfo("simcontrols", "joystick/y", 0d)
+                .updateInfo("simcontrols", "rotation/angle", 0d)
+                .updateInfo("simcontrols", "fov/angle", -1d);
+
+            return;
+        }
+
         if (checkIfConnected()) {
             Logger.Log("Successfully connected to controller (type " + type.name().toUpperCase() + ") on port " + port + "!");
         } else {
@@ -124,6 +140,17 @@ public class GameController {
                 double axisValueJoystick = ((Joystick) controller).getRawAxis(axisNum) * (inverted ? -1 : 1);
 
                 return Math.abs(axisValueJoystick) > threshold ? axisValueJoystick : 0;
+            case Simulated:
+                double value = 0;
+                if (axis == Axis.Horizontal) {
+                    value = CommunicationManager.getInstance().get("simcontrols", "joystick/x").getDouble(0);
+                } else if (axis == Axis.Vertical) {
+                    value = CommunicationManager.getInstance().get("simcontrols", "joystick/y").getDouble(0);
+                } else if (axis == Axis.Rotation || axis == Axis.Twist) {
+                    value = CommunicationManager.getInstance().get("simcontrols", "rotation/angle").getDouble(0);
+                }
+
+                return value;
             default:
                 try {
                     double axisValue = controller.getRawAxis(axis.getValue()) * (inverted ? -1 : 1);
@@ -198,6 +225,10 @@ public class GameController {
         if (awaitingForConnection && !connected) checkIfConnected();
         if (!connected) return 0;
 
+        if (type == Type.Simulated) {
+            return CommunicationManager.getInstance().get("simcontrols", "fov/angle").getDouble(0);
+        }
+
         return controller.getPOV();
     }
 
@@ -211,6 +242,7 @@ public class GameController {
         Joystick,
         Xbox,
         Custom,
+        Simulated,
         None;
 
         public static Type detectType(int port) {

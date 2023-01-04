@@ -1,5 +1,7 @@
 package frc.team_8840_lib;
 
+import frc.team_8840_lib.IO.devices.IOCANCoder;
+
 public class Test {
     public static void main(String[] args) {
         //Any testing code? Just throw it in here. This isn't ran by anything, you have to manually select it.

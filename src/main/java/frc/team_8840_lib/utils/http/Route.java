@@ -1,7 +1,5 @@
 package frc.team_8840_lib.utils.http;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import frc.team_8840_lib.utils.http.html.Element;
@@ -9,9 +7,6 @@ import frc.team_8840_lib.utils.http.html.Element;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class Route implements HttpHandler {
 

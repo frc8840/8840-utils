@@ -41,5 +41,10 @@
       <option name="name" value="WPIab676553-b602-441f-a38d-f1296eff6537_0Release" />
       <option name="url" value="https://maven.ctr-electronics.com/release/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="WPILocal" />
+      <option name="name" value="WPILocal" />
+      <option name="url" value="file:$USER_HOME$/wpilib/2023/maven/" />
+    </remote-repository>
   </component>
 </project>

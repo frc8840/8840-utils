@@ -5,7 +5,6 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
-import frc.team_8840_lib.controllers.SwerveGroup;
 
 public class CTREConfig {
     public static CTREConfig create(SwerveSettings settings) {

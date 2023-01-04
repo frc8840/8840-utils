@@ -2,11 +2,9 @@ package frc.team_8840_lib.examples;
 
 import frc.team_8840_lib.controllers.ControllerGroup;
 import frc.team_8840_lib.info.time.TimeKeeper;
-import frc.team_8840_lib.input.controls.GameController;
 import frc.team_8840_lib.listeners.EventListener;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.controllers.SCType;
-import frc.team_8840_lib.utils.controls.Axis;
 import frc.team_8840_lib.utils.time.SubscriptionType;
 
 public class MotorExample extends EventListener {

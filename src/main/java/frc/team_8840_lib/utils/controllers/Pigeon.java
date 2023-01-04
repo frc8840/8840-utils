@@ -3,7 +3,6 @@ package frc.team_8840_lib.utils.controllers;
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.info.console.Logger;
 
@@ -18,10 +17,21 @@ public class Pigeon {
     private boolean inverted;
 
     private double dummyAngle = 0;
+
+    /**
+     * Sets the dummy angle of the pigeon gyroscope. Used primarly for simulation.
+     * @param angle
+     */
     public void setDummyAngle(double angle) {
         dummyAngle = angle;
     }
 
+    /**
+     * Creates a new Pigeon gyroscope.
+     * @param pigeonType Type of pigeon (Two, IMU, Dummy)
+     * @param pigeonID Can ID of Pigeon
+     * @param inverted Whether the gyroscope is inverted or not.
+     */
     public Pigeon(Type pigeonType, int pigeonID, boolean inverted) {
         type = pigeonType;
 
@@ -33,18 +43,26 @@ public class Pigeon {
         }
 
         if (type == Type.IMU) {
-            pigeonIMU = new PigeonIMU(pigeonID);
+            pigeonIMU = new PigeonIMU(id);
         } else if (type == Type.TWO) {
-            pigeon2 = new Pigeon2(pigeonID);
+            pigeon2 = new Pigeon2(id);
         }
 
         this.inverted = inverted;
     }
 
+    /**
+     * Creates a new Pigeon gyroscope (non-inverted)
+     * @param pigeonType Type of the pigeon (Two, IMU, Dummy)
+     * @param pigeonID CAN id of pigeon.
+     */
     public Pigeon(Type pigeonType, int pigeonID) {
         this(pigeonType, pigeonID, false);
     }
 
+    /**
+     * Sets up the pigeon gyroscope for use.
+     */
     public void config() {
         if (type == Type.IMU) {
             pigeonIMU.configFactoryDefault();
@@ -55,6 +73,9 @@ public class Pigeon {
         zero();
     }
 
+    /**
+     * Zeros out the gyroscope.
+     */
     public void zero() {
         if (type == Type.IMU) {
             pigeonIMU.setYaw(0);
@@ -65,6 +86,11 @@ public class Pigeon {
         }
     }
 
+    /**
+     * Gets the rotation of the gyroscope.
+     * @param inverted Whether to invert it or not.
+     * @return Rotation of gyroscope.
+     */
     public Rotation2d getAngle(boolean inverted) {
         double angle = 0;
 
@@ -81,10 +107,18 @@ public class Pigeon {
         return inverted ? Rotation2d.fromDegrees(360 - angle) : Rotation2d.fromDegrees(angle);
     }
 
+    /**
+     * Gets the rotation of the gyroscope, inverted based on what was provided at creation.
+     * @return Rotation of gyroscope.
+     */
     public Rotation2d getAngle() {
         return getAngle(inverted);
     }
 
+    /**
+     * Gets the yaw, pitch, and roll of gyroscope.
+     * @return [yaw, pitch, roll]
+     */
     public double[] getRotation() {
         double[] rotation = new double[3];
 

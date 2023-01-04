@@ -2,9 +2,6 @@ package frc.team_8840_lib.pathing;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.math.MathUtils;
@@ -15,6 +12,8 @@ public class PathPlanner {
 
     private double atTime = 0;
     private int atIndex = 0;
+
+    private boolean finished = false;
 
     public PathPlanner(TimePoint[] points) {
         timePoints = points;
@@ -44,6 +43,8 @@ public class PathPlanner {
         //For some reason the first point is null, so just skip it
         atIndex = 0;
         atTime = -Robot.DELTA_TIME;
+
+        finished = false;
     }
 
     public Pose2d getLastPose() {
@@ -66,6 +67,8 @@ public class PathPlanner {
         if (atIndex < timePoints.length - 1) {
             atIndex++;
             atTime += Robot.DELTA_TIME;
+        } else {
+            finished = true;
         }
 
         Pose2d pathVector = new Pose2d(
@@ -79,5 +82,9 @@ public class PathPlanner {
         //field2d.getObject("index" + atIndex).setPose(pathVector);
 
         return pathVector;
+    }
+
+    public boolean finished() {
+        return finished;
     }
 }

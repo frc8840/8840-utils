@@ -1,6 +1,5 @@
 package frc.team_8840_lib.utils.controllers;
 
-import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj.motorcontrol.*;
 
 public enum SCType {
@@ -22,6 +21,11 @@ public enum SCType {
     Victor,
     Victor_SP;
 
+    /**
+     * Creates a PWMMotorController with type. Used generally in this library's SpeedControllerGroup class.
+     * @param port Port of controller.
+     * @param type Type of controller.
+     */
     public PWMMotorController createController(int port, SCType type) {
         switch (type) {
             case PWM_SparkMax:
@@ -33,8 +37,8 @@ public enum SCType {
             case Jaguar:
                 return new Jaguar(port);
             case NidecBrushless:
-                //This is opted out for
-                throw new UnsupportedOperationException("Nidec Brushless is not supported in this function due to the fact it also needs a DIO port.");
+                //This is opted out since it needs a DIO port
+                throw new UnsupportedOperationException("Nidec Brushless is not supported in this function due to the fact it also needs a DIO port. Use SCType#createNB instead.");
             case PWM_Talon_FX:
                 return new PWMTalonFX(port);
             case PWM_Talon_SRX:
@@ -56,10 +60,21 @@ public enum SCType {
         }
     }
 
+    /**
+     * Creates a Nidec Brushless controller.
+     * @param port Port of controller
+     * @param dioPort Dio port of controller.
+     * @return Nidec Brushless controller
+     */
     public NidecBrushless createNB(int port, int dioPort) {
         return new NidecBrushless(port, dioPort);
     }
 
+    /**
+     * Checks whether a type is used for PWM.
+     * @param type Type of controller
+     * @return Returns whether it's used with PWM.
+     */
     public static boolean isPWM(SCType type) {
         if (type == CAN_SparkMaxBrushed || type == CAN_SparkMaxBrushless) {
             return false;
@@ -70,14 +85,27 @@ public enum SCType {
         }
     }
 
+    /**
+     * Check whether the type uses PWM.
+     * @return
+     */
     public boolean isPWM() {
         return isPWM(this);
     }
 
+    /**
+     * Creates a controller.
+     * @param port PWM port of controller.
+     * @return The PWM speed controller object.
+     */
     public PWMMotorController create(int port) {
         return createController(port, this);
     }
 
+    /**
+     * Check whether the controller is brushed or not.
+     * @return Whether it's brushed or not.
+     */
     public boolean isBrushed() {
         if (!this.isPWM()) throw new UnsupportedOperationException("This function is only supported for PWM controllers.");
         return this == CAN_SparkMaxBrushed;

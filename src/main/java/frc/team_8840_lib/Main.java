@@ -5,7 +5,7 @@
 package frc.team_8840_lib;
 
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.team_8840_lib.examples.TankDrive;
+import frc.team_8840_lib.examples.*;
 
 public final class Main {
     private Main() {}
@@ -29,7 +29,16 @@ public final class Main {
         frc.team_8840_lib.listeners.Robot.assignListener(new Robot()); // frc.robot.Robot is a class that extends EventListener (NOT frc.robot.listeners.Robot)
         </code>
         * */
-        frc.team_8840_lib.listeners.Robot.assignListener(new TankDrive());
+        frc.team_8840_lib.listeners.Robot.assignListener(new AutonomousExample());
+
+        /**
+         * Also assign a log writer such as FileWriter.
+         * This is not required, but this is useful for recording data.
+         * This can also be called in the constructor of the EventListener.
+         * 
+         * In this example, it's creating a FileWriter to be writen to the default path.
+         */
+        frc.team_8840_lib.info.console.Logger.setWriter(new frc.team_8840_lib.info.console.FileWriter("default"));
 
         //Start the robot - Don't change this line
         RobotBase.startRobot(frc.team_8840_lib.listeners.Robot::new);
