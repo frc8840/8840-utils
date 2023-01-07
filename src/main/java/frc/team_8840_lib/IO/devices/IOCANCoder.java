@@ -1,5 +1,9 @@
 package frc.team_8840_lib.IO.devices;
 
+import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderConfiguration;
+
+import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
@@ -10,6 +14,8 @@ import frc.team_8840_lib.utils.IO.IOValue;
 @IOAccess(IOPermission.READ_WRITE)
 public class IOCANCoder extends IOLayer {
     private int encoderPort = -1;
+
+    private CANCoder encoder = null;
     
     private double cache = 0;
 
@@ -18,7 +24,9 @@ public class IOCANCoder extends IOLayer {
 
         this.encoderPort = (int) args[0];
 
-        this.setReal(false);
+        this.encoder = new CANCoder(this.encoderPort);
+
+        this.setReal(!RobotBase.isSimulation());
     }
 
     /**
@@ -27,7 +35,8 @@ public class IOCANCoder extends IOLayer {
      */
     @IOMethod(name = "absolute position", method_type = IOMethodType.READ, value_type = IOValue.DOUBLE)
     public double getAbsolutePosition() {
-        return isReal() ? 0 : this.cache;
+        if (encoder == null) return 0;
+        return isReal() ? encoder.getAbsolutePosition() : this.cache;
     }
     
     /**
@@ -39,12 +48,12 @@ public class IOCANCoder extends IOLayer {
         this.cache = value;
     }
 
-    public void configAllSettings() {
-        //TODO: add here when Pheonix 2023 comes out
+    public void configAllSettings(CANCoderConfiguration config) {
+        encoder.configAllSettings(config);
     }
 
     public void configFactoryDefault() {
-        //TODO: add here
+        encoder.configFactoryDefault();
     }
 
     public String getBaseName() {

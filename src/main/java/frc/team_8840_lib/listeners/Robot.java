@@ -1,7 +1,5 @@
 package frc.team_8840_lib.listeners;
 
-import edu.wpi.first.hal.DriverStationJNI;
-import edu.wpi.first.hal.NotifierJNI;
 import edu.wpi.first.wpilibj.DSControlWord;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -258,6 +256,8 @@ public class Robot extends RobotBase {
     public void endCompetition() {
         Logger.logCompetitionEnd();
         Logger.closeLogger();
+
+        IOManager.close();
 
         exit = true;
     }

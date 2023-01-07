@@ -1,11 +1,11 @@
 package frc.team_8840_lib.IO;
 
-import java.lang.annotation.Annotation;
 import java.lang.annotation.AnnotationFormatError;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import frc.team_8840_lib.IO.devices.IOPowerDistribution;
 import frc.team_8840_lib.info.console.AutoLog;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.info.console.Logger.LogType;
@@ -28,6 +28,12 @@ public class IOManager implements Loggable {
 
     public static void init() {
         instance = new IOManager();
+
+        IOPowerDistribution.init();
+    }
+
+    public static void close() {
+        getInstance().exit();
     }
 
     public static void addIO(IOLayer layer) {
@@ -118,41 +124,51 @@ public class IOManager implements Loggable {
         }
 
         if (outputingToComms) {
-            for (String key : data.keySet()) {
-                for (int i = 0; i < data.get(key).size(); i++) {
-                    Object preValue = data.get(key).get(i).value;
+            for (String _key : data.keySet()) {
+                HashMap<String, Integer> nameCalled = new HashMap<>();
+                for (int i = 0; i < data.get(_key).size(); i++) {
+                    Object preValue = data.get(_key).get(i).value;
+                    String key = data.get(_key).get(i).name;
+
+                    if (!nameCalled.keySet().contains(key)) {
+                        nameCalled.put(key, 0);
+                    }
+
+                    int numCalled = nameCalled.get(key);
+                    nameCalled.put(key, numCalled + 1);
 
                     try {
-                        switch (data.get(key).get(i).type) {
+
+                        switch (data.get(_key).get(i).type) {
                             case DOUBLE:
                                 CommunicationManager.getInstance()
-                                    .updateInfo("IO", key + "/" + i + "/value", (double) preValue);
+                                    .updateInfo("IO", key + "/" + numCalled + "/value", (double) preValue);
                                     break;
                             case INT:
                                 CommunicationManager.getInstance()
-                                    .updateInfo("IO", key + "/" + i + "/value", (int) preValue);
+                                    .updateInfo("IO", key + "/" + numCalled + "/value", (int) preValue);
                                 break;
                             case STRING:
                                 CommunicationManager.getInstance()
-                                    .updateInfo("IO", key + "/" + i + "/value", (String) preValue);
+                                    .updateInfo("IO", key + "/" + numCalled + "/value", (String) preValue);
                                 break;
                             case BOOLEAN:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + i + "/value", (boolean) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (boolean) preValue);
                                 break;
                             case BYTE_ARRAY:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + i + "/value", (byte[]) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (byte[]) preValue);
                                 break;
                             case DOUBLE_ARRAY:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + i + "/value", (double[]) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (double[]) preValue);
                                 break;
                             case LONG_ARRAY:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + i + "/value", (long[]) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (long[]) preValue);
                                 break;
                             case STRING_ARRAY:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + i + "/value", (String[]) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (String[]) preValue);
                                 break;
                             case BOOLEAN_ARRAY:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + i + "/value", (boolean[]) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (boolean[]) preValue);
                                 break;
                             case NONE:
                             default:
@@ -166,18 +182,18 @@ public class IOManager implements Loggable {
                     CommunicationManager.getInstance()
                         .updateInfo(
                             "IO", 
-                            key + "/" + i + "/type", //EX: /default/0/type
-                            data.get(key).get(i).type.name()
+                            key + "/" + numCalled + "/type", //EX: /default/0/type
+                            data.get(_key).get(i).type.name()
                         )
                         .updateInfo(
                             "IO", 
-                            key + "/" + i + "/p", //EX: /default/0/p
-                            data.get(key).get(i).perms.shortName()
+                            key + "/" + numCalled + "/p", //EX: /default/0/p
+                            data.get(_key).get(i).perms.shortName()
                         )
                         .updateInfo(
                             "IO", 
-                            key + "/" + i + "/real", 
-                            data.get(key).get(i).real
+                            key + "/" + numCalled + "/real", 
+                            data.get(_key).get(i).real
                         );
                 }
             }
@@ -240,6 +256,12 @@ public class IOManager implements Loggable {
         log[0] = (byte) 0;
 
         return log;
+    }
+
+    public void exit() {
+        for (IOLayer layer : this.ioLayers) {
+            layer.close();
+        }
     }
 
     private class IOInfo {

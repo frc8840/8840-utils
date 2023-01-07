@@ -5,7 +5,14 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
+import frc.team_8840_lib.IO.IOManager;
 import frc.team_8840_lib.input.communication.CommunicationManager;
+import frc.team_8840_lib.utils.IO.IOAccess;
+import frc.team_8840_lib.utils.IO.IOLayer;
+import frc.team_8840_lib.utils.IO.IOMethod;
+import frc.team_8840_lib.utils.IO.IOMethodType;
+import frc.team_8840_lib.utils.IO.IOPermission;
+import frc.team_8840_lib.utils.IO.IOValue;
 import frc.team_8840_lib.utils.controllers.EncoderInformation;
 import frc.team_8840_lib.utils.controllers.MotorInfo;
 import frc.team_8840_lib.utils.controllers.SCType;
@@ -257,7 +264,8 @@ public class ControllerGroup {
         setSpeed(0);
     }
 
-    public static class SpeedController {
+    @IOAccess(IOPermission.READ_WRITE)
+    public static class SpeedController extends IOLayer {
         private int port;
         private SCType type;
         private PWMMotorController controller;
@@ -277,6 +285,8 @@ public class ControllerGroup {
 
             speed = 0;
 
+            setReal(true);
+
             initialize();
         }
 
@@ -287,6 +297,8 @@ public class ControllerGroup {
             isPWM = type.isPWM();
 
             speed = 0;
+
+            setReal(false);
 
             initialized = true; //ignore initialization for this one.
         }
@@ -307,6 +319,8 @@ public class ControllerGroup {
 
         public void setSpeed(double speed) {
             this.speed = speed;
+            
+            if (!isReal()) return;
 
             if (speed == 0) {
                 controller.stopMotor();
@@ -328,6 +342,7 @@ public class ControllerGroup {
             return group;
         }
 
+        @IOMethod(name = "Speed", value_type = IOValue.DOUBLE, method_type = IOMethodType.READ)
         public double getSpeed() {
             return speed;
         }
@@ -340,8 +355,14 @@ public class ControllerGroup {
             return type;
         }
 
+        @IOMethod(name = "Port", value_type = IOValue.INT, method_type = IOMethodType.READ)
         public int getPort() {
             return port;
+        }
+
+        @IOMethod(name = "Initialized", value_type = IOValue.STRING, method_type = IOMethodType.READ)
+        public String getInitializedName() {
+            return initialized ? "Yes" : "No";
         }
 
         public boolean isInitialized() {
@@ -354,6 +375,11 @@ public class ControllerGroup {
 
         public boolean isPWM() {
             return isPWM;
+        }
+
+        @IOMethod(name = "Set Speed", value_type = IOValue.DOUBLE, method_type = IOMethodType.WRITE)
+        public void setSpeedIO(double speed) {
+            setSpeed(speed);
         }
     }
 

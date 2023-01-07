@@ -40,4 +40,8 @@ public class IOLayer {
     public String getBaseName() {
         return "Empty IOLayer";
     }
+
+    public void close() {
+        //Do nothing.
+    }
 }

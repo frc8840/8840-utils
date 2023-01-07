@@ -1,16 +1,14 @@
 package frc.team_8840_lib.info.console;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PowerDistribution;
 import frc.team_8840_lib.info.time.TimeKeeper;
 import frc.team_8840_lib.utils.GamePhase;
+import frc.team_8840_lib.utils.buffer.ByteConversions;
 import frc.team_8840_lib.utils.logging.LogWriter;
 import frc.team_8840_lib.utils.logging.Loggable;
 import frc.team_8840_lib.utils.time.TimeStamp;
@@ -165,8 +163,14 @@ public class Logger implements Loggable {
             @Override
             public void run() {
                 if (loggingClasses == null) return;
+                
+                try {
+                    loadAndSaveAllAutoLogs();
+                } catch (Exception e) {
+                    //TODO: Save error to log file.
 
-                loadAndSaveAllAutoLogs();
+                    Logger.Log("[Logger] Error while auto logging. Skipping past this log, but this may lead to logging missing information.", TimeStamp.None);
+                }
             }
         };
 
@@ -229,72 +233,115 @@ public class Logger implements Loggable {
                         try {
                             switch (logType) {
                                 case DOUBLE:
-                                    result = new byte[] { 
-                                        LogType.DOUBLE_CORRESPONDENCE,
-                                        ((byte) ((double) method.invoke(klass))) 
+                                    byte[] doubleStart = new byte[] { 
+                                        LogType.DOUBLE_CORRESPONDENCE
                                     };
+
+                                    byte[] doubleConversion = ByteConversions.doubleToByteArray((double) method.invoke(klass));
+
+                                    result = new byte[doubleStart.length + doubleConversion.length];
+
+                                    //Join start and doubleConversion in result
+                                    System.arraycopy(doubleStart, 0, result, 0, doubleStart.length);
+                                    System.arraycopy(doubleConversion, 0, result, doubleStart.length, doubleConversion.length);
                                     
                                     break;
                                 case DOUBLE_ARRAY:
+                                    byte[] doubleArrayStart = new byte[] { 
+                                        LogType.DOUBLE_ARRAY_CORRESPONDENCE
+                                    };
+
                                     double[] preprocessResult = (double[]) method.invoke(klass);
 
-                                    result = new byte[preprocessResult.length + 1];
-                                    result[0] = LogType.DOUBLE_ARRAY_CORRESPONDENCE;
+                                    byte[][] doubleArrayConversion = new byte[preprocessResult.length][];
 
-                                    for (int i = 0; i < preprocessResult.length; i++) {
-                                        result[i + 1] = (byte) preprocessResult[i];
+                                    for (int i = 0; i < doubleArrayConversion.length; i++) {
+                                        doubleArrayConversion[i] = ByteConversions.doubleToByteArray(preprocessResult[i]);
+                                    }
+
+                                    int count = 0;
+
+                                    for (byte[] _double : doubleArrayConversion) count += _double.length;
+
+                                    result = new byte[count + doubleArrayStart.length];
+
+                                    //Join start and doubleArrayConversion in result
+                                    System.arraycopy(doubleArrayStart, 0, result, 0, doubleArrayStart.length);
+
+                                    int index = doubleArrayStart.length;
+
+                                    for (byte[] _double : doubleArrayConversion) {
+                                        System.arraycopy(_double, 0, result, index, _double.length);
+
+                                        index += _double.length;
                                     }
 
                                     break;
                                 case STRING:
+                                    byte[] stringStart = new byte[] { 
+                                        LogType.STRING_CORRESPONDENCE
+                                    };
+
                                     String str = (String) method.invoke(klass);
-                                    char[] chars = str.toCharArray();
 
-                                    result = new byte[chars.length + 1];
-                                    result[0] = LogType.STRING_CORRESPONDENCE;
+                                    byte[] stringConversion = ByteConversions.stringToByteArray(str);
 
-                                    for (int i = 0; i < chars.length; i++) {
-                                        result[i + 1] = (byte) chars[i];
-                                    }
+                                    result = new byte[stringStart.length + stringConversion.length];
+
+                                    //Join start and stringConversion in result
+                                    System.arraycopy(stringStart, 0, result, 0, stringStart.length);
+                                    System.arraycopy(stringConversion, 0, result, stringStart.length, stringConversion.length);
 
                                     break;
                                 case STRING_ARRAY:
+                                    byte[] stringArrayStart = new byte[] { 
+                                        LogType.STRING_ARRAY_CORRESPONDENCE
+                                    };
+                                    
                                     String[] strs = (String[]) method.invoke(klass);
 
                                     if (strs.length == 0) {
-                                        result = new byte[] {
-                                            LogType.STRING_ARRAY_CORRESPONDENCE
-                                        };
+                                        result = stringArrayStart;
 
                                         break;
                                     }
 
-                                    int count = strs.length;
+                                    byte[][] stringArrayConversion = new byte[strs.length][];
 
-                                    for (String _str : strs) count += _str.length();
+                                    for (int i = 0; i < stringArrayConversion.length; i++) {
+                                        stringArrayConversion[i] = ByteConversions.stringToByteArray(strs[i]);
+                                    }
 
-                                    int writer = 1;
-                                    result = new byte[count];
-                                    
-                                    for (int i = 0; i < strs.length; i++) {
-                                        char[] brokenString = strs[i].toCharArray();
+                                    int count2 = 0;
 
-                                        for (int j = 0; j < strs.length; j++) {
-                                            result[writer] = (byte) brokenString[j];
-                                        }
+                                    for (byte[] _string : stringArrayConversion) count2 += _string.length;
+
+                                    result = new byte[count2 + stringArrayStart.length];
+
+                                    //Join start and stringArrayConversion in result
+                                    System.arraycopy(stringArrayStart, 0, result, 0, stringArrayStart.length);
+
+                                    int index2 = stringArrayStart.length;
+
+                                    for (byte[] _string : stringArrayConversion) {
+                                        System.arraycopy(_string, 0, result, index2, _string.length);
+
+                                        index2 += _string.length;
                                     }
                                     
                                     break;
                                 case BYTE_ARRAY:
+                                    byte[] byteArrayStart = new byte[] { 
+                                        LogType.BYTE_ARRAY_CORRESPONDENCE
+                                    };
+
                                     byte[] preResult = (byte[]) method.invoke(klass);
 
-                                    result = new byte[preResult.length + 1];
-                                    result[0] = LogType.BYTE_ARRAY_CORRESPONDENCE;
+                                    result = new byte[preResult.length + byteArrayStart.length];
 
-                                    //I know there's a better method for this but I don't have internet so this is what ill do lol
-                                    for (int i = 0; i < preResult.length; i++) {
-                                        result[i + 1] = preResult[i];
-                                    }
+                                    //Join start and preResult in result
+                                    System.arraycopy(byteArrayStart, 0, result, 0, byteArrayStart.length);
+                                    System.arraycopy(preResult, 0, result, byteArrayStart.length, preResult.length);
                                     
                                     break;
                                 default:
@@ -307,9 +354,8 @@ public class Logger implements Loggable {
 
                         String convertedResult = ((char) START) + (char) ((byte) 0) + (char) ((byte) 0) + (char) ((byte) 0) + name + ((char) (byte) 0) + ((char) (byte) 0) + ((char) (byte) 0);
 
-                        for (byte _byte : result) {
-                            convertedResult += (char) _byte;
-                        }
+                        //Join result and end in convertedResult
+                        convertedResult += new String(result);
 
                         convertedResult += (char) ((byte) 0);
                         convertedResult += (char) ((byte) 0);
@@ -328,42 +374,8 @@ public class Logger implements Loggable {
         }
     }
 
-    @AutoLog(logtype = LogType.BYTE_ARRAY, name = "Power Distribution Info")
-    public byte[] logPD() {
-        PowerDistribution pd = new PowerDistribution();
-
-        int nOfChannels = pd.getNumChannels();
-
-        double tempature = pd.getTemperature();
-        double totalCurrent = pd.getTotalCurrent();
-        double voltage = pd.getVoltage();
-
-        //Format: 
-        /**
-         * 0: voltage
-         * 1: totalCurrent
-         * 2: empty (0)
-         * 3: tempature
-         * 4: empty (0)
-         * 5: number of channels
-         * 6: empty (0)
-         * 7+: current of channel 0 to n
-         */
-
-        byte[] pdInfo = new byte[7 + nOfChannels];
-        pdInfo[0] = (byte) voltage;
-        pdInfo[1] = (byte) totalCurrent;
-        pdInfo[2] = (byte) 0d;
-        pdInfo[3] = (byte) tempature;
-        pdInfo[4] = (byte) 0d;
-        pdInfo[5] = (byte) nOfChannels;
-        pdInfo[6] = (byte) 0d;
-        for (int i = 0; i < nOfChannels; i++) {
-            pdInfo[i + 7] = (byte) pd.getCurrent(i);
-        }
-
-        pd.close();
-    
-        return pdInfo;
+    @AutoLog(name = "working", logtype = LogType.STRING)
+    public String getWorking() {
+        return "yep!";
     }
 }

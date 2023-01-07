@@ -4,7 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.REVPhysicsSim;
@@ -15,8 +14,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.IO.devices.IOCANCoder;
+import frc.team_8840_lib.utils.IO.IOAccess;
+import frc.team_8840_lib.utils.IO.IOMethod;
+import frc.team_8840_lib.utils.IO.IOMethodType;
+import frc.team_8840_lib.utils.IO.IOPermission;
+import frc.team_8840_lib.utils.IO.IOValue;
 import frc.team_8840_lib.utils.controllers.SCType;
 import frc.team_8840_lib.utils.controllers.swerve.CTREConfig;
 import frc.team_8840_lib.utils.controllers.swerve.CTREModuleState;
@@ -29,6 +34,7 @@ import frc.team_8840_lib.utils.controllers.swerve.conversions.FalconConversions;
  * Team 3512
  * **/
 
+@IOAccess(IOPermission.READ_WRITE)
 public class SwerveModule extends ControllerGroup.SpeedController {
     private double driveSpeed;
 
@@ -137,6 +143,7 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         driveNEO.setOpenLoopRampRate(config.getSettings().driveOpenRampRate);
         driveNEO.setClosedLoopRampRate(config.getSettings().driveClosedRampRate);
 
+        neoDriveEncoder.setPositionConversionFactor(config.getSettings().wheelCircumference() / (double) config.getSettings().neoDrivingMotorReduction);
         neoDriveEncoder.setVelocityConversionFactor((1 / config.getSettings().driveGearRatio) * config.getSettings().wheelCircumference() / 60);
 
         neoDrivePIDController.setP(config.getSettings().drivePID.kP);
@@ -188,7 +195,7 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         }
 
         this.angleCANCoder.configFactoryDefault();
-        //this.angleCANCoder.configAllSettings(this.config.getCanCoderConfiguration());
+        this.angleCANCoder.configAllSettings(this.config.getCanCoderConfiguration());
     }
 
     /**
@@ -349,15 +356,26 @@ public class SwerveModule extends ControllerGroup.SpeedController {
 
     public SwerveModulePosition getPosition() {
         //First argument is the distance measured by the wheel of the module
-        double distanceMeters = (getType() == SCType.SWERVE_Talon_FX ?
-                //No clue if the falcon works.
-                FalconConversions.falconToMPS(driveTalonFX.getSelectedSensorPosition(), config.getSettings().wheelCircumference(), config.getSettings().driveGearRatio) :
-                neoDriveEncoder.getPosition()
-        ) * config.getSettings().wheelCircumference() * config.getSettings().driveGearRatio;
+        double distanceMeters = 0;
+        if (getType() == SCType.SWERVE_Talon_FX) {
+            //No clue if the falcon works.
+            distanceMeters = (
+                FalconConversions.falconToMPS(
+                    driveTalonFX.getSelectedSensorPosition(), 
+                    config.getSettings().wheelCircumference(), 
+                    config.getSettings().driveGearRatio
+                ) 
+                    * config.getSettings().wheelCircumference() 
+                    * config.getSettings().driveGearRatio
+            );
+
+        } else if (getType() == SCType.SWERVE_SparkMax) {
+            distanceMeters = Units.metersToInches(neoDriveEncoder.getPosition());
+        }
 
         return new SwerveModulePosition(
-                distanceMeters,
-                getAngle()
+            distanceMeters,
+            getAngle()
         );
     }
 
@@ -376,5 +394,16 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         }
 
         return new SwerveModuleState(velocity, angle);
+    }
+
+    @IOMethod(name = "Drive Encoder Position", value_type = IOValue.DOUBLE, method_type = IOMethodType.READ)
+    public double getDriveEncoderPosition() {
+        if (driveTalonFX == null && driveNEO == null) return 0;
+        
+        return getType() == SCType.SWERVE_Talon_FX ? driveTalonFX.getSelectedSensorPosition() : neoDriveEncoder.getPosition();
+    }
+
+    public String getBaseName() {
+        return "Swerve Module " + this.privateID;
     }
 }

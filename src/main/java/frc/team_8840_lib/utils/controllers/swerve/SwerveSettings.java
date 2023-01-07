@@ -37,6 +37,9 @@ public class SwerveSettings {
         return wheelDiameter * Math.PI;
     }
 
+    public int pinionTeethCount = 14;
+    public double neoDrivingMotorReduction = 990d / ((double) (pinionTeethCount * 15));
+
     public double driveGearRatio = 6.86;
     public double angleGearRatio = 12.8;
 
