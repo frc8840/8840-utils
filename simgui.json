@@ -106,6 +106,9 @@
               "1": {
                 "open": true
               },
+              "2": {
+                "open": true
+              },
               "open": true
             },
             "open": true
@@ -123,8 +126,7 @@
             "current": {
               "0": {
                 "open": true
-              },
-              "open": true
+              }
             },
             "number of channels": {
               "0": {
@@ -132,7 +134,6 @@
               },
               "open": true
             },
-            "open": true,
             "tempature": {
               "0": {
                 "open": true
@@ -157,7 +158,8 @@
               "0": {
                 "open": true
               }
-            }
+            },
+            "open": true
           },
           "Swerve Module 1": {
             "Drive Encoder Position": {

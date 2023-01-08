@@ -116,6 +116,9 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         }
     }
 
+    private double neoPositionConversionFactor = 1;
+    private double neoVelocityConversionFactor = 1;
+
     /**
      * Configures the NEO motors
      */
@@ -133,6 +136,13 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         neoTurnPIDController.setD(config.getSettings().turnPID.kD);
         neoTurnPIDController.setFF(config.getSettings().turnPID.kF);
 
+        neoTurnPIDController.setFeedbackDevice(neoTurnEncoder);
+        
+        //Make the NEO turn PID controller wrap around from [0, 2pi]
+        neoTurnPIDController.setPositionPIDWrappingEnabled(true);
+        neoTurnPIDController.setPositionPIDWrappingMinInput(0);
+        neoTurnPIDController.setPositionPIDWrappingMaxInput(2 * Math.PI);
+
         turnNEO.burnFlash();
 
         driveNEO.restoreFactoryDefaults();
@@ -143,13 +153,17 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         driveNEO.setOpenLoopRampRate(config.getSettings().driveOpenRampRate);
         driveNEO.setClosedLoopRampRate(config.getSettings().driveClosedRampRate);
 
-        neoDriveEncoder.setPositionConversionFactor(config.getSettings().wheelCircumference() / (double) config.getSettings().neoDrivingMotorReduction);
-        neoDriveEncoder.setVelocityConversionFactor((1 / config.getSettings().driveGearRatio) * config.getSettings().wheelCircumference() / 60);
+        neoPositionConversionFactor = (1 / config.getSettings().driveGearRatio) * config.getSettings().wheelCircumference();
+        neoDriveEncoder.setPositionConversionFactor(neoPositionConversionFactor);
+        neoVelocityConversionFactor = (1 / config.getSettings().driveGearRatio) * config.getSettings().wheelCircumference() / 60d;
+        neoDriveEncoder.setVelocityConversionFactor(neoVelocityConversionFactor);
 
         neoDrivePIDController.setP(config.getSettings().drivePID.kP);
         neoDrivePIDController.setI(config.getSettings().drivePID.kI);
         neoDrivePIDController.setD(config.getSettings().drivePID.kD);
         neoDrivePIDController.setFF(config.getSettings().drivePID.kF);
+
+        neoDrivePIDController.setFeedbackDevice(neoDriveEncoder);
 
         driveNEO.burnFlash();
 
@@ -253,10 +267,13 @@ public class SwerveModule extends ControllerGroup.SpeedController {
                 );
             } else if (getType() == SCType.SWERVE_SparkMax) {
                 driveNEO.getPIDController().setReference(
-                        desiredState.speedMetersPerSecond,
-                        CANSparkMax.ControlType.kVelocity, 0,
-                        feedforward.calculate(desiredState.speedMetersPerSecond)
+                        desiredState.speedMetersPerSecond / neoVelocityConversionFactor,
+                        CANSparkMax.ControlType.kVelocity
                 );
+                /* 
+                0,
+                feedforward.calculate(desiredState.speedMetersPerSecond / (1 / config.getSettings().driveGearRatio) * config.getSettings().wheelCircumference())
+                */
             }
         }
     }
@@ -370,7 +387,7 @@ public class SwerveModule extends ControllerGroup.SpeedController {
             );
 
         } else if (getType() == SCType.SWERVE_SparkMax) {
-            distanceMeters = Units.metersToInches(neoDriveEncoder.getPosition());
+            distanceMeters = neoDriveEncoder.getPosition();
         }
 
         return new SwerveModulePosition(
