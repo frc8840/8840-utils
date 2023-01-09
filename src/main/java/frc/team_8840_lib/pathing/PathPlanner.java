@@ -3,6 +3,7 @@ package frc.team_8840_lib.pathing;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.team_8840_lib.input.communication.CommunicationManager;
+import frc.team_8840_lib.listeners.FrameworkUtil;
 import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.math.MathUtils;
 import frc.team_8840_lib.utils.pathplanner.TimePoint;
@@ -42,7 +43,7 @@ public class PathPlanner {
     public void reset() {
         //For some reason the first point is null, so just skip it
         atIndex = 0;
-        atTime = -Robot.DELTA_TIME;
+        atTime = -FrameworkUtil.DELTA_TIME;
 
         finished = false;
     }
@@ -66,7 +67,7 @@ public class PathPlanner {
     public Pose2d moveToNext() {
         if (atIndex < timePoints.length - 1) {
             atIndex++;
-            atTime += Robot.DELTA_TIME;
+            atTime += FrameworkUtil.DELTA_TIME;
         } else {
             finished = true;
         }

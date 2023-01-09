@@ -5,26 +5,19 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
-import frc.team_8840_lib.info.console.Logger;
-import frc.team_8840_lib.utils.controllers.SCType;
 import frc.team_8840_lib.utils.controllers.swerve.structs.CurrentLimit;
 import frc.team_8840_lib.utils.controllers.swerve.structs.PIDStruct;
 
 //A lot of these values are taken from Team 364's Constants.java file, esp the PID values: these can be fine-tuned since it's an instantiable class though, so it's not a big deal
 public class SwerveSettings {
-    private SCType type = SCType.SWERVE_Talon_FX;
+    private SwerveType type = SwerveType.FALCON_500;
 
-    public SCType getType() {
+    public SwerveType getType() {
         return type;
     }
 
-    public SwerveSettings(SCType type) {
-        if (!type.name().startsWith("SWERVE")) {
-            Logger.Log("Error: SwerveSettings constructor called with non-swerve type, defaulting to TalonFX");
-            this.type = SCType.SWERVE_Talon_FX;
-        } else {
-            this.type = type;
-        }
+    public SwerveSettings(SwerveType type) {
+        this.type = type;
     }
 
     public boolean invertGyro = false; // Counterclockwise is positive, clockwise is negative
@@ -130,7 +123,7 @@ public class SwerveSettings {
      * Use at your own risk, I would do adjustments AFTER calling this function.
      * */
     public void defaultAdjustToType() {
-        if (this.type == SCType.SWERVE_Talon_FX) {
+        if (this.type == SwerveType.FALCON_500) {
             //Drive KS, KV, and KA values are different for the TalonFX
             driveKS = 0.667 / 12;
             driveKV = 2.44 / 12;
@@ -139,7 +132,7 @@ public class SwerveSettings {
             //The PID values are different for the TalonFX
             turnPID = new PIDStruct(0.6, 0.0, 12.0, 0.0);
             drivePID = new PIDStruct(0.10, 0.0, 0.0, 0.0);
-        } else if (this.type == SCType.SWERVE_SparkMax) {
+        } else if (this.type == SwerveType.SPARK_MAX) {
             //Drive KS, KV, and KA values are different for the SparkMax
             driveKS = 0.667;
             driveKV = 2.44;

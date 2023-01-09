@@ -20,7 +20,11 @@ import frc.team_8840_lib.utils.math.MathUtils;
  * Based on the wonderful work of Team 364
  * <a href="https://github.com/Team364/BaseFalconSwerve">Repo Here</a>
  * */
-public class SwerveGroup extends ControllerGroup implements Loggable {
+public class SwerveGroup implements Loggable {
+    private String name;
+
+    public String getName() { return name; }
+
     private final String[] moduleNames = {
             "Front Left",
             "Front Right",
@@ -58,8 +62,8 @@ public class SwerveGroup extends ControllerGroup implements Loggable {
      * @param pigeon Gyroscope (Pigeon 2.0 or IMU, use Pigeon class)
      * */
     public SwerveGroup(String name, SwerveSettings settings, int[] driveIDs, int[] steerIDs, int[] encoderIDs, Pigeon pigeon) {
-        super(name, settings.getType()); //init w/ no ports so it doesn't create any objects.
-
+        this.name = name;
+        
         if (driveIDs.length != steerIDs.length && driveIDs.length != encoderIDs.length) {
             throw new IllegalArgumentException("Drive and steer ports must be the same length");
         }
@@ -303,7 +307,7 @@ public class SwerveGroup extends ControllerGroup implements Loggable {
                 .plus(pose.getTranslation());
             
             CommunicationManager.getInstance().updateFieldObjectPose(
-                getName() + " Module " + i, 
+                this.name + " Module " + i, 
                 new Pose2d(
                     modulePosition,
                     modules[i].getState().angle.plus(getAngle())

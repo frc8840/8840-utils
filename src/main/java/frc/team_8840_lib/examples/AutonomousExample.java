@@ -11,8 +11,8 @@ import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.pathing.PathPlanner;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.controllers.Pigeon;
-import frc.team_8840_lib.utils.controllers.SCType;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
+import frc.team_8840_lib.utils.controllers.swerve.SwerveType;
 import frc.team_8840_lib.utils.controls.Axis;
 
 import java.util.TimerTask;
@@ -26,7 +26,7 @@ public class AutonomousExample extends EventListener {
     @Override
     public void robotInit() {
         //All of this is documented in the SwerveDrive.java file, I'm just simplifying it down for this file.
-        SwerveSettings settings = new SwerveSettings(SCType.SWERVE_SparkMax);
+        SwerveSettings settings = new SwerveSettings(SwerveType.SPARK_MAX);
 
         settings.defaultAdjustToType();
         settings.updateKinematics();

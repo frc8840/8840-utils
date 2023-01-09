@@ -1,5 +1,7 @@
 package frc.team_8840_lib.utils.controllers;
 
+import java.util.HashMap;
+
 import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -7,6 +9,26 @@ import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.info.console.Logger;
 
 public class Pigeon {
+    private static HashMap<Integer, Pigeon> pigeonMap = new HashMap<>();
+
+    public static Pigeon hasPigeon(int id) {
+        if (pigeonMap.containsKey(id)) {
+            return pigeonMap.get(id);
+        } else {
+            return null;
+        }
+    }
+
+    public static Pigeon getPigeon(int id) {
+        if (pigeonMap.containsKey(id)) {
+            return pigeonMap.get(id);
+        } else {
+            Pigeon newPigeon = new Pigeon(Type.DUMMY, id);
+            pigeonMap.put(id, newPigeon);
+            return newPigeon;
+        }
+    }
+
     private PigeonIMU pigeonIMU;
     private Pigeon2 pigeon2;
 
@@ -47,6 +69,8 @@ public class Pigeon {
         } else if (type == Type.TWO) {
             pigeon2 = new Pigeon2(id);
         }
+
+        pigeonMap.put(this.id, this);
 
         this.inverted = inverted;
     }
@@ -105,6 +129,26 @@ public class Pigeon {
         }
 
         return inverted ? Rotation2d.fromDegrees(360 - angle) : Rotation2d.fromDegrees(angle);
+    }
+
+    /**
+     * Gets the yaw, pitch, and roll of the gyroscope.
+     * @return [yaw, pitch, roll]
+     */
+    public double[] getYawPitchRoll() {
+        if (type == Type.IMU) {
+            double[] ypr = new double[3];
+            pigeonIMU.getYawPitchRoll(ypr);
+            return ypr;
+        } else if (type == Type.TWO) {
+            double[] ypr = new double[3];
+            pigeon2.getYawPitchRoll(ypr);
+            return ypr;
+        } else if (type == Type.DUMMY) {
+            return new double[] {dummyAngle, 0, 0};
+        } else {
+            return new double[] {0, 0, 0};
+        }
     }
 
     /**

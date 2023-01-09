@@ -9,22 +9,22 @@ import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.REVPhysicsSim;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.IO.devices.IOCANCoder;
 import frc.team_8840_lib.utils.IO.IOAccess;
+import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
 import frc.team_8840_lib.utils.IO.IOMethodType;
 import frc.team_8840_lib.utils.IO.IOPermission;
 import frc.team_8840_lib.utils.IO.IOValue;
-import frc.team_8840_lib.utils.controllers.SCType;
 import frc.team_8840_lib.utils.controllers.swerve.CTREConfig;
-import frc.team_8840_lib.utils.controllers.swerve.CTREModuleState;
+import frc.team_8840_lib.utils.controllers.swerve.SwerveType;
 import frc.team_8840_lib.utils.controllers.swerve.conversions.FalconConversions;
 
 /**
@@ -34,10 +34,19 @@ import frc.team_8840_lib.utils.controllers.swerve.conversions.FalconConversions;
  * Team 3512
  * **/
 
-@IOAccess(IOPermission.READ_WRITE)
-public class SwerveModule extends ControllerGroup.SpeedController {
+@IOAccess(IOPermission.READ)
+public class SwerveModule extends IOLayer {
+    //Ports
+    private int drivePort;
+    private int turnPort;
+
+    //Type
+    private SwerveType type;
+
+    //Speed
     private double driveSpeed;
 
+    //Config
     private CTREConfig config;
 
     //TalonFX variables
@@ -48,9 +57,11 @@ public class SwerveModule extends ControllerGroup.SpeedController {
     private CANSparkMax driveNEO;
     private CANSparkMax turnNEO;
 
+    //Neo Encoders
     private RelativeEncoder neoDriveEncoder;
     private RelativeEncoder neoTurnEncoder;
 
+    //Neo PID controllers
     public static SparkMaxPIDController neoDrivePIDController = null;
     public static SparkMaxPIDController neoTurnPIDController = null;
 
@@ -70,7 +81,12 @@ public class SwerveModule extends ControllerGroup.SpeedController {
     private int privateID;
 
     public SwerveModule(int drivePort, int steerPort, int encoderPort, int swerveNum, CTREConfig config) {
-        super(drivePort, config.getSettings().getType());
+        super();
+
+        this.drivePort = drivePort;
+        this.turnPort = steerPort;
+
+        this.type = config.getSettings().getType();
 
         this.privateID = swerveNum;
 
@@ -84,12 +100,12 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         this.angleCANCoder = new IOCANCoder(encoderPort);
         this.configAngleEncoder();
 
-        if (config.getSettings().getType() == SCType.SWERVE_Talon_FX) {
-            this.driveTalonFX = new TalonFX(drivePort);
-            this.turnTalonFX = new TalonFX(steerPort);
-        } else if (config.getSettings().getType() == SCType.SWERVE_SparkMax) {
-            driveNEO = new CANSparkMax(drivePort, CANSparkMaxLowLevel.MotorType.kBrushless);
-            turnNEO = new CANSparkMax(steerPort, CANSparkMaxLowLevel.MotorType.kBrushless);
+        if (config.getSettings().getType() == SwerveType.FALCON_500) {
+            this.driveTalonFX = new TalonFX(this.drivePort);
+            this.turnTalonFX = new TalonFX(this.turnPort);
+        } else if (config.getSettings().getType() == SwerveType.SPARK_MAX) {
+            driveNEO = new CANSparkMax(this.drivePort, CANSparkMaxLowLevel.MotorType.kBrushless);
+            turnNEO = new CANSparkMax(this.turnPort, CANSparkMaxLowLevel.MotorType.kBrushless);
 
             neoDriveEncoder = driveNEO.getEncoder();
             neoTurnEncoder = turnNEO.getEncoder();
@@ -106,18 +122,27 @@ public class SwerveModule extends ControllerGroup.SpeedController {
     }
 
     /**
+     * Gets the type of swerve drive.
+     */
+    public SwerveType getType() {
+        return type;
+    }
+
+    /**
      * Configures the motors to the correct settings
      */
     public void configMotors() {
-        if (this.config.getSettings().getType() == SCType.SWERVE_Talon_FX) {
+        if (this.config.getSettings().getType() == SwerveType.FALCON_500) {
             configTalonMotors();
-        } else if (this.config.getSettings().getType() == SCType.SWERVE_SparkMax) {
+        } else if (this.config.getSettings().getType() == SwerveType.SPARK_MAX) {
             configNEOMotors();
         }
     }
 
     private double neoPositionConversionFactor = 1;
     private double neoVelocityConversionFactor = 1;
+    
+    private double neoTurnPositionConversionFactor = 1;
 
     /**
      * Configures the NEO motors
@@ -129,14 +154,15 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         turnNEO.setInverted(config.getSettings().turnInverted);
         turnNEO.setIdleMode(config.getSettings().turnIdleMode);
 
-        neoTurnEncoder.setPositionConversionFactor((1 / config.getSettings().angleGearRatio) * 360);
+        neoTurnPositionConversionFactor = (1 / config.getSettings().angleGearRatio) * 360;
+        if (!RobotBase.isSimulation()) neoTurnEncoder.setPositionConversionFactor(neoTurnPositionConversionFactor);
 
         neoTurnPIDController.setP(config.getSettings().turnPID.kP);
         neoTurnPIDController.setI(config.getSettings().turnPID.kI);
         neoTurnPIDController.setD(config.getSettings().turnPID.kD);
         neoTurnPIDController.setFF(config.getSettings().turnPID.kF);
 
-        neoTurnPIDController.setFeedbackDevice(neoTurnEncoder);
+        //neoTurnPIDController.setFeedbackDevice(neoTurnEncoder);
         
         //Make the NEO turn PID controller wrap around from [0, 2pi]
         neoTurnPIDController.setPositionPIDWrappingEnabled(true);
@@ -153,10 +179,13 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         driveNEO.setOpenLoopRampRate(config.getSettings().driveOpenRampRate);
         driveNEO.setClosedLoopRampRate(config.getSettings().driveClosedRampRate);
 
-        neoPositionConversionFactor = (1 / config.getSettings().driveGearRatio) * config.getSettings().wheelCircumference();
-        neoDriveEncoder.setPositionConversionFactor(neoPositionConversionFactor);
-        neoVelocityConversionFactor = (1 / config.getSettings().driveGearRatio) * config.getSettings().wheelCircumference() / 60d;
-        neoDriveEncoder.setVelocityConversionFactor(neoVelocityConversionFactor);
+        //NOTE: As of 2023-01-08, the position factor is not working correctly in simulation.
+        //This is a problem with REV's simulation, not our code.
+        //Right now, we're doing the math manually if we're in simulation.
+        neoPositionConversionFactor = config.getSettings().driveGearRatio * Math.PI * config.getSettings().wheelDiameter;
+        if (!RobotBase.isSimulation()) neoDriveEncoder.setPositionConversionFactor(neoPositionConversionFactor);
+        neoVelocityConversionFactor = neoPositionConversionFactor / 60d;
+        if (!RobotBase.isSimulation()) neoDriveEncoder.setVelocityConversionFactor(neoVelocityConversionFactor);
 
         neoDrivePIDController.setP(config.getSettings().drivePID.kP);
         neoDrivePIDController.setI(config.getSettings().drivePID.kI);
@@ -169,7 +198,7 @@ public class SwerveModule extends ControllerGroup.SpeedController {
 
         resetToAbsolute();
         neoDriveEncoder.setPosition(0);
-
+        
         if (RobotBase.isSimulation()) {
             REVPhysicsSim.getInstance().addSparkMax(driveNEO, DCMotor.getNEO(1));
         }
@@ -205,7 +234,7 @@ public class SwerveModule extends ControllerGroup.SpeedController {
     public void configAngleEncoder() {
         this.angleCANCoder.setReal(!RobotBase.isSimulation());
         if (RobotBase.isSimulation()) {
-            this.angleCANCoder.setCache(driveSpeed);
+            this.angleCANCoder.setCache(0);
         }
 
         this.angleCANCoder.configFactoryDefault();
@@ -217,11 +246,12 @@ public class SwerveModule extends ControllerGroup.SpeedController {
      * */
     public void resetToAbsolute() {
         double rawDegrees = getRotation().getDegrees() - config.getSettings().angleOffsets[privateID];
-        if (this.config.getSettings().getType() == SCType.SWERVE_Talon_FX) {
+        if (this.config.getSettings().getType() == SwerveType.FALCON_500) {
             double absPos = FalconConversions.degreesToFalcon(rawDegrees, config.getSettings().angleGearRatio);
             this.turnTalonFX.setSelectedSensorPosition(absPos);
-        } else if (this.config.getSettings().getType() == SCType.SWERVE_SparkMax) {
-            neoTurnEncoder.setPosition(getAbsoluteAngle().getDegrees() - config.getSettings().angleOffsets[privateID]);
+        } else if (this.config.getSettings().getType() == SwerveType.SPARK_MAX) {
+            double newPosition = getAbsoluteAngle().getDegrees() - config.getSettings().angleOffsets[privateID];
+            neoTurnEncoder.setPosition(newPosition / (RobotBase.isSimulation() ? neoTurnPositionConversionFactor : 1));
         }
     }
 
@@ -236,13 +266,13 @@ public class SwerveModule extends ControllerGroup.SpeedController {
 
         this.driveSpeed = speed * config.getSettings().maxSpeed;
 
-        if (this.getType() == SCType.SWERVE_Talon_FX) {
+        if (this.getType() == SwerveType.FALCON_500) {
             if (Math.abs(speed) < this.config.getSettings().threshold) {
                 driveTalonFX.set(TalonFXControlMode.PercentOutput, 0);
             } else {
                 driveTalonFX.set(TalonFXControlMode.PercentOutput, this.driveSpeed);
             }
-        } else if (this.getType() == SCType.SWERVE_SparkMax) {
+        } else if (this.getType() == SwerveType.SPARK_MAX) {
             driveNEO.set(this.driveSpeed);
         }
     }
@@ -256,7 +286,7 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         if (isOpenLoop) {
             this.setSpeed(desiredState.speedMetersPerSecond / config.getSettings().maxSpeed);
         } else {
-            if (getType() == SCType.SWERVE_Talon_FX) {
+            if (getType() == SwerveType.FALCON_500) {
                 double velocity = FalconConversions.MPSToFalcon(desiredState.speedMetersPerSecond, config.getSettings().wheelCircumference(), config.getSettings().driveGearRatio);
 
                 this.driveTalonFX.set(
@@ -265,15 +295,22 @@ public class SwerveModule extends ControllerGroup.SpeedController {
                         DemandType.ArbitraryFeedForward,
                         feedforward.calculate(desiredState.speedMetersPerSecond)
                 );
-            } else if (getType() == SCType.SWERVE_SparkMax) {
+            } else if (getType() == SwerveType.SPARK_MAX) {
+                //Drive neo PID controller takes in the conversion factor
                 driveNEO.getPIDController().setReference(
-                        desiredState.speedMetersPerSecond / neoVelocityConversionFactor,
-                        CANSparkMax.ControlType.kVelocity
+                       desiredState.speedMetersPerSecond / (RobotBase.isSimulation() ? neoVelocityConversionFactor : 1),
+                       CANSparkMax.ControlType.kVelocity,
+                       0,
+                       feedforward.calculate(desiredState.speedMetersPerSecond)
                 );
-                /* 
+                /*
+                driveNEO.getPIDController().setReference(
+                        desiredState.speedMetersPerSecond / 
+                        CANSparkMax.ControlType.kVelocity
+                ); 
                 0,
-                feedforward.calculate(desiredState.speedMetersPerSecond / (1 / config.getSettings().driveGearRatio) * config.getSettings().wheelCircumference())
-                */
+                        feedforward.calculate(desiredState.speedMetersPerSecond)
+                 */
             }
         }
     }
@@ -288,10 +325,10 @@ public class SwerveModule extends ControllerGroup.SpeedController {
             angle = lastAngle.getDegrees();
         }
 
-        if (this.getType() == SCType.SWERVE_Talon_FX) {
+        if (this.getType() == SwerveType.FALCON_500) {
             turnTalonFX.set(ControlMode.Position, FalconConversions.degreesToFalcon(angle, config.getSettings().angleGearRatio));
-        } else if (this.getType() == SCType.SWERVE_SparkMax) {
-            turnNEO.getPIDController().setReference(angle, CANSparkMax.ControlType.kPosition);
+        } else if (this.getType() == SwerveType.SPARK_MAX) {
+            turnNEO.getPIDController().setReference(angle / neoTurnPositionConversionFactor, CANSparkMax.ControlType.kPosition);
         }
 
         lastAngle = Rotation2d.fromDegrees(angle);
@@ -313,7 +350,7 @@ public class SwerveModule extends ControllerGroup.SpeedController {
      * */
     public void setDesiredState(SwerveModuleState state, boolean isOpenLoop) {
         //TODO: fix the optimization to make it more efficient
-        SwerveModuleState optimizedState = CTREModuleState.optimize(state, getRotation());
+        SwerveModuleState optimizedState = SwerveModuleState.optimize(state, getRotation());
 
         this.setAngle(optimizedState);
         this.setSpeed(optimizedState, isOpenLoop);
@@ -362,10 +399,10 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         //if (RobotBase.isSimulation()) return angleCache;
         if (RobotBase.isSimulation()) return Rotation2d.fromDegrees(angleCANCoder.getAbsolutePosition());
 
-        if (this.getType() == SCType.SWERVE_Talon_FX) {
+        if (this.getType() == SwerveType.FALCON_500) {
             return Rotation2d.fromDegrees(FalconConversions.falconToDegrees(turnTalonFX.getSelectedSensorPosition(), config.getSettings().angleGearRatio));
-        } else if (this.getType() == SCType.SWERVE_SparkMax) {
-            return Rotation2d.fromDegrees(neoTurnEncoder.getPosition());
+        } else if (this.getType() == SwerveType.SPARK_MAX) {
+            return Rotation2d.fromDegrees(neoTurnEncoder.getPosition() * (RobotBase.isSimulation() ? neoTurnPositionConversionFactor : 1));
         } else {
             return Rotation2d.fromDegrees(0);
         }
@@ -374,7 +411,7 @@ public class SwerveModule extends ControllerGroup.SpeedController {
     public SwerveModulePosition getPosition() {
         //First argument is the distance measured by the wheel of the module
         double distanceMeters = 0;
-        if (getType() == SCType.SWERVE_Talon_FX) {
+        if (getType() == SwerveType.FALCON_500) {
             //No clue if the falcon works.
             distanceMeters = (
                 FalconConversions.falconToMPS(
@@ -386,8 +423,9 @@ public class SwerveModule extends ControllerGroup.SpeedController {
                     * config.getSettings().driveGearRatio
             );
 
-        } else if (getType() == SCType.SWERVE_SparkMax) {
+        } else if (getType() == SwerveType.SPARK_MAX) {
             distanceMeters = neoDriveEncoder.getPosition();
+            distanceMeters *= (RobotBase.isSimulation() ? neoPositionConversionFactor : 1);
         }
 
         return new SwerveModulePosition(
@@ -404,9 +442,9 @@ public class SwerveModule extends ControllerGroup.SpeedController {
         double velocity = 0;
         Rotation2d angle = getAngle();
 
-        if (getType() == SCType.SWERVE_Talon_FX) {
+        if (getType() == SwerveType.FALCON_500) {
             velocity = RobotBase.isSimulation() ? speedCache : FalconConversions.falconToMPS(driveTalonFX.getSelectedSensorVelocity(), config.getSettings().wheelCircumference(), config.getSettings().driveGearRatio);
-        } else if (getType() == SCType.SWERVE_SparkMax) {
+        } else if (getType() == SwerveType.SPARK_MAX) {
             velocity = RobotBase.isSimulation() ? speedCache : neoDriveEncoder.getVelocity();
         }
 
@@ -417,7 +455,7 @@ public class SwerveModule extends ControllerGroup.SpeedController {
     public double getDriveEncoderPosition() {
         if (driveTalonFX == null && driveNEO == null) return 0;
         
-        return getType() == SCType.SWERVE_Talon_FX ? driveTalonFX.getSelectedSensorPosition() : neoDriveEncoder.getPosition();
+        return getType() == SwerveType.FALCON_500 ? driveTalonFX.getSelectedSensorPosition() : neoDriveEncoder.getPosition();
     }
 
     public String getBaseName() {

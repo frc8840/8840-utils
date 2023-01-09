@@ -11,8 +11,8 @@ import frc.team_8840_lib.listeners.EventListener;
 import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.controllers.Pigeon;
-import frc.team_8840_lib.utils.controllers.SCType;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
+import frc.team_8840_lib.utils.controllers.swerve.SwerveType;
 import frc.team_8840_lib.utils.controls.Axis;
 import frc.team_8840_lib.utils.math.MathUtils;
 
@@ -26,7 +26,7 @@ public class SwerveDrive extends EventListener {
         //Create a new SwerveSettings
         //This has all the default values from Team 364 and Team 3512's robots, but you might want to adjust them.
         //Edit the values like the example below to your liking
-        SwerveSettings settings = new SwerveSettings(SCType.SWERVE_Talon_FX);
+        SwerveSettings settings = new SwerveSettings(SwerveType.FALCON_500);
 
         //I would call this function BEFORE making adjustments, just changes any values that were different between the two swerve types.
         //Use at risk though, it might adjust the values to something you don't want.

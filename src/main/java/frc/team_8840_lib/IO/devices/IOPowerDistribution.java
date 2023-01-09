@@ -126,6 +126,10 @@ public class IOPowerDistribution extends IOLayer implements Loggable {
         pd.close();
     }
 
+    public String getBaseName() {
+        return "Power Distribution";
+    }
+
     @AutoLog(logtype = LogType.BYTE_ARRAY, name = "Power Distribution Info")
     public byte[] logPD() {
         int nOfChannels = getNumberOfChannels();
@@ -158,6 +162,8 @@ public class IOPowerDistribution extends IOLayer implements Loggable {
              * 0x00000000,
              * tempature,
              * 0x00000000,
+             * total current,
+             * 0x00000000,
              * nOfChannels,
              * 0x00000000,
              * current of channel 0,
@@ -165,7 +171,7 @@ public class IOPowerDistribution extends IOLayer implements Loggable {
              * etc..
              */
 
-            byte[] data = new byte[3 + voltageEncoded.length + tempatureEncoded.length + nOfChannelsEncoded.length + (8 * nOfChannels)];
+            byte[] data = new byte[4 + voltageEncoded.length + tempatureEncoded.length + totalCurrentEncoded.length + nOfChannelsEncoded.length + (8 * nOfChannels)];
 
             int index = 0;
 
@@ -179,6 +185,15 @@ public class IOPowerDistribution extends IOLayer implements Loggable {
             index++;
 
             for (int i = 0; i < tempatureEncoded.length; i++) {
+                data[index] = tempatureEncoded[i];
+                index++;
+            }
+
+            data[index] = 0x00;
+
+            index++;
+
+            for (int i = 0; i < totalCurrentEncoded.length; i++) {
                 data[index] = tempatureEncoded[i];
                 index++;
             }

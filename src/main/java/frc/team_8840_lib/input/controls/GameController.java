@@ -45,6 +45,7 @@ public class GameController {
     private double threshold = 0.1;
     private boolean inverted = false;
 
+    @Deprecated
     public GameController(int port) {
         this.port = port;
         if (checkIfConnected()) {
@@ -60,6 +61,7 @@ public class GameController {
 
     private boolean awaitingForConnection = false;
 
+    @Deprecated
     public GameController(int port, Type type) {
         this.port = port;
         this.type = type;

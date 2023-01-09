@@ -1,21 +1,25 @@
 package frc.team_8840_lib.listeners;
 
-import edu.wpi.first.wpilibj.DSControlWord;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import frc.team_8840_lib.IO.IOManager;
 import frc.team_8840_lib.info.console.Logger;
-import frc.team_8840_lib.info.time.TimeKeeper;
-import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.time.TimeStamp;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 public class Robot extends RobotBase {
     private static Robot instance;
-    public static Robot getInstance() { return instance; }
+    public static FrameworkUtil getInstance() { 
+        return frameworkUtil;
+    }
+
+    public static Robot getRealInstance() {
+        return instance;
+    }
+
+    public static final double DELTA_TIME = 0.03125; //32 times per sec
+
+    private static boolean runningWithInstance = true;
+
+    private static FrameworkUtil frameworkUtil;
 
     private static EventListener listener;
 
@@ -28,146 +32,40 @@ public class Robot extends RobotBase {
         System.out.println("[Robot] Assigning listener: " + listener.getClass().getName());
 
         Robot.listener = listener;
+
+        frameworkUtil = new FrameworkUtil();
     }
 
     private static boolean hasListener() {
         return listener != null;
     }
 
+    public static FrameworkUtil no8840LibEventListener() {
+        runningWithInstance = false;
+        frameworkUtil = new FrameworkUtil();
+        return frameworkUtil;
+    }
+
     public Robot() {
         super();
+
+        if (!runningWithInstance) exit = true;
+
         if (instance == null) {
             instance = this;
-        } else throw new RuntimeException("Robot already instantiated.");
+        }// else throw new RuntimeException("Robot already instantiated.");
     }
 
     //Volatile since can be assessed by stuff outside the program
     private volatile boolean exit;
 
-    private DSControlWord controlWord;
-
     private GamePhase lastPhase;
-
-    public static final double DELTA_TIME = 0.03125; //32 times per sec
-
-    //private final int m_notifier = NotifierJNI.initializeNotifier();
-
-    private TimerTask fixedAutonomous;
-    private TimerTask fixedTeleop;
-    private TimerTask fixedTest;
-
-    private Timer fixedTimer;
-
-    /**
-     * Due to the nature of periodic tasks (called 3500 to 4000 times per second), it's hard to get an accurate time for timing each call.
-     * By using a fixed rate, we can get a more accurate time for each call, which is extremely useful for things like PID and other control loops.
-     * This also puts less strain on the CPU since it's only called every 0.03125 seconds (32 times per second), about 1/100th of the time it's called in the other loop.
-     * This is also useful for things like logging, AI and other things that don't need to be called as often.
-     */
-    public void subscribeFixedPhase(TimerTask timerTask, GamePhase phase) {
-        if (!hasListener()) {
-            Logger.Log("No listener assigned. Cannot subscribe to fixed phase.");
-            return;
-        }
-
-        switch (phase) {
-            case Autonomous:
-                fixedAutonomous = timerTask;
-                break;
-            case Teleop:
-                fixedTeleop = timerTask;
-                break;
-            case Test:
-                fixedTest = timerTask;
-                break;
-            default:
-                break;
-        }
-    }
-
-    /**
-     * This method is called when the GamePhase changes.
-     * This will queue up the fixed rate tasks for the new phase, and resubscribe TimeKeeper subscriptions.
-     * @param newPhase The new GamePhase.
-     **/
-    private void onGamePhaseChange(GamePhase newPhase) {
-        try {
-            if (TimeKeeper.getInstance().automaticallyResubscribeEvents) {
-                TimeKeeper.getInstance().resubscribeAll(newPhase.getTimerName());
-            }
-        } catch (Exception e) {
-            Logger.Log("There was an error resubscribing events.");
-            e.printStackTrace();
-        }
-
-        if (fixedTimer != null) {
-            fixedTimer.cancel();
-            fixedTimer.purge();
-            fixedTimer = null;
-        }
-
-        TimerTask task = null;
-        switch (newPhase) {
-            case Autonomous:
-                task = new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (fixedAutonomous != null) {
-                            fixedAutonomous.run();
-                        }
-                    }
-                };
-                break;
-            case Teleop:
-                task = new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (fixedTeleop != null) {
-                            fixedTeleop.run();
-                        }
-                    }
-                };
-                break;
-            case Test:
-                task = new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (fixedTest != null) {
-                            fixedTest.run();
-                        }
-                    }
-                };
-                break;
-            default:
-                break;
-        }
-
-        if (task != null) {
-            fixedTimer = new Timer();
-            fixedTimer.scheduleAtFixedRate(task, 0, (long) (DELTA_TIME * 1000));
-            Logger.Log("[Robot] Started fixed rate task for " + newPhase.name());
-        }
-    }
-
-    public DSControlWord getDSControlWord() {
-        return controlWord;
-    }
 
     @Override
     public void startCompetition() {
-        controlWord = new DSControlWord();
+        frameworkUtil.onStart();
 
-        //DriverStationJNI.observeUserProgramStarting();
-
-        Logger.addClassToBeAutoLogged(new Logger());
-
-        CommunicationManager.init();
-        Logger.initWriter();
-        IOManager.init();
-        TimeKeeper.init();
-        Logger.logCompetitionStart();
-
-        lastPhase = GamePhase.Disabled;
+        boolean noRun = false;
 
         if (!hasListener()) {
             Logger.Log("[Robot] Warning: No event listener assigned. Please assign a listener before starting the competition.");
@@ -175,25 +73,18 @@ public class Robot extends RobotBase {
             Logger.Log("[Robot] Automatically stopping program due to no event listener.", TimeStamp.None);
 
             exit = true;
+            noRun = true;
         } else {
             listener.robotInit();
         }
 
+        lastPhase = GamePhase.Disabled;
+
         // Loop forever, calling the appropriate mode-dependent function
-        while (!exit) {
-            DriverStation.refreshData();
-            controlWord.refresh();
+        while (!exit) {            
+            frameworkUtil.periodicCall();
 
             GamePhase currentPhase = GamePhase.getCurrentPhase();
-
-            if (GamePhase.isEnabled()) {
-                TimeKeeper.getInstance().checkSubscribers(GamePhase.getCurrentPhase());
-            }
-
-            if (lastPhase != currentPhase) {
-                TimeKeeper.getInstance().changePhaseTimers(currentPhase);
-                onGamePhaseChange(currentPhase);
-            }
 
             listener.robotPeriodic();
 
@@ -244,7 +135,7 @@ public class Robot extends RobotBase {
             }
         }
 
-        System.out.println("[Robot] Exiting the program...");
+        if (!noRun) System.out.println("[Robot] Exiting the program...");
 
         // DriverStationJNI.observeUserProgramDisabled();
 
@@ -254,10 +145,7 @@ public class Robot extends RobotBase {
 
     @Override
     public void endCompetition() {
-        Logger.logCompetitionEnd();
-        Logger.closeLogger();
-
-        IOManager.close();
+        frameworkUtil.onEnd();
 
         exit = true;
     }

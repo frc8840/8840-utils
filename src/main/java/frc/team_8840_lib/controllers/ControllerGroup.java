@@ -5,7 +5,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
-import frc.team_8840_lib.IO.IOManager;
 import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
@@ -42,7 +41,9 @@ public class ControllerGroup {
      * @param name Name of the group
      * @param mainType Type of the ports
      * @param ports PWM Ports/CAN IDs of the controllers
+     * @deprecated
      */
+    @Deprecated(forRemoval = true)
     public ControllerGroup(String name, SCType mainType, int... ports) {
         this.name = name;
 
@@ -251,8 +252,10 @@ public class ControllerGroup {
      * Creates a speed controller at port with type 
      * @param port Port of speed controller
      * @param type Type of speed controller
+     * @deprecated
      * @return SpeedController
      */
+    @Deprecated(forRemoval = true)
     public static SpeedController createSC(int port, SCType type) {
         return new SpeedController(port, type);
     }
@@ -276,6 +279,13 @@ public class ControllerGroup {
 
         private boolean initialized = false;
 
+        /**
+         * Creates a speed controller at port with type
+         * @param port
+         * @param type
+         * @deprecated
+         */
+        @Deprecated(forRemoval = true)
         public SpeedController(int port, SCType type) {
             this.port = port;
             this.type = type;

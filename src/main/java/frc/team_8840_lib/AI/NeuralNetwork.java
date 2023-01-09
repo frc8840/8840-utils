@@ -5,7 +5,6 @@ import frc.team_8840_lib.utils.math.MathUtils;
 import frc.team_8840_lib.utils.math.Matrix;
 
 import java.util.List;
-import java.util.ArrayList;
 
 public class NeuralNetwork {
     private final int numberOfInputNodes;

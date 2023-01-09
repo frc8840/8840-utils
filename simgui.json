@@ -100,16 +100,12 @@
               "open": true
             },
             "absolute position": {
-              "0": {
-                "open": true
-              },
               "1": {
                 "open": true
               },
               "2": {
                 "open": true
-              },
-              "open": true
+              }
             },
             "open": true
           },
@@ -146,6 +142,18 @@
               },
               "open": true
             }
+          },
+          "Power Distribution": {
+            "current": {
+              "0": {
+                "open": true
+              },
+              "open": true
+            },
+            "number of channels": {
+              "open": true
+            },
+            "open": true
           },
           "Swerve Module 0": {
             "Drive Encoder Position": {
