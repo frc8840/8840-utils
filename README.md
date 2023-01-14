@@ -1,5 +1,6 @@
 # 8840 Utils
-### [Team 8840](https://team8840.org) - [Jaiden Grimminck](https://github.com/jaidenagrimminck)
+
+**[Team 8840](https://team8840.org) - [Jaiden Grimminck](https://github.com/jaidenagrimminck)**
 
 ## What is this?
 
@@ -15,6 +16,7 @@ We also have examples in the `/examples` folder, and they should work.
   
 **IMPORTANT:**  
 In your `Main` class, you will have to have this code in order for it to work:  
+
 ```java
 class Main {
     private Main() {}
@@ -23,114 +25,169 @@ class Main {
         //Assign the listener to the robot. See Examples/TankDrive.java for more info.
         frc.team_8840_lib.listeners.Robot.assignListener(new TankDrive());
 
+        //Assign the logger. This line is optional. This will record all files to the default directory, at "~/8840applogs"
+        frc.team_8840_lib.info.console.Logger.setWriter(new frc.team_8840_lib.info.console.FileWriter("default"));
+
         //Start the robot - Don't change this line
         RobotBase.startRobot(frc.team_8840_lib.listeners.Robot::new);
     }
 }
 ```
+
 Check [Main](https://github.com/frc8840/8840-utils/blob/main/src/main/java/frc/team_8840_lib/Main.java) for more info.
 
 ## What's in it?
 
-### `frc.team_8840_lib.AI`
+This library has a lot of stuff in it, so here's an overview of what's in it:
 
-One of our most important and expanding libraries, this is where we put all of our AI code.  
-...Well, "important" since it can run a neural network. DO NOT USE THIS FILE FOR TRAINING. This file is still a work in progress - there's code in a different repo that I'm (Jaiden) working on for the competition that will be added to this folder.  
-If you do want to train an AI, refer to our [8840-app](https://github.com/frc8840/8840-app) repository where we do have a working AI training program.
+- Swerve Drive for both Falcon 500 and Spark Max (note: not tested for Falcon 500)
+- IO Devices
+- Simulated Controls
+- Logging System
+- Listeners
+- Path Planning with our own path planner (8840-app)
+- Easy communications with NetworkTables
+- Custom HTTP Server, hosted on the robot
+- NeuralNetwork (note: issues with backpropagation due to some double errors)
+- ControllerGroup (note: deprecated, subject to removal)
+- Many examples for all of the above, found in the examples folder.
 
-### `frc.team_8840_lib.controllers`
+### IO Devices
 
-This is where we put all of our speed controller code.
-It contains two files, one being the `ControllerGroup` class. This class was made to be used with a multitude of different speed controllers, but it doesn't really support CAN yet (coming in near future), only PWM.
-We also have a `SwerveGroup` class, an extension of the `ControllerGroup` specifically for swerve drive. A lot of the code was adapted from [Team 364's Swerve Drive](https://github.com/Team364/BaseFalconSwerve) and [Team 3512's Swerve Drive](https://github.com/frc3512/SwerveBot-2022). Credit goes to them!
-  
-TODO: Add support for NEOs for `SwerveGroup`.
+IO Devices are a way to easily simulate controls and sensors, and to switch between them easily.
 
-Refer to `frc.team_8840_lib.examples.*` for some usage of them.
+Here's an example of how to use IO Devices:
 
-### `frc.team_8840_lib.examples`
-This is where we put all of our examples. 
-`TankDrive`, which is a simple replica of our code from last year. It's a simple setup using Spark Speed Controllers and a Logitech Joystick to control it. It's one of the most documented files, so if you're looking for a good amount of documentation, this is the place to go.
-`SwerveDrive` is also in this folder which is an example of possible swerve drive code. We haven't done much testing though, so it might not work!
+```java
+//Make sure the IOAccess is accurate. Methods that have READ_WRITE will be able to be read and written to, while READ will only be able to be read from. READ_WRITE must have a set method and read method, and READ must have a read method and not a set method.
+@IOAccess(IOPermission.READ_WRITE)
+public class IODevice extends IOLayer {
+    private double simulatedValue = 0;
 
-### `frc.team_8840_lib.info`
+    //SomeDevice does not exist, this is supposed to be what you're trying to simulate
+    private SomeDevice device;
 
-This folder is meant for code that has certain info specific to the robot, such as logging to the console or the time. There's a few holes in logic, but it... works out?
+    public IODevice(int port) {
+        //Include this line in every IODevice.
+        //This will make sure that the IOManager knows that this device exists.
+        super();
 
-#### • `frc.team_8840_lib.info.console`
+        this.device = new SomeDevice(port);
 
-This has the `Logger` class which is used for logging to the console with important info such as the time. This will be updated in the future to be saved to a file as well as robot info.
+        //This changes a variable in the IOLayer class that tells the library whether or not the device is real or simulated.
+        this.setReal(Robot.isReal());
+    }
 
-#### •`frc.team_8840_lib.info.time`
+    //Make sure the IOValue is accurate. This is the type of value that IOManager will write with.
+    //The method_type is the type of method that this is. This can be READ or WRITE. For this example, we're using WRITE.
+    //Make sure that the name is different from other methods in the class.
+    @IOMethod(name = "set value", method_type = IOMethodType.WRITE, value_type = IOValue.DOUBLE)
+    public void set(double value) {
+        this.simulatedValue = value;
+    }
+    
+    //Make sure the IOValue is accurate. This is the type of value that IOManager will write with.
+    //The method_type is the type of method that this is. This can be READ or WRITE. For this example, we're using READ.
+    //Make sure that the name is different from other methods in the class.
+    @IOMethod(name = "some value", method_type = IOMethodType.READ, value_type = IOValue.DOUBLE)
+    public double get() {
+        return this.isReal() ? this.device.get() : this.simulatedValue;
+    }
 
-This has the `TimeKeeper` class, which is used for keeping track of time. It's one of the more important classes, a lot of the other classes use it to figure out the time for the round/game phase/more!
-You can also create a subscription to the time, which can call a function before, after, and at a time. See `Examples.TankDrive` to see how it's implemented.
 
-### `frc.team_8840_lib.input`
+    //This is the name of the device. This is what will be displayed in the IOManager. This is also what will be used to identify the device. Note that this is a function, so if you want to difference between devices, you can do that here. We recommend not to change names after the robot has been deployed, since the NT values will persist and will not be updated.
+    public String getBaseName() {
+        return "IO Device";
+    }
+}
+```
 
-This is used for input from anything, whether it be a joystick, a sensor, or an HTTP request.
+### Logging
 
-#### • `frc.team_8840_lib.input.communication`
+The logging system is a way to easily log data to some file, or other place. A NT logger exists in this library, but it needs to be updated to be more efficient.
 
-This folder has the `CommunicationManager`, which is used for sending info to the Driver Station through SmartDashboard or other programs. One of the more important files. The folder also has another folder, called `server` which is used for hosting a REST server, which is used in the `CommunicationManager` to host a server on port 5805 (which should be legal according to rule R704 from the 2022 game, Rapid React).
+Here's an example of how to use the logging system:
 
-#### • `frc.team_8840_lib.input.controls`
+```java
+class SomeImportantLoggingThing implements Loggable {
+    private int someValue = 0;
+    private double multiplier = 1;
 
-This folder has the `GameController` class. This class is used from getting input from a controller, but only supports the Logitech Extreme 3D controller and a Logitech XBOX Controller. You can implement it in a new class if you want to add a different controller.
+    public SomeImportantLoggingThing() {
+        //This will add the logger to the list of loggers that will be logged to.
+        Logger.addClassToBeAutoLogged(this);
+    }
 
-### `frc.team_8840_lib.listeners`
+    //This is an example method that is called outside of the class.
+    //This method DOES NOT exist in the Loggable interface, and WILL not be called by the logger.
+    public void periodic() {
+        this.someValue++;
+        this.setMultiplier(this.multiplier + 0.1)
+    }
 
-This folder contains the `EventListener` abstract class, which is meant to be extended to contain the robot code. 
-The folder also has the `Robot` class, which is used for running the `EventListener`. Don't use this class, use the `EventListener` class instead and use `Robot#assignListener` to assign the listener to the robot.
-Check out the `TankDrive` example and `Main` class to see how they're implemented. (It also contains the GamePhase enum, which is used for the current phase of the game.)
+    //This is an example method that is called outside of the class.
+    //This method DOES NOT exist in the Loggable interface, and WILL not be called by the logger.
+    public void setMultiplier(double multiplier) {
+        this.multiplier = multiplier;
+    }
 
-### `frc.team_8840_lib.utils`
+    //This method will be called by the logger, and any other method with the AutoLog annotation. Specify the type of return value, and the name of the value.
+    @AutoLog(logtype = LogType.INT, name = "some value")
+    public int log() {
+        return this.someValue;
+    }
 
-This folder contains all the more general utility classes, mostly enums, interfaces, and some general classes.
+    //This method will be called by the logger, and any other method with the AutoLog annotation. Specify the type of return value, and the name of the value.
+    //You can also use the byte[] notation to log any type of data.
+    //This is useful for logging streams of data.
+    @AutoLog(logtype = LogType.DOUBLE, name = "multiplier")
+    public byte[] logMultiplier() {
+        //ByteConversions is a class that exists in the library.
+        //It has methods to convert different types of data to byte arrays.
 
-#### • `frc.team_8840_lib.utils.controllers`
+        //We declare two byte arrays containing the encoded values.
+        byte[] encodedMutliplier = ByteConversions.doubleToByteArray(this.multiplier);
 
-This folder contains the `EncoderInformation` and `MotorInfo` class which are used to reformat some information from motor/encoder sensors. (A bit useless now, but can be expanded on in the future to provide better info.)
-It also contains the `SCType` enum, which is used to specify the type of speed controller. This is used in the `ControllerGroup` class. (I need a better name for it, but yeah.)  
-More centered on swerve drive, it has the Pigeon class which can support both the Pigeon IMU and the Pigeon 2.0.
+        byte[] encodedSomeValue = ByteConversions.intToByteArray(this.someValue);
 
-#### · · `frc.team_8840_lib.utils.controllers.swerve`
+        //Create a combined array, with a length of the two arrays combined.
+        byte[] combined = new byte[encodedMutliplier.length + 1 + encodedSomeValue.length];
 
-This folder contains all utility classes for swerve drive. A lot of code from this was adapted/is from 
-[Team 364's Swerve Drive](https://github.com/Team364/BaseFalconSwerve) and [Team 3512's Swerve Drive](https://github.com/frc3512/SwerveBot-2022). Credit goes to them for much of the code.
+        //Set the middle value to 0x00, which is the delimiter. This is useful for reading the data.
+        combined[encodedMutliplier.length] = 0x00;
 
-#### • `frc.team_8840_lib.utils.controls`
+        //Copy the arrays into one array
+        System.arraycopy(encodedMutliplier, 0, combined, 0, encodedMutliplier.length);
 
-This folder contains all information for the axis's and buttons raw numbers on the controllers.
+        System.arraycopy(encodedSomeValue, 0, combined, encodedMutliplier.length, encodedSomeValue.length);
 
-#### • `frc.team_8840_lib.utils.http`
+        //Return the combined array.
+        return combined;
 
-This contains all the utilities used for creating a path on the REST server. See `CommunicationManager` to see how it's implemented.
+        //Unfortunately, we only support reading byte arrays that are default to the library in 8840-app
+        //We will be adding support for custom byte arrays in the future, but for now, we recommend using the default types unless you want to write your own parser.
+        //I don't think you should be using this library if you can write your own parser though. You probably have enough knolwedge to write your own library.
+    }
+}
+```
 
-#### • `frc.team_8840_lib.utils.interfaces`
+Loggables and IODevices can be combined, look at IOPowerDistribution for an example.
 
-This contains all the interfaces used in the library.
+Note: IOPowerDistribution is disabled by default. You can enable it by `IOPowerDistribution.init()` but the robot should be connected to the IOPowerDistribtion by CAN in order for it to work. (We'll fix it in the future, but for now it's disabled by default.)
+Only one IOPowerDistribution can be initialized at a time. Please use `IOPowerDistribution.getInstance()` to get the instance of the IOPowerDistribution.
 
-#### • `frc.team_8840_lib.utils.math`
+### Swerve Drive
 
-This folder contains the `MathUtils` class, which is used for math functions that aren't in the `Math` class.
-It also contains the `Matrix` class which is used for matrix math. This is primarily used in the `NeuralNetwork` class.
-
-#### • `frc.team_8840_lib.utils.time`
-
-This folder contains the utilities used with time. It has the `SubscriptionType` enum which is used for registering subscriptions in `TimeKeeper`.
-It also contains the `TimeStamp` class which is used primarly for logging.
-
+The swerve drive is a way to control a swerve drive. It's pretty simple to use, and it's pretty easy to use. Check out the SwerveDrive example class for information initializing the swerve drive, and funnily enough, check out the AutonomousExample for a better example of how to drive it (you can see which file I used for testing more often). Check out AutonomousExample for how the path planner is implemented into the swerve drive.
 
 ## What's coming?
 
 We're still working on the library, so there's a lot of stuff that's coming. Here's a list of what's coming:
-- CAN support for `ControllerGroup`
+
+- Better communication with driver station
+- Better and smoother swerve drive
+- Better path planning
 - More documentation
-- More examples
-- A lot more AI code!
-- Better communication with the Driver Station
-- Being able to be controlled over HTTP
 - Much more!
 
 ## Contributing

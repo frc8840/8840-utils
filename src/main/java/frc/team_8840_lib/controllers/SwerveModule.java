@@ -162,7 +162,7 @@ public class SwerveModule extends IOLayer {
         neoTurnPIDController.setD(config.getSettings().turnPID.kD);
         neoTurnPIDController.setFF(config.getSettings().turnPID.kF);
 
-        //neoTurnPIDController.setFeedbackDevice(neoTurnEncoder);
+        neoTurnPIDController.setFeedbackDevice(neoTurnEncoder);
         
         //Make the NEO turn PID controller wrap around from [0, 2pi]
         neoTurnPIDController.setPositionPIDWrappingEnabled(true);

@@ -29,7 +29,7 @@ public class IOManager implements Loggable {
     public static void init() {
         instance = new IOManager();
 
-        IOPowerDistribution.init();
+        //IOPowerDistribution.init();
     }
 
     public static void close() {

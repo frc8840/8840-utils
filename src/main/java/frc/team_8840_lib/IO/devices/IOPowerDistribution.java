@@ -42,7 +42,7 @@ public class IOPowerDistribution extends IOLayer implements Loggable {
     public IOPowerDistribution() {
         super();
 
-        setReal(!RobotBase.isSimulation());
+        setReal(!RobotBase.isReal());
 
         pd = new PowerDistribution();
         numberOfPDChannels = pd.getNumChannels() <= 0 ? 16 : pd.getNumChannels();
@@ -127,7 +127,7 @@ public class IOPowerDistribution extends IOLayer implements Loggable {
     }
 
     public String getBaseName() {
-        return "Power Distribution";
+        return "Power_Distribution";
     }
 
     @AutoLog(logtype = LogType.BYTE_ARRAY, name = "Power Distribution Info")

@@ -1,6 +1,13 @@
 package frc.team_8840_lib.listeners;
 
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.hal.HAL;
+import edu.wpi.first.hal.NotifierJNI;
+import edu.wpi.first.hal.FRCNetComm.tInstances;
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Watchdog;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.time.TimeStamp;
@@ -61,8 +68,23 @@ public class Robot extends RobotBase {
 
     private GamePhase lastPhase;
 
+    private Watchdog watchdog;
+    private final double watchdogPeriod = 0.02;
+
+    private final int notifier = NotifierJNI.initializeNotifier();
+    
+    private double startTime;
+
     @Override
     public void startCompetition() {
+        watchdog = new Watchdog(watchdogPeriod, this::printLoopOverrunMessage);
+
+        startTime = System.currentTimeMillis();
+
+        NotifierJNI.setNotifierName(notifier, "8840LibRobot");
+
+        HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
+
         frameworkUtil.onStart();
 
         boolean noRun = false;
@@ -78,60 +100,101 @@ public class Robot extends RobotBase {
             listener.robotInit();
         }
 
+        Logger.Log("[Robot] Robot program startup completed in " + (System.currentTimeMillis() - startTime) + "ms.");
+        DriverStationJNI.observeUserProgramStarting();
+
         lastPhase = GamePhase.Disabled;
 
         // Loop forever, calling the appropriate mode-dependent function
-        while (!exit) {            
+        while (!exit) {
+            NotifierJNI.updateNotifierAlarm(notifier, (long) (System.currentTimeMillis() + DELTA_TIME * 1000));
+
+            long curTime = NotifierJNI.waitForNotifierAlarm(notifier);
+            if (curTime == 0) {
+                break;
+            }
+
             frameworkUtil.periodicCall();
 
             GamePhase currentPhase = GamePhase.getCurrentPhase();
 
             listener.robotPeriodic();
+            watchdog.reset();
+
+            if (Robot.isSimulation()) {
+                HAL.simPeriodicBefore();
+            }  
 
             switch (currentPhase) {
                 case Disabled:
                     if (lastPhase != currentPhase) {
                         listener.onDisabled();
+                        watchdog.addEpoch("onDisabled()");
                         lastPhase = currentPhase;
                     }
 
-                   // DriverStationJNI.observeUserProgramDisabled();
+                    DriverStationJNI.observeUserProgramDisabled();
 
                     listener.onDisabledPeriodic();
+
+                    watchdog.addEpoch("onDisabledPeriodic()");
+
                     break;
                 case Autonomous:
                     if (lastPhase != currentPhase) {
                         listener.onAutonomousEnable();
+                        watchdog.addEpoch("onAutonomousEnable()");
                         lastPhase = currentPhase;
                     }
 
-                   // DriverStationJNI.observeUserProgramAutonomous();
+                    DriverStationJNI.observeUserProgramAutonomous();
 
                     listener.onAutonomousPeriodic();
+
+                    watchdog.addEpoch("onAutonomousPeriodic()");
+
                     break;
                 case Teleop:
                     if (lastPhase != currentPhase) {
                         listener.onTeleopEnable();
+                        watchdog.addEpoch("onTeleopEnable()");
                         lastPhase = currentPhase;
                     }
 
-                   // DriverStationJNI.observeUserProgramTeleop();
+                    DriverStationJNI.observeUserProgramTeleop();
 
                     listener.onTeleopPeriodic();
+
+                    watchdog.addEpoch("onTeleopPeriodic()");
+
                     break;
                 case Test:
                     if (lastPhase != currentPhase) {
                         listener.onTestEnable();
+                        watchdog.addEpoch("onTestEnable()");
                         lastPhase = currentPhase;
                     }
 
-                    //DriverStationJNI.observeUserProgramTest();
+                    DriverStationJNI.observeUserProgramTest();
 
                     listener.onTestPeriodic();
+
+                    watchdog.addEpoch("onTestPeriodic()");
+
                     break;
                 default:
                     Logger.Log("[Robot] Warning: Unknown game phase. Please report this to the developers.");
                     break;
+            }
+
+            if (Robot.isSimulation()) {
+                HAL.simPeriodicAfter();
+            }
+
+            watchdog.disable();
+
+            if (watchdog.isExpired()) {
+                watchdog.printEpochs();
             }
         }
 
@@ -147,6 +210,19 @@ public class Robot extends RobotBase {
     public void endCompetition() {
         frameworkUtil.onEnd();
 
+        NotifierJNI.stopNotifier(notifier);
+
         exit = true;
+    }
+
+    @Override
+    public void close() {
+        NotifierJNI.stopNotifier(notifier);
+        NotifierJNI.cleanNotifier(notifier);
+    }
+
+    private void printLoopOverrunMessage() {
+        DriverStation.reportWarning("Loop time of " + watchdogPeriod + "s overrun\n", false);
+        Logger.Log("[Robot] Warning: Loop time of " + watchdogPeriod + "s overrun", TimeStamp.BothRealAndGameTime);
     }
 }

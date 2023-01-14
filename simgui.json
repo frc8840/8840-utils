@@ -106,8 +106,7 @@
               "2": {
                 "open": true
               }
-            },
-            "open": true
+            }
           },
           "Empty IOLayer": {
             "0": {
@@ -155,6 +154,21 @@
             },
             "open": true
           },
+          "Power_Distribution": {
+            "current": {
+              "open": true
+            },
+            "number of channels": {
+              "open": true
+            },
+            "open": true,
+            "tempature": {
+              "open": true
+            },
+            "voltage": {
+              "open": true
+            }
+          },
           "Swerve Module 0": {
             "Drive Encoder Position": {
               "0": {
@@ -178,7 +192,8 @@
             },
             "Initialized": {
               "open": true
-            }
+            },
+            "open": true
           },
           "open": true
         },
