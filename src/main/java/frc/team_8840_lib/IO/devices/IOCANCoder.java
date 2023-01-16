@@ -41,7 +41,8 @@ public class IOCANCoder extends IOLayer {
      */
     @IOMethod(name = "absolute position", method_type = IOMethodType.READ, value_type = IOValue.DOUBLE)
     public double getAbsolutePosition() {
-        if (encoder == null) return 0;
+        if (encoder == null) return isReal() ? 0 : this.cache;
+        
         return isReal() ? encoder.getAbsolutePosition() : this.cache;
     }
     
@@ -55,10 +56,12 @@ public class IOCANCoder extends IOLayer {
     }
 
     public void configAllSettings(CANCoderConfiguration config) {
+        if (encoder == null) return;
         encoder.configAllSettings(config);
     }
 
     public void configFactoryDefault() {
+        if (encoder == null) return;
         encoder.configFactoryDefault();
     }
 

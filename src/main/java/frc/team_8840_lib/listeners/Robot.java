@@ -102,6 +102,8 @@ public class Robot extends RobotBase {
 
         Logger.Log("[Robot] Robot program startup completed in " + (System.currentTimeMillis() - startTime) + "ms.");
 
+        lastPhase = GamePhase.Disabled;
+
         //This line is the line that alerts the DriverStation that the robot is ready to be enabled.
         //pretty much turns that red robot code light to green.
         //also this means that any delays in the robotInit() method will delay the robot from being enabled.
@@ -111,8 +113,6 @@ public class Robot extends RobotBase {
         //loosing a crap ton of points. Maybe an empty listener if the robot reboots? or just call this earlier.
         //TODO: figure out this stuff from above.
         DriverStationJNI.observeUserProgramStarting();
-
-        lastPhase = GamePhase.Disabled;
 
         // Loop forever, calling the appropriate mode-dependent function
         while (!exit) {
