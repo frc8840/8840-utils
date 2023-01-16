@@ -101,6 +101,15 @@ public class Robot extends RobotBase {
         }
 
         Logger.Log("[Robot] Robot program startup completed in " + (System.currentTimeMillis() - startTime) + "ms.");
+
+        //This line is the line that alerts the DriverStation that the robot is ready to be enabled.
+        //pretty much turns that red robot code light to green.
+        //also this means that any delays in the robotInit() method will delay the robot from being enabled.
+        //etc. potentially may add a small little delay method to add some processing or something to allow transfer or data
+        //or something like that.
+        //also might want to figure out how to make this call if the robot reboots or something to prevent the robot from
+        //loosing a crap ton of points. Maybe an empty listener if the robot reboots? or just call this earlier.
+        //TODO: figure out this stuff from above.
         DriverStationJNI.observeUserProgramStarting();
 
         lastPhase = GamePhase.Disabled;
@@ -109,10 +118,11 @@ public class Robot extends RobotBase {
         while (!exit) {
             NotifierJNI.updateNotifierAlarm(notifier, (long) (System.currentTimeMillis() + DELTA_TIME * 1000));
 
-            long curTime = NotifierJNI.waitForNotifierAlarm(notifier);
-            if (curTime == 0) {
-                break;
-            }
+            //Don't think this is needed since this is a custom framework.
+            // long curTime = NotifierJNI.waitForNotifierAlarm(notifier);
+            // if (curTime == 0) {
+            //     break;
+            // }
 
             frameworkUtil.periodicCall();
 
@@ -123,47 +133,77 @@ public class Robot extends RobotBase {
 
             if (Robot.isSimulation()) {
                 HAL.simPeriodicBefore();
-            }  
-
+            }
+            
             switch (currentPhase) {
                 case Disabled:
                     if (lastPhase != currentPhase) {
-                        listener.onDisabled();
+                        try {
+                            listener.onDisabled();
+                        } catch (Exception e) {
+                            Logger.Log("[Robot] Error in onDisabled()!");
+                            e.printStackTrace();
+                        }
                         watchdog.addEpoch("onDisabled()");
                         lastPhase = currentPhase;
                     }
 
                     DriverStationJNI.observeUserProgramDisabled();
 
-                    listener.onDisabledPeriodic();
+                    try {
+                        listener.onDisabledPeriodic();
+                    } catch (Exception e) {
+                        Logger.Log("[Robot] Error in onDisabledPeriodic()!");
+                        e.printStackTrace();
+                    }
 
                     watchdog.addEpoch("onDisabledPeriodic()");
 
                     break;
                 case Autonomous:
                     if (lastPhase != currentPhase) {
-                        listener.onAutonomousEnable();
+                        try {
+                            listener.onAutonomousEnable();
+                        } catch (Exception e) {
+                            Logger.Log("[Robot] Error in onAutonomousEnable()!");
+                            e.printStackTrace();
+                        }
                         watchdog.addEpoch("onAutonomousEnable()");
                         lastPhase = currentPhase;
                     }
 
                     DriverStationJNI.observeUserProgramAutonomous();
 
-                    listener.onAutonomousPeriodic();
+                    try {
+                        listener.onAutonomousPeriodic();
+                    } catch (Exception e) {
+                        Logger.Log("[Robot] Error in onAutonomousPeriodic()!");
+                        e.printStackTrace();
+                    }
 
                     watchdog.addEpoch("onAutonomousPeriodic()");
 
                     break;
                 case Teleop:
                     if (lastPhase != currentPhase) {
-                        listener.onTeleopEnable();
+                        try {
+                            listener.onTeleopEnable();
+                        } catch (Exception e) {
+                            Logger.Log("[Robot] Error in onTeleopEnable()!");
+                            e.printStackTrace();
+                        }
                         watchdog.addEpoch("onTeleopEnable()");
                         lastPhase = currentPhase;
                     }
 
                     DriverStationJNI.observeUserProgramTeleop();
 
-                    listener.onTeleopPeriodic();
+                    try {
+                        listener.onTeleopPeriodic();
+                    } catch (Exception e) {
+                        Logger.Log("[Robot] Error in onTeleopPeriodic()!");
+                        e.printStackTrace();
+                    }
 
                     watchdog.addEpoch("onTeleopPeriodic()");
 
@@ -177,7 +217,12 @@ public class Robot extends RobotBase {
 
                     DriverStationJNI.observeUserProgramTest();
 
-                    listener.onTestPeriodic();
+                    try {
+                        listener.onTestPeriodic();
+                    } catch (Exception e) {
+                        Logger.Log("[Robot] Error in onTestPeriodic()!");
+                        e.printStackTrace();
+                    }
 
                     watchdog.addEpoch("onTestPeriodic()");
 

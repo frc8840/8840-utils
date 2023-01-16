@@ -349,7 +349,6 @@ public class SwerveModule extends IOLayer {
      * @param isOpenLoop Whether the drive motor should be in open loop.
      * */
     public void setDesiredState(SwerveModuleState state, boolean isOpenLoop) {
-        //TODO: fix the optimization to make it more efficient
         SwerveModuleState optimizedState = SwerveModuleState.optimize(state, getRotation());
 
         this.setAngle(optimizedState);

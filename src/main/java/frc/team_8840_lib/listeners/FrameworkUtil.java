@@ -38,8 +38,6 @@ public class FrameworkUtil {
     public void onStart() {
         controlWord = new DSControlWord();
 
-        //DriverStationJNI.observeUserProgramStarting();
-
         Logger.addClassToBeAutoLogged(new Logger());
 
         CommunicationManager.init();

@@ -24,9 +24,15 @@ public class IOCANCoder extends IOLayer {
 
         this.encoderPort = (int) args[0];
 
-        this.encoder = new CANCoder(this.encoderPort);
+        if (this.encoderPort >= 0) {
+            this.encoder = new CANCoder(this.encoderPort);
+        }
 
         this.setReal(!RobotBase.isSimulation());
+
+        if (this.encoderPort < 0) {
+            this.setReal(false);
+        }
     }
 
     /**

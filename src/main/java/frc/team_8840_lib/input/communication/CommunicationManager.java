@@ -14,6 +14,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.networktables.Publisher;
 import edu.wpi.first.networktables.StringPublisher;
+import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team_8840_lib.controllers.ControllerGroup;
@@ -472,6 +473,17 @@ public class CommunicationManager {
             }
         }
         pop();
+
+        return this;
+    }
+
+    public CommunicationManager updateMotorControllerInfo(MotorController controller, String name) {
+        double speed = controller.get();
+        
+        updateInfo(SpeedControllerKey, name + "/hasSubGroup", false);
+        updateInfo(SpeedControllerKey, name + "/AvgSpeed", speed);
+        updateInfo(SpeedControllerKey, name + "/Name", name);
+        updateInfo(SpeedControllerKey, name + "/Controller_0_Speed", speed);
 
         return this;
     }

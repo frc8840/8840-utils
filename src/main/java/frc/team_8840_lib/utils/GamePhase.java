@@ -11,6 +11,7 @@ public enum GamePhase {
 
     public static GamePhase getCurrentPhase() {
         DSControlWord dsControlWord = Robot.getInstance().getDSControlWord();
+        
         if (dsControlWord.isAutonomous() && dsControlWord.isAutonomousEnabled()) {
             return Autonomous;
         } else if (dsControlWord.isTeleop() && dsControlWord.isTeleopEnabled()) {
