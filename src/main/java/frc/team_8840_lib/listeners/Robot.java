@@ -1,5 +1,8 @@
 package frc.team_8840_lib.listeners;
 
+import java.nio.file.Path;
+import java.util.HashMap;
+
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.NotifierJNI;
@@ -41,6 +44,64 @@ public class Robot extends RobotBase {
         Robot.listener = listener;
 
         frameworkUtil = new FrameworkUtil();
+    }
+
+    public static String getEventListenerName() {
+        return listener.getClass().getSimpleName();
+    }
+
+    public static boolean listenerAssigned() {
+        return listener != null;
+    }
+
+    private static boolean lockEventListenerToOnlyCode = true;
+
+    public static boolean eventListenerIsLockedToCode() {
+        return lockEventListenerToOnlyCode;
+    }
+
+    public static void assignListenerThroughSettings(Path preferencesFilePath, Class<EventListener>[] listeners, Class<EventListener> _default) {
+        if (!Preferences.loaded()) Preferences.loadPreferences(preferencesFilePath);
+
+        lockEventListenerToOnlyCode = false;
+
+        for (Class<EventListener> eventListener : listeners) {
+            if (Preferences.getSelectedEventListener() == eventListener.getSimpleName()) {
+                try {
+                    EventListener newListener = (EventListener) eventListener.getConstructors()[0].newInstance();
+
+                    assignListener(newListener);
+                } catch (Exception e) {
+                    Logger.Log("[Robot] Was unable to create class, an error occurred. Please check the stack trace for more information.");
+                    e.printStackTrace();
+
+                    try {
+                        EventListener _defaultListener = (EventListener) _default.getConstructors()[0].newInstance();
+
+                        assignListener(_defaultListener);
+                    } catch (Exception e2) {
+                        Logger.Log("[Robot] Was unable to create class FOR DEFAULT, an error occurred. Please check the stack trace for more information.");
+                        e2.printStackTrace();
+
+                        Logger.Log("[Robot] If you have not already, please make sure that you try assigning the default listener in an if-statement, checking Robot#listenerAssigned()");
+                    }
+                }
+                return;
+            }
+        }
+
+        try {
+            EventListener _defaultListener = (EventListener) _default.getConstructors()[0].newInstance();
+
+            Logger.Log("[Robot] Was unable to find class, assigning default listener: " + _defaultListener.getClass().getName());
+
+            assignListener(_defaultListener);
+        } catch (Exception e2) {
+            Logger.Log("[Robot] Was unable to create class FOR DEFAULT, an error occurred. Please check the stack trace for more information.");
+            e2.printStackTrace();
+
+            Logger.Log("[Robot] If you have not already, please make sure that you try assigning the default listener in an if-statement, checking Robot#listenerAssigned()");
+        }
     }
 
     private static boolean hasListener() {

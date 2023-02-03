@@ -20,7 +20,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team_8840_lib.controllers.ControllerGroup;
 import frc.team_8840_lib.controllers.SwerveGroup;
 import frc.team_8840_lib.info.console.Logger;
+import frc.team_8840_lib.input.communication.dashboard.ModuleBuilder;
 import frc.team_8840_lib.input.communication.server.HTTPServer;
+import frc.team_8840_lib.listeners.Preferences;
+import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.http.Constructor;
 import frc.team_8840_lib.utils.http.IP;
 import frc.team_8840_lib.utils.http.Route;
@@ -29,6 +32,7 @@ import frc.team_8840_lib.utils.http.html.EncodingUtil;
 import frc.team_8840_lib.utils.pathplanner.PathCallback;
 import frc.team_8840_lib.utils.pathplanner.TimePoint;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -363,6 +367,61 @@ public class CommunicationManager {
                 }
             }));
 
+            server.route(new Route("/preferences", new Constructor() {
+                @Override
+                public Route.Resolution finish(HttpExchange req, Route.Resolution res) {
+                    if (!req.getRequestMethod().equals("POST")) {
+                        if (req.getRequestMethod().equals("GET")) {
+                            String currentStoredLogWriter = Preferences.getSelectedLogger();
+                            String currentStoredEventListener = Preferences.getSelectedEventListener();
+
+                            boolean lockedLogWriter = Logger.logWriterIsLockedToCode();
+                            boolean lockedEventListener = Robot.eventListenerIsLockedToCode();
+
+                            if (lockedEventListener) {
+                                currentStoredEventListener = Robot.getEventListenerName();
+                            }
+
+                            if (lockedLogWriter) {
+                                currentStoredLogWriter = Logger.getLogWriterName();
+                            }
+
+                            return res.json("{\"success\": true, \"logWriter\": \"" + currentStoredLogWriter + "\", \"eventListener\": \"" + currentStoredEventListener + "\", \"lockedLogWriter\": " + lockedLogWriter + ", \"lockedEventListener\": " + lockedEventListener + "}");
+                        }
+
+                        return res.json(this.error("Invalid request method.")).status(405);
+                    }
+
+                    JSONObject json;
+
+                    try {
+                        json = new JSONObject(new String(req.getRequestBody().readAllBytes()));
+                    } catch (JSONException | IOException e) {
+                        e.printStackTrace();
+
+                        return res.json(this.error("Invalid JSON code.")).status(400);
+                    }
+
+                    if (!json.has("logWriter") || !json.has("eventListener")) {
+                        return res.json(this.error("Invalid JSON format.")).status(400);
+                    }
+
+                    String logWriter = json.getString("logWriter");
+                    String eventListener = json.getString("eventListener");
+
+                    if (!Logger.logWriterIsLockedToCode()) Preferences.setSelectedLogger(logWriter);
+                    if (!Robot.eventListenerIsLockedToCode()) Preferences.setSelectedEventListener(eventListener);
+
+                    Logger.Log("[Preferences] Successfully loaded in preferences from /preferences endpoint.");
+
+                    Preferences.savePreferences(Preferences.getDefaultPreferencesPath());
+
+                    return res.json("{\"success\": true, \"message\": \"Preferences set.\"}");
+                }
+            }));
+
+            server.route(new Route("/custom_modules", ModuleBuilder.getConstructor()));
+
             server.listen();
 
             String ip_addr = IP.getIP();
@@ -424,7 +483,12 @@ public class CommunicationManager {
         final String name = "swerve_drive";
         final String groupName = EncodingUtil.encodeURIComponent(swerveGroup.getName());
 
-        updateInfo(name, "swerve_name", groupName);
+        try {
+            updateInfo(name, "swerve_name", groupName);
+        } catch (Exception e) {
+            //just wait and try again later, since the server is probably not ready yet.
+            return this;
+        }
 
         swerveGroup.loop(((module, index) -> {
             updateInfo(name, "module_" + index + "/last_angle", module.getLastAngle().getDegrees());

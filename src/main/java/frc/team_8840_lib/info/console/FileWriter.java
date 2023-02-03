@@ -11,6 +11,10 @@ public class FileWriter extends LogWriter {
 
     private String[] args;
 
+    public FileWriter() {
+        this.args = new String[] { "default" };
+    }
+
     public FileWriter(String ...args) {
         this.args = args;
     }

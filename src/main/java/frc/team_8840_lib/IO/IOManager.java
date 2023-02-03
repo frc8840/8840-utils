@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import frc.team_8840_lib.IO.devices.IOPowerDistribution;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import frc.team_8840_lib.info.console.AutoLog;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.info.console.Logger.LogType;
@@ -55,9 +55,19 @@ public class IOManager implements Loggable {
         ioLayers.add(layer);
     }
 
+    private HashMap<String, Long> recordedWriteChanges;
+
     @AutoLog( logtype = LogType.BYTE_ARRAY, name = "IO" )
     public byte[] readAndSendIOInformation() {
         HashMap<String, ArrayList<IOInfo>> data = new HashMap<>();
+
+        ArrayList<IOWriteInfo> ioWriteInfo = new ArrayList<>();
+
+        HashMap<String, Integer> layerCount = new HashMap<>();
+
+        if (recordedWriteChanges == null) {
+            recordedWriteChanges = new HashMap<>();
+        }
 
         for (IOLayer layer : this.ioLayers) {
             IOPermission perms = IOPermission.NONE;
@@ -68,8 +78,29 @@ public class IOManager implements Loggable {
                 throw new AnnotationFormatError("[IOManager] Annotation not found on any method in IOLayer class " + layer.getBaseName() + " (class: " + layer.getClass().getName() + ")");
             }
 
+            //get the count of the write methods.
+            if (!layerCount.containsKey(layer.getBaseName())) {
+                layerCount.put(layer.getBaseName(), -1);
+            }
+
+            layerCount.put(layer.getBaseName(), layerCount.get(layer.getBaseName()) + 1);
+
             boolean hasRead = false;
             boolean hasWrite = false;
+
+            if (outputingToComms) {
+                CommunicationManager.getInstance()
+                    .updateInfo(
+                        "IO", 
+                        layer.getBaseName() + "/.info/p",
+                        perms.shortName()
+                    )
+                    .updateInfo(
+                        "IO", 
+                        layer.getBaseName() + "/" + layerCount.get(layer.getBaseName()) + "/.info/real", 
+                        layer.isReal()
+                    );
+            }
 
             for (Method method : layer.getClass().getMethods()) {                
                 IOMethod iomethod = method.getAnnotation(IOMethod.class);
@@ -78,6 +109,8 @@ public class IOManager implements Loggable {
                     continue;
                 }
 
+                String key = layer.getBaseName() + "/" + layerCount.get(layer.getBaseName()) + "/" + iomethod.name();
+
                 /*
                 We don't need the write methods since they're supposed to be invoked
                 when writing. All we're doing here is reading the methods so
@@ -85,6 +118,21 @@ public class IOManager implements Loggable {
                 */
                 if (iomethod.method_type() == IOMethodType.WRITE) {
                     hasWrite = true;
+
+                    IOWriteInfo writeInfo = new IOWriteInfo(
+                        key,
+                        layer,
+                        method,
+                        iomethod.value_type()
+                    );
+                    
+                    if (outputingToComms) {
+                        //just write the type of the value.
+                        CommunicationManager.getInstance()
+                            .updateInfo("IO", key + "/t", iomethod.value_type().toString());
+                    }
+
+                    ioWriteInfo.add(writeInfo);
 
                     continue;
                 } else if (iomethod.method_type() == IOMethodType.READ) {
@@ -99,7 +147,7 @@ public class IOManager implements Loggable {
                     if (iomethod.method_type() == IOMethodType.READ) {
                         data.get(layer.getBaseName()).add(
                             new IOInfo(
-                                layer.getBaseName() + "/" + iomethod.name(),
+                                key,
                                 method.invoke(layer),
                                 iomethod.value_type(),
                                 perms,
@@ -115,60 +163,51 @@ public class IOManager implements Loggable {
 
             //Quickly check perms to make sure it has all of the methods.
             if (!(hasRead && hasWrite) && perms == IOPermission.READ_WRITE) {
-                throw new IllegalArgumentException("[IOManager] Missing either read or write methods on IO layer " + layer.getBaseName() + "(class name: " + layer.getClass().getName() + ")" + " when marked as having both. Either change the IOPermissions or add in a read or write method.");
+                throw new IllegalArgumentException("[IOManager] Missing either read or write methods on IO layer " + layer.getBaseName() + " (class name: " + layer.getClass().getName() + ")" + " when marked as having both. Either change the IOPermissions or add in a read or write method.");
             }
 
             if (!hasRead && perms == IOPermission.READ) {
-                throw new IllegalArgumentException("[IOManager] Missing either ");
+                throw new IllegalArgumentException("[IOManager] Missing read method(s) on IO layer " + layer.getBaseName() + " (class name: " + layer.getClass().getName() + ")" + " when marked as having at least one. Either change the IOPermissions or add in a read method.");
             }
         }
 
         if (outputingToComms) {
             for (String _key : data.keySet()) {
-                HashMap<String, Integer> nameCalled = new HashMap<>();
                 for (int i = 0; i < data.get(_key).size(); i++) {
                     Object preValue = data.get(_key).get(i).value;
                     String key = data.get(_key).get(i).name;
 
-                    if (!nameCalled.keySet().contains(key)) {
-                        nameCalled.put(key, 0);
-                    }
-
-                    int numCalled = nameCalled.get(key);
-                    nameCalled.put(key, numCalled + 1);
-
                     try {
-
                         switch (data.get(_key).get(i).type) {
                             case DOUBLE:
                                 CommunicationManager.getInstance()
-                                    .updateInfo("IO", key + "/" + numCalled + "/value", (double) preValue);
+                                    .updateInfo("IO", key + "/v", (double) preValue);
                                     break;
                             case INT:
                                 CommunicationManager.getInstance()
-                                    .updateInfo("IO", key + "/" + numCalled + "/value", (int) preValue);
+                                    .updateInfo("IO", key + "/v", (int) preValue);
                                 break;
                             case STRING:
                                 CommunicationManager.getInstance()
-                                    .updateInfo("IO", key + "/" + numCalled + "/value", (String) preValue);
+                                    .updateInfo("IO", key + "/v", (String) preValue);
                                 break;
                             case BOOLEAN:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (boolean) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/v", (boolean) preValue);
                                 break;
                             case BYTE_ARRAY:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (byte[]) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/v", (byte[]) preValue);
                                 break;
                             case DOUBLE_ARRAY:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (double[]) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/v", (double[]) preValue);
                                 break;
                             case LONG_ARRAY:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (long[]) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/v", (long[]) preValue);
                                 break;
                             case STRING_ARRAY:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (String[]) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/v", (String[]) preValue);
                                 break;
                             case BOOLEAN_ARRAY:
-                                CommunicationManager.getInstance().updateInfo("IO", key + "/" + numCalled + "/value", (boolean[]) preValue);
+                                CommunicationManager.getInstance().updateInfo("IO", key + "/v", (boolean[]) preValue);
                                 break;
                             case NONE:
                             default:
@@ -182,19 +221,74 @@ public class IOManager implements Loggable {
                     CommunicationManager.getInstance()
                         .updateInfo(
                             "IO", 
-                            key + "/" + numCalled + "/type", //EX: /default/0/type
+                            key + "/t",
                             data.get(_key).get(i).type.name()
-                        )
-                        .updateInfo(
-                            "IO", 
-                            key + "/" + numCalled + "/p", //EX: /default/0/p
-                            data.get(_key).get(i).perms.shortName()
-                        )
-                        .updateInfo(
-                            "IO", 
-                            key + "/" + numCalled + "/real", 
-                            data.get(_key).get(i).real
-                        );
+                        );  
+                }
+            }
+
+
+            for (IOWriteInfo writeInfo : ioWriteInfo) {
+                String key = writeInfo.name;
+
+                NetworkTableEntry entry = CommunicationManager.getInstance().get("IO", key + "/w");
+
+                if (entry == null || !entry.exists()) {
+                    continue;
+                }
+
+                long lastEdited = entry.getLastChange();
+                long recordedLastEdited = recordedWriteChanges.getOrDefault(key, 0L);
+
+                if (lastEdited == recordedLastEdited) {
+                    continue;
+                }
+
+                recordedWriteChanges.put(key, lastEdited);
+
+                Method method = writeInfo.method;
+                IOLayer layer = writeInfo.layer;
+
+                IOValue valueType = writeInfo.type;
+
+                Logger.Log("[IOManager] Recieved IO Update for " + key + ".");
+
+                try {
+                    switch (valueType) {
+                        case DOUBLE:
+                            method.invoke(layer, (double) entry.getDouble(0d));
+                            break;
+                        case INT:
+                            method.invoke(layer, (int) entry.getInteger(0L));
+                            break;
+                        case STRING:
+                            method.invoke(layer, (String) entry.getString("ERROR"));
+                            break;
+                        case BOOLEAN:
+                            method.invoke(layer, (boolean) entry.getBoolean(false));
+                            break;
+                        case BYTE_ARRAY:
+                            method.invoke(layer, (byte[]) entry.getRaw(new byte[0]));
+                            break;
+                        case DOUBLE_ARRAY:
+                            method.invoke(layer, (double[]) entry.getDoubleArray(new double[0]));
+                            break;
+                        case LONG_ARRAY:
+                            method.invoke(layer, (long[]) entry.getIntegerArray(new long[0]));
+                            break;
+                        case STRING_ARRAY:
+                            method.invoke(layer, (Object[]) entry.getStringArray(new String[0]));
+                            break;
+                        case BOOLEAN_ARRAY:
+                            method.invoke(layer, (boolean[]) entry.getBooleanArray(new boolean[0]));
+                            break;
+                        case NONE:
+                        default:
+                            break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new IllegalArgumentException("[IOManager] There was an issue parsing the value returned from the read method " + key + ". Are the types matched up?");
                 }
             }
         }
@@ -277,6 +371,20 @@ public class IOManager implements Loggable {
             this.name = name;
             this.perms = perms;
             this.real = real;
+        }
+    }
+
+    private class IOWriteInfo {
+        public String name;
+        public Method method;
+        public IOValue type;
+        public IOLayer layer;
+
+        public IOWriteInfo(String name, IOLayer layer, Method method, IOValue type) {
+            this.name = name;
+            this.method = method;
+            this.type = type;
+            this.layer = layer;
         }
     }
 }

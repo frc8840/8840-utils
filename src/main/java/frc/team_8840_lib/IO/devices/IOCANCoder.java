@@ -4,6 +4,8 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.team_8840_lib.info.console.Logger;
+import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
@@ -25,7 +27,10 @@ public class IOCANCoder extends IOLayer {
         this.encoderPort = (int) args[0];
 
         if (this.encoderPort >= 0) {
+            Logger.Log("[IO] Initializing (real" + (Robot.isSimulation() ? " <in simulation> " : "") + ") CANCoder on port " + this.encoderPort);
             this.encoder = new CANCoder(this.encoderPort);
+        } else {
+            Logger.Log("[IO] Initializing (simulated) CANCoder on port " + this.encoderPort);
         }
 
         this.setReal(!RobotBase.isSimulation());
@@ -41,7 +46,7 @@ public class IOCANCoder extends IOLayer {
      */
     @IOMethod(name = "absolute position", method_type = IOMethodType.READ, value_type = IOValue.DOUBLE)
     public double getAbsolutePosition() {
-        if (encoder == null) return isReal() ? 0 : this.cache;
+        if (encoder == null || this.encoderPort < 0) return isReal() ? 0 : this.cache;
         
         return isReal() ? encoder.getAbsolutePosition() : this.cache;
     }
@@ -56,13 +61,29 @@ public class IOCANCoder extends IOLayer {
     }
 
     public void configAllSettings(CANCoderConfiguration config) {
-        if (encoder == null) return;
-        encoder.configAllSettings(config);
+        if (encoder == null || this.encoderPort < 0) return;
+        
+        Logger.Log("[IO] Configuring CANCoder on port " + this.encoderPort);
+
+        try {
+            encoder.configAllSettings(config);
+        } catch (Exception e) {
+            Logger.Log("[IO] Error configuring CANCoder on port " + this.encoderPort);
+            e.printStackTrace();
+        }
     }
 
     public void configFactoryDefault() {
-        if (encoder == null) return;
-        encoder.configFactoryDefault();
+        if (encoder == null || this.encoderPort < 0) return;
+
+        Logger.Log("[IO] Configuring to factory default CANCoder on port " + this.encoderPort);
+        
+        try {
+            encoder.configFactoryDefault();
+        } catch (Exception e) {
+            Logger.Log("[IO] Error configuring to factory default CANCoder on port " + this.encoderPort);
+            e.printStackTrace();
+        }
     }
 
     public String getBaseName() {

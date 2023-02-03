@@ -88,7 +88,16 @@
         "IO": {
           "CANCoder": {
             "0": {
-              "open": true
+              ".info": {
+                "open": true
+              },
+              "absolute position": {
+                "open": true
+              },
+              "open": true,
+              "set cached position": {
+                "open": true
+              }
             },
             "1": {
               "open": true
@@ -100,13 +109,20 @@
               "open": true
             },
             "absolute position": {
+              "0": {
+                "open": true
+              },
               "1": {
                 "open": true
               },
               "2": {
                 "open": true
+              },
+              "3": {
+                "open": true
               }
-            }
+            },
+            "open": true
           },
           "Empty IOLayer": {
             "0": {
@@ -176,15 +192,32 @@
               },
               "open": true
             },
+            "DriveData": {
+              "open": true
+            },
             "Port": {
               "0": {
                 "open": true
               }
-            },
-            "open": true
+            }
           },
           "Swerve Module 1": {
+            ".info": {
+              "open": true
+            },
             "Drive Encoder Position": {
+              "0": {
+                "open": true
+              },
+              "open": true
+            },
+            "DriveData": {
+              "0": {
+                "open": true
+              },
+              "open": true
+            },
+            "Error": {
               "0": {
                 "open": true
               },
@@ -192,8 +225,7 @@
             },
             "Initialized": {
               "open": true
-            },
-            "open": true
+            }
           },
           "open": true
         },
@@ -207,10 +239,14 @@
         "swerve_drive": {
           "module_0": {
             "open": true
-          }
+          },
+          "open": true
         }
       },
       "LiveWindow": {
+        ".status": {
+          "open": true
+        },
         "open": true
       },
       "Shuffleboard": {

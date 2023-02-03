@@ -26,11 +26,28 @@ public class SwerveGroup implements Loggable {
     public String getName() { return name; }
 
     private final String[] moduleNames = {
-            "Front Left",
-            "Front Right",
-            "Back Left",
-            "Back Right"
+            "Top Right",
+            "Bottom Right",
+            "Top Left",
+            "Bottom Left"
     };
+
+    public static enum ModuleIndex {
+        kTOP_RIGHT(0),
+        kBOTTOM_RIGHT(1),
+        kTOP_LEFT(2),
+        kBOTTOM_LEFT(3);
+
+        private int index;
+
+        private ModuleIndex(int index) {
+            this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+    }
 
     private SwerveDriveOdometry odometry;
 
@@ -192,6 +209,31 @@ public class SwerveGroup implements Loggable {
         }
 
         updateOdometry();
+    }
+
+    public void applyXBrake() {
+        //Turn the modules so they form an "x" with the directions of the wheels
+        //This is especially useful when the robot is stopped since it can prevent other robots from pushing it
+
+        //Get the current states
+        SwerveModuleState[] states = getModuleStates();
+
+        //Set the states
+        states[0] = new SwerveModuleState(0, new Rotation2d(-Math.PI / 4));
+        states[1] = new SwerveModuleState(0, new Rotation2d(Math.PI / 4));
+        states[2] = new SwerveModuleState(0, new Rotation2d(-Math.PI / 4));
+        states[3] = new SwerveModuleState(0, new Rotation2d(Math.PI / 4));
+
+        //Set the states
+        setModuleStates(states, true);
+    }
+
+    public void setBrakeModes(boolean brake) {
+        loop((module, i) -> module.setBrakeMode(brake));
+    }
+
+    public void setIndividualBrakeModes(boolean driveBrake, boolean steerBrake) {
+        loop((module, i) -> module.setIndividualBrakeMode(driveBrake, steerBrake));
     }
 
     /**

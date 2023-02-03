@@ -1,12 +1,14 @@
 package frc.team_8840_lib.info.console;
 
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.team_8840_lib.info.time.TimeKeeper;
+import frc.team_8840_lib.listeners.Preferences;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.buffer.ByteConversions;
 import frc.team_8840_lib.utils.logging.LogWriter;
@@ -51,6 +53,10 @@ public class Logger implements Loggable {
     private static String getTimeLogString(TimeStamp timeStamp) {
         String time = "";
 
+        if (TimeKeeper.getInstance() == null) {
+            return "PRE_INIT";
+        }
+
         switch (timeStamp) {
             case BothRealAndGameTime:
             case RealTime:
@@ -58,10 +64,10 @@ public class Logger implements Loggable {
                 if (timeStamp == TimeStamp.RealTime) break;
             case GameTime:
                 GamePhase gamePhase = GamePhase.getCurrentPhase();
-                time += (timeStamp == TimeStamp.BothRealAndGameTime ? ", " : "") + "GT: " + TimeKeeper.getInstance().getPhaseTime(gamePhase) + " seconds";
+                time += (timeStamp == TimeStamp.BothRealAndGameTime ? ", " : "") + "GT: " + TimeKeeper.getInstance().getPhaseTime(gamePhase) + "s";
                 break;
             case RobotTime:
-                time += "RRT: " + TimeKeeper.getInstance().getRobotTime() + " seconds";
+                time += "RBT: " + TimeKeeper.getInstance().getRobotTime() + "s";
                 break;
             default:
                 break;
@@ -129,6 +135,10 @@ public class Logger implements Loggable {
      */
     public static void setWriter(LogWriter writer) {
         Logger.writer = writer;
+    }
+
+    public static String getLogWriterName() {
+        return writer.getClass().getSimpleName();
     }
 
     private static boolean errorWhileInitializingWriter = false;
@@ -215,7 +225,11 @@ public class Logger implements Loggable {
     private static int cycle = 0;
 
     private static void loadAndSaveAllAutoLogs() {
-        writer.saveInfo("AutoLog Cycle " + cycle++);
+        writer.saveInfo("AutoLog Cycle " + cycle++ + (cycle < 3 ? " (skipped due to early cycle)" : ""));
+
+        if (cycle < 3) return;
+        //We skip the first 3 since the robot is not fully initialized yet + it usually causes annoying errors in console.
+        //Should be fine after the first one.
 
         try {
             for (Loggable klass : loggingClasses) {
@@ -371,6 +385,67 @@ public class Logger implements Loggable {
                 e.printStackTrace();
                 throw new IllegalArgumentException("[Logger] There was an error parsing the log in " + loggingClasses.get(0).getClass().getName() + ". Are the types matched up correctly?");
             }
+        }
+    }
+
+    private static boolean lockLogWriterToOnlyCode = true;
+
+    public static boolean logWriterIsLockedToCode() {
+        return lockLogWriterToOnlyCode;
+    }
+
+    public static void assignLogWriterThroughPreferences(Path preferencesFilePath, Class<LogWriter>[] logWriters, Class<LogWriter> _default) {
+        if (!Preferences.loaded()) Preferences.loadPreferences(preferencesFilePath);
+
+        lockLogWriterToOnlyCode = false;
+
+        for (Class<LogWriter> logWriter : logWriters) {
+            if (Preferences.getSelectedLogger() == logWriter.getClass().getSimpleName()) {
+                try {
+                    LogWriter writer = (LogWriter) logWriter.getConstructors()[0].newInstance();
+
+                    Logger.Log("[Logger] Successfully loaded " + logWriter.getClass().getSimpleName() + " as the logger!");
+
+                    setWriter(writer);
+                    return;
+                } catch (Exception e) {
+                    e.printStackTrace();
+
+                    Logger.Log("[Logger] There was an error loading " + logWriter.getClass().getSimpleName() + " as the logger! Falling back to " + _default.getClass().getSimpleName() + "...");
+
+                    try {
+                        LogWriter _defaultInstance = (LogWriter) _default.getConstructors()[0].newInstance();
+
+                        Logger.Log("[Logger] Successfully loaded " + _default.getClass().getSimpleName() + " as the logger!");
+
+                        setWriter(_defaultInstance);
+                    } catch (Exception e2) {
+                        e2.printStackTrace();
+                        Logger.Log("[Logger] There was an error loading " + _default.getClass().getSimpleName() + " as the logger! Falling back to an empty logger...");
+
+                        setWriter(new EmptyLog());
+
+                        return;
+                    }
+                }
+
+                return;
+            }
+        }
+
+        try {
+            LogWriter _defaultInstance = (LogWriter) _default.getConstructors()[0].newInstance();
+
+            Logger.Log("[Logger] Successfully loaded " + _default.getClass().getSimpleName() + " as the logger!");
+
+            setWriter(_defaultInstance);
+        } catch (Exception e2) {
+            e2.printStackTrace();
+            Logger.Log("[Logger] There was an error loading " + _default.getClass().getSimpleName() + " as the logger! Falling back to an empty logger...");
+
+            setWriter(new EmptyLog());
+
+            return;
         }
     }
 

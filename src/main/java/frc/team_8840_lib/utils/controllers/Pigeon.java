@@ -7,8 +7,15 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.info.console.Logger;
+import frc.team_8840_lib.utils.IO.IOAccess;
+import frc.team_8840_lib.utils.IO.IOLayer;
+import frc.team_8840_lib.utils.IO.IOMethod;
+import frc.team_8840_lib.utils.IO.IOMethodType;
+import frc.team_8840_lib.utils.IO.IOPermission;
+import frc.team_8840_lib.utils.IO.IOValue;
 
-public class Pigeon {
+@IOAccess(IOPermission.READ)
+public class Pigeon extends IOLayer {
     private static HashMap<Integer, Pigeon> pigeonMap = new HashMap<>();
 
     public static Pigeon hasPigeon(int id) {
@@ -135,6 +142,7 @@ public class Pigeon {
      * Gets the yaw, pitch, and roll of the gyroscope.
      * @return [yaw, pitch, roll]
      */
+    @IOMethod(name="yaw pitch roll", method_type=IOMethodType.READ, value_type=IOValue.DOUBLE_ARRAY)
     public double[] getYawPitchRoll() {
         if (type == Type.IMU) {
             double[] ypr = new double[3];
@@ -177,6 +185,10 @@ public class Pigeon {
         }
 
         return rotation;
+    }
+
+    public String getBaseName() {
+        return "Pigeon Gyroscope";
     }
 
     public static enum Type {

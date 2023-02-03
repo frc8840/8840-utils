@@ -19,6 +19,23 @@ import frc.team_8840_lib.utils.controllers.SCType;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * This class is a wrapper of a SpeedController class.
+ * Personally, I'm stuck between keeping it and removing 
+ * it since it was one of the very first classes that was added to the library, 
+ * alongside the GameController class. All `forRemoval` tags were
+ * removed though, but this class will keep the @Deprecated annotation
+ * until this class is updated to be more useful/better than the normal
+ * MotorController classes, such as SparkMax or TalonSRX. This class is
+ * primarly kept for half backwards compatibility, and for our langauge,
+ * Till, due to the ease of use for instantiating a group of controllers
+ * with just an enum instead of having to create a new MotorController.
+ * 
+ * If you are reading this, I would recommend that you use the default MotorController
+ * and MotorControllerGroup definition. Those are much more useful and
+ * are updated more frequently since this class is not used as much and
+ * therefore isn't as important.
+ */
 public class ControllerGroup {
     HashMap<Integer, SpeedController> controllers;
 
@@ -43,7 +60,7 @@ public class ControllerGroup {
      * @param ports PWM Ports/CAN IDs of the controllers
      * @deprecated
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public ControllerGroup(String name, SCType mainType, int... ports) {
         this.name = name;
 
@@ -255,7 +272,7 @@ public class ControllerGroup {
      * @deprecated
      * @return SpeedController
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     public static SpeedController createSC(int port, SCType type) {
         return new SpeedController(port, type);
     }
@@ -285,7 +302,7 @@ public class ControllerGroup {
          * @param type
          * @deprecated
          */
-        @Deprecated(forRemoval = true)
+        @Deprecated
         public SpeedController(int port, SCType type) {
             this.port = port;
             this.type = type;
