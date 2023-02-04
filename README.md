@@ -1,6 +1,10 @@
 # 8840 Utils
 
 **[Team 8840](https://team8840.org) - [Jaiden Grimminck](https://github.com/jaidenagrimminck)**
+  
+
+**JAVA DOCS:**
+[https://frc8840.github.io/8840-utils/build/docs/javadoc/index.html](https://frc8840.github.io/8840-utils/build/docs/javadoc/index.html)
 
 ## What is this?
 
