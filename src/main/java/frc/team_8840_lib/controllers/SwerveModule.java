@@ -71,8 +71,8 @@ public class SwerveModule extends IOLayer {
     private RelativeEncoder neoTurnEncoder;
 
     //Neo PID controllers
-    public static SparkMaxPIDController neoDrivePIDController = null;
-    public static SparkMaxPIDController neoTurnPIDController = null;
+    public SparkMaxPIDController neoDrivePIDController = null;
+    public SparkMaxPIDController neoTurnPIDController = null;
 
     //Simulation variables
     private double speedCache = 0;
@@ -89,6 +89,18 @@ public class SwerveModule extends IOLayer {
     //Private ID is a number between 0 and 3 which is used to identify the module
     private int privateID;
 
+    public int getIndex() {
+        return privateID;
+    }
+
+    //When it is initialized, it will set this to true
+    private boolean isInitialized = false;
+    
+    public boolean ready() {
+        return isInitialized;
+    }
+
+    //Whether to do the manual conversion or not for the NEO. If false, it will use the REV API. If true, it will do manual conversion
     private boolean doManualConversion = true;
 
     public SwerveModule(int drivePort, int steerPort, int encoderPort, int swerveNum, CTREConfig config) {
@@ -120,23 +132,25 @@ public class SwerveModule extends IOLayer {
                     thisModule.driveTalonFX = new TalonFX(thisModule.drivePort);
                     thisModule.turnTalonFX = new TalonFX(thisModule.turnPort);
                 } else if (config.getSettings().getType() == SwerveType.SPARK_MAX) {
-                    driveNEO = new CANSparkMax(thisModule.drivePort, CANSparkMaxLowLevel.MotorType.kBrushless);
-                    turnNEO = new CANSparkMax(thisModule.turnPort, CANSparkMaxLowLevel.MotorType.kBrushless);
+                    thisModule.driveNEO = new CANSparkMax(thisModule.drivePort, CANSparkMaxLowLevel.MotorType.kBrushless);
+                    thisModule.turnNEO = new CANSparkMax(thisModule.turnPort, CANSparkMaxLowLevel.MotorType.kBrushless);
         
-                    neoDriveEncoder = driveNEO.getEncoder();
-                    neoTurnEncoder = turnNEO.getEncoder();
+                    thisModule.neoDriveEncoder = driveNEO.getEncoder();
+                    thisModule.neoTurnEncoder = turnNEO.getEncoder();
         
-                    neoDrivePIDController = driveNEO.getPIDController();
-                    neoTurnPIDController = turnNEO.getPIDController();
+                    thisModule.neoDrivePIDController = driveNEO.getPIDController();
+                    thisModule.neoTurnPIDController = turnNEO.getPIDController();
                 }
         
                 thisModule.configMotors();
         
-                feedforward = new SimpleMotorFeedforward(config.getSettings().driveKS, config.getSettings().driveKV, config.getSettings().driveKA);
+                thisModule.feedforward = new SimpleMotorFeedforward(config.getSettings().driveKS, config.getSettings().driveKV, config.getSettings().driveKA);
         
                 thisModule.lastAngle = getState().angle;
 
                 Logger.Log("[" + thisModule.getBaseName() + "] Configured motors.");
+
+                thisModule.isInitialized = true;
             }
         };
 

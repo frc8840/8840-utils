@@ -137,7 +137,10 @@ $RECYCLE.BIN/
 
 ### Gradle ###
 .gradle
-/build/
+# include the javadocs in the repo
+!/build/
+/build/*
+!/build/docs/
 
 # Ignore Gradle GUI config
 gradle-app.setting

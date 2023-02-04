@@ -64,9 +64,15 @@ public class AutonomousExample extends EventListener {
         });
 
         CommunicationManager.getInstance().createField();
-        swerveDrive.resetOdometry(new Pose2d(7, 4, new Rotation2d(0)));
 
         GameController.expectController(-1, GameController.Type.Simulated);
+
+        //Wait till the swerve drive is ready to be used
+        Robot.getRealInstance()
+            .waitForFullfillConditions(1000, () -> swerveDrive.ready())
+            .onFinishFullfillment(() -> {
+                swerveDrive.resetOdometry(new Pose2d(7, 4, new Rotation2d(0)));
+            });
     }
 
     @Override

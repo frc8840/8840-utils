@@ -1,7 +1,9 @@
 package frc.team_8840_lib.listeners;
 
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.function.Supplier;
 
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
@@ -13,6 +15,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Watchdog;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.utils.GamePhase;
+import frc.team_8840_lib.utils.interfaces.Callback;
 import frc.team_8840_lib.utils.time.TimeStamp;
 
 public class Robot extends RobotBase {
@@ -36,10 +39,10 @@ public class Robot extends RobotBase {
     public static void assignListener(EventListener listener) {
         //using system.out.println just in case the logger hasn't been initialized yet
         if (Robot.listener != null) {
-            System.out.println("[Robot] Warning! Unsafe operation: assigning a new event listener. Old listener will be overwritten. In the future, please only assign the listener once.");
+            System.out.println("[8840-utils] Warning! Unsafe operation: assigning a new event listener. Old listener will be overwritten. In the future, please only assign the listener once.");
         }
 
-        System.out.println("[Robot] Assigning listener: " + listener.getClass().getName());
+        System.out.println("[8840-utils] Assigning listener: " + listener.getClass().getName());
 
         Robot.listener = listener;
 
@@ -136,6 +139,69 @@ public class Robot extends RobotBase {
     
     private double startTime;
 
+    private boolean conditionsFullfilled = true;
+    
+    @SafeVarargs
+    public final Robot waitForFullfillConditions(final int timeoutMS, Supplier<Boolean> ...conditions) {
+        conditionsFullfilled = false;
+
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                int total = conditions.length;
+                int fullfilled = 0;
+
+                for (Supplier<Boolean> condition : conditions) {
+                    if (condition.get()) fullfilled++;
+                }
+
+                if (fullfilled == total) conditionsFullfilled = true;
+
+                if (conditionsFullfilled) {
+                    this.cancel();
+                }
+            }
+        };
+
+        TimerTask overrideFullfill = new TimerTask() {
+            @Override
+            public void run() {
+                conditionsFullfilled = true;
+            }
+        };
+
+        Timer timer = new Timer();
+        timer.schedule(task, 10);
+
+        Timer overrideTimer = new Timer();
+        overrideTimer.schedule(overrideFullfill, timeoutMS);
+
+        return this;
+    }
+
+    Callback finishFullfillmentCallback = null;
+
+    public void onFinishFullfillment(Callback callback) {
+        finishFullfillmentCallback = callback;
+    }
+
+    boolean doQuickStart = false;
+    
+    /**
+     * Quick start the robot. This is not recommended for normal use.
+     * This will tell HAL that the robot is READY to start, and will not wait for initialization code.
+     * This is useful for if the robot looses power and needs to be restarted in order not to lose points due to the light not turning on.
+     * Usually, you SHOULD have a delay until the robot is ready to start, especially if you are using a camera or at the start of a match.
+     * Else, you're risking the robot not being ready to start, and thus losing points.
+     * @param quickStart Whether to quick start or not. TRUE = quick start, FALSE = normal start. It is already set to FALSE by default.
+     * @see #waitForFullfillConditions(int, Supplier[])
+     * @see #onFinishFullfillment(Callback)
+     */
+    public void quickStart(boolean quickStart) {
+        doQuickStart = quickStart;
+        if (doQuickStart) Logger.Log("[Robot] DOING QUICK START. NOTE: THIS IS NOT RECOMMENDED FOR NORMAL USE.");
+    }
+
     @Override
     public void startCompetition() {
         watchdog = new Watchdog(watchdogPeriod, this::printLoopOverrunMessage);
@@ -145,6 +211,8 @@ public class Robot extends RobotBase {
         NotifierJNI.setNotifierName(notifier, "8840LibRobot");
 
         HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Timed);
+
+        if (doQuickStart) DriverStationJNI.observeUserProgramStarting();
 
         frameworkUtil.onStart();
 
@@ -159,6 +227,30 @@ public class Robot extends RobotBase {
             noRun = true;
         } else {
             listener.robotInit();
+
+            if (!conditionsFullfilled) {
+                Logger.Log("[Robot] Conditions not fullfilled for startup, waiting until conditions are fullfilled...");
+                Timer waitTimer = new Timer();
+                waitTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (conditionsFullfilled) {
+                            Logger.Log("[Robot] Conditions fullfilled, continuing startup!");
+                            this.cancel();
+
+                            if (finishFullfillmentCallback != null) finishFullfillmentCallback.run();
+                        }
+                    }
+                }, 10);
+
+                while (!conditionsFullfilled) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
 
         Logger.Log("[Robot] Robot program startup completed in " + (System.currentTimeMillis() - startTime) + "ms.");
@@ -173,7 +265,7 @@ public class Robot extends RobotBase {
         //also might want to figure out how to make this call if the robot reboots or something to prevent the robot from
         //loosing a crap ton of points. Maybe an empty listener if the robot reboots? or just call this earlier.
         //TODO: figure out this stuff from above.
-        DriverStationJNI.observeUserProgramStarting();
+        if (!doQuickStart) DriverStationJNI.observeUserProgramStarting();
 
         // Loop forever, calling the appropriate mode-dependent function
         while (!exit) {

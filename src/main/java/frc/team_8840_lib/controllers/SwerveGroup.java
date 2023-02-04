@@ -1,5 +1,9 @@
 package frc.team_8840_lib.controllers;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.function.Supplier;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -69,6 +73,9 @@ public class SwerveGroup implements Loggable {
     //A list of modules
     private SwerveModule[] modules;
 
+    private boolean fullyReady = false;
+    public boolean ready() { return fullyReady; }
+
     /**
      * Creates a new swerve group (4 modules)
      * @param name Name of the swerve group
@@ -121,8 +128,58 @@ public class SwerveGroup implements Loggable {
             modules[i] = new SwerveModule(this.driveIDs[i], this.steerIDs[i], this.encoderIDs[i], i, this.config);
         }
 
-        //Set the odometry
-        odometry = new SwerveDriveOdometry(settings.getKinematics(), getAngle(), getSwervePositions());
+        TimerTask whenReady = new TimerTask() {
+            @Override
+            public void run() {
+                //Set the odometry
+                odometry = new SwerveDriveOdometry(settings.getKinematics(), getAngle(), getSwervePositions());
+
+                fullyReady = true;
+            }
+        };
+
+        TimerTask waitTillReady = new TimerTask() {
+            int lastAmountReady = 0;
+            double startTime = System.currentTimeMillis();
+
+            @Override
+            public void run() {
+                int count = 0;
+                int[] ready = new int[modules.length];
+
+                for (SwerveModule module : modules) {
+                    if (module.ready()) {
+                        count++;
+                        ready[module.getIndex()] = 1;
+                    }
+                }
+
+                if (count != lastAmountReady) {
+                    boolean isFirst = lastAmountReady == 0;
+
+                    //create a string of the modules that are ready
+                    String readyString = "";
+                    for (int i = 0; i < ready.length; i++) {
+                        if (ready[i] == 1) {
+                            readyString += moduleNames[i] + ", ";
+                        }
+                    }
+                    
+                    Logger.Log((count - lastAmountReady) + (isFirst ? "" : " more") + " modules are now ready. " + readyString + "are ready. Took " + (System.currentTimeMillis() - startTime) + "ms.");
+
+                    lastAmountReady = count;
+                }
+
+                if (count == 4) {
+                    whenReady.run();
+                    this.cancel();
+                }
+            }
+        };
+        
+        //Wait for the modules to be ready
+        Timer timer = new Timer();
+        timer.schedule(waitTillReady, 0, 10);
 
         //Add to logger
         Logger.addClassToBeAutoLogged(this);

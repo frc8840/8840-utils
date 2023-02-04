@@ -36,9 +36,9 @@ public class Matrix {
     /**
      * Get a specific value in the matrix
      * @param i the row of the value
-     *          0 <= i < rows
+     *          0 less equal to i less than rows
      * @param j the column of the value
-     *          0 <= j < cols
+     *          0 less equal to j less than cols
      * @return the value at the specified row and column
      * */
     public double get(int i, int j) {
@@ -48,9 +48,9 @@ public class Matrix {
     /**
      * Sets the value at the specified row and column
      * @param i the row of the value
-     *          0 <= i < rows
+     *          0 less equal to i less than rows
      * @param j the column of the value
-     *          0 <= j < cols
+     *          0 less equal to j less than cols
      * @param value the value to set
      * */
     public void set(int i, int j, double value) {
@@ -296,7 +296,7 @@ public class Matrix {
 
     /**
      * Converts this matrix to an array.
-     * @reutrn the array
+     * @return the array
      * */
     public List<Double> toArray() {
         List<Double> temp = new ArrayList<Double>();

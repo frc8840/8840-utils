@@ -171,7 +171,7 @@ public class ControllerGroup {
     /**
      * Returns a list of speeds in subgroup matched up to their ports
      * @param key Subgroup name
-     * @return HashMap<Port, Speed>
+     * @return HashMap of port and speed
      */
     public HashMap<Integer, Double> subgroupSpeeds(String key) {
         if (!isCombination()) throw new IllegalArgumentException("This is not a combination of speed controller groups.");
