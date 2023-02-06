@@ -2,7 +2,6 @@ package frc.team_8840_lib.controllers;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.function.Supplier;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -170,7 +169,7 @@ public class SwerveGroup implements Loggable {
                     lastAmountReady = count;
                 }
 
-                if (count == 4) {
+                if (count == modules.length) {
                     whenReady.run();
                     this.cancel();
                 }
@@ -282,7 +281,7 @@ public class SwerveGroup implements Loggable {
         states[3] = new SwerveModuleState(0, new Rotation2d(Math.PI / 4));
 
         //Set the states
-        setModuleStates(states, true);
+        setModuleStates(states, false);
     }
 
     public void setBrakeModes(boolean brake) {
@@ -291,6 +290,14 @@ public class SwerveGroup implements Loggable {
 
     public void setIndividualBrakeModes(boolean driveBrake, boolean steerBrake) {
         loop((module, i) -> module.setIndividualBrakeMode(driveBrake, steerBrake));
+    }
+
+    /**
+     * Sets the angle of all the modules to a certain degree
+     * @param degree The degree to set the modules to
+     */
+    public void setAllModuleAngles(double degree) {
+        loop((module, i) -> module.setAngle(degree));
     }
 
     /**
@@ -344,6 +351,10 @@ public class SwerveGroup implements Loggable {
      * @return The current pose of the robot
      * */
     public Pose2d getPose() {
+        if (odometry == null) {
+            return new Pose2d(0,0, new Rotation2d(0));
+        }
+
         return odometry.getPoseMeters();
     }
 

@@ -95,7 +95,9 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">SwerveModule</span>
 <span class="extends-implements">extends <a href="../utils/IO/IOLayer.html" title="class in frc.team_8840_lib.utils.IO">IOLayer</a></span></div>
-<div class="block">Sources:
+<div class="block">This class is used to control a swerve module. It is meant to be used with the SwerveDrive class.
+ 
+ Sources:
  https://www.chiefdelphi.com/t/adapting-364s-base-swerve-drive-code-to-use-neos-for-steering/418402/3
  Team 364
  Team 3512</div>
@@ -133,7 +135,9 @@ loadScripts(document, 'script');</script>
  int&nbsp;encoderPort,
  int&nbsp;swerveNum,
  <a href="../utils/controllers/swerve/CTREConfig.html" title="class in frc.team_8840_lib.utils.controllers.swerve">CTREConfig</a>&nbsp;config)</code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Constructor for the swerve module</div>
+</div>
 </div>
 </section>
 </li>
@@ -175,13 +179,19 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getBaseName()" class="member-name-link">getBaseName</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the swerve module name for the IO system.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDriveData()" class="member-name-link">getDriveData</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the values of the module in a string.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getIndex()" class="member-name-link">getIndex</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Get the private ID of the module</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Rotation2d</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getLastAngle()" class="member-name-link">getLastAngle</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -189,13 +199,19 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.SwerveModulePosition</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPosition()" class="member-name-link">getPosition</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the current position of the module.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRawDrivePosition()" class="member-name-link">getRawDrivePosition</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the raw return value of the drive encoder.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRawDriveVelocity()" class="member-name-link">getRawDriveVelocity</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the raw velocity value of the drive encoder.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.ctre.phoenix.motorcontrol.can.TalonFX[]</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRawFalcon()" class="member-name-link">getRawFalcon</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -208,7 +224,9 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRawTurnPosition()" class="member-name-link">getRawTurnPosition</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the raw return value of the turn encoder.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Rotation2d</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRotation()" class="member-name-link">getRotation</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -231,7 +249,9 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ready()" class="member-name-link">ready</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Whether the module is ready to be used</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resetToAbsolute()" class="member-name-link">resetToAbsolute</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -248,43 +268,49 @@ loadScripts(document, 'script');</script>
 <div class="block">Sets the angle of the module to the given angle in the desired state</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setBrakeMode(boolean)" class="member-name-link">setBrakeMode</a><wbr>(boolean&nbsp;brake)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setAngle(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)" class="member-name-link">setAngle</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;desiredState,
+ boolean&nbsp;ignoreSpeedRequirement)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the angle of the module to the given angle in the desired state</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDesiredState(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)" class="member-name-link">setDesiredState</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
- boolean&nbsp;isOpenLoop)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setBrakeMode(boolean)" class="member-name-link">setBrakeMode</a><wbr>(boolean&nbsp;brake)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the angle and speed of the module to the given state.</div>
+<div class="block">Sets the brake for both the drive and turn motors</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setIndividualBrakeMode(boolean,boolean)" class="member-name-link">setIndividualBrakeMode</a><wbr>(boolean&nbsp;driveBrake,
- boolean&nbsp;turnBrake)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDesiredState(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)" class="member-name-link">setDesiredState</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
+ boolean&nbsp;isOpenLoop)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the angle and speed of the module to the given state.</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeoCANStatusFrames(com.revrobotics.CANSparkMax,int,int,int,int,int)" class="member-name-link">setNeoCANStatusFrames</a><wbr>(com.revrobotics.CANSparkMax&nbsp;m_motor,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setIndividualBrakeMode(boolean,boolean)" class="member-name-link">setIndividualBrakeMode</a><wbr>(boolean&nbsp;driveBrake,
+ boolean&nbsp;turnBrake)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the individual brake modes for the drive and turn motors</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeoCANStatusFrames(com.revrobotics.CANSparkMax,int,int,int,int,int)" class="member-name-link">setNeoCANStatusFrames</a><wbr>(com.revrobotics.CANSparkMax&nbsp;m_motor,
  int&nbsp;CANStatus0,
  int&nbsp;CANStatus1,
  int&nbsp;CANStatus2,
  int&nbsp;CANStatus3,
  int&nbsp;CANStatus4)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(double)" class="member-name-link">setSpeed</a><wbr>(double&nbsp;speed)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the NEO CAN Status Frames</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(double)" class="member-name-link">setSpeed</a><wbr>(double&nbsp;speed)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the % output of the drive motor to the given value</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)" class="member-name-link">setSpeed</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;desiredState,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)" class="member-name-link">setSpeed</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;desiredState,
  boolean&nbsp;isOpenLoop)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the speed of the drive motor using the desired state.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateNeoDrivePID(frc.team_8840_lib.utils.controllers.swerve.structs.PIDStruct)" class="member-name-link">updateNeoDrivePID</a><wbr>(<a href="../utils/controllers/swerve/structs/PIDStruct.html" title="class in frc.team_8840_lib.utils.controllers.swerve.structs">PIDStruct</a>&nbsp;pid)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateNeoTurnPID(frc.team_8840_lib.utils.controllers.swerve.structs.PIDStruct)" class="member-name-link">updateNeoTurnPID</a><wbr>(<a href="../utils/controllers/swerve/structs/PIDStruct.html" title="class in frc.team_8840_lib.utils.controllers.swerve.structs">PIDStruct</a>&nbsp;pid)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -333,6 +359,15 @@ loadScripts(document, 'script');</script>
  int&nbsp;encoderPort,
  int&nbsp;swerveNum,
  <a href="../utils/controllers/swerve/CTREConfig.html" title="class in frc.team_8840_lib.utils.controllers.swerve">CTREConfig</a>&nbsp;config)</span></div>
+<div class="block">Constructor for the swerve module</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>drivePort</code> - - port for the drive motor</dd>
+<dd><code>steerPort</code> - - port for the steer motor</dd>
+<dd><code>encoderPort</code> - - port for the encoder</dd>
+<dd><code>swerveNum</code> - - number between 0 and 3 which is used to identify the module</dd>
+<dd><code>config</code> - - configuration for the swerve group.</dd>
+</dl>
 </section>
 </li>
 </ul>
@@ -347,12 +382,22 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="getIndex()">
 <h3>getIndex</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getIndex</span>()</div>
+<div class="block">Get the private ID of the module</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the private ID. Can be 0, 1, 2, or 3, and can be used as the index.</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="ready()">
 <h3>ready</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">ready</span>()</div>
+<div class="block">Whether the module is ready to be used</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>true if it is ready, false if it is not</dd>
+</dl>
 </section>
 </li>
 <li>
@@ -374,18 +419,6 @@ loadScripts(document, 'script');</script>
 <h3>configNEOMotors</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">configNEOMotors</span>()</div>
 <div class="block">Configures the NEO motors</div>
-</section>
-</li>
-<li>
-<section class="detail" id="updateNeoDrivePID(frc.team_8840_lib.utils.controllers.swerve.structs.PIDStruct)">
-<h3>updateNeoDrivePID</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">updateNeoDrivePID</span><wbr><span class="parameters">(<a href="../utils/controllers/swerve/structs/PIDStruct.html" title="class in frc.team_8840_lib.utils.controllers.swerve.structs">PIDStruct</a>&nbsp;pid)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="updateNeoTurnPID(frc.team_8840_lib.utils.controllers.swerve.structs.PIDStruct)">
-<h3>updateNeoTurnPID</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">updateNeoTurnPID</span><wbr><span class="parameters">(<a href="../utils/controllers/swerve/structs/PIDStruct.html" title="class in frc.team_8840_lib.utils.controllers.swerve.structs">PIDStruct</a>&nbsp;pid)</span></div>
 </section>
 </li>
 <li>
@@ -413,6 +446,11 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="setBrakeMode(boolean)">
 <h3>setBrakeMode</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setBrakeMode</span><wbr><span class="parameters">(boolean&nbsp;brake)</span></div>
+<div class="block">Sets the brake for both the drive and turn motors</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>brake</code> - The brake mode. True is brake, false is coast.</dd>
+</dl>
 </section>
 </li>
 <li>
@@ -420,6 +458,12 @@ loadScripts(document, 'script');</script>
 <h3>setIndividualBrakeMode</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setIndividualBrakeMode</span><wbr><span class="parameters">(boolean&nbsp;driveBrake,
  boolean&nbsp;turnBrake)</span></div>
+<div class="block">Sets the individual brake modes for the drive and turn motors</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>driveBrake</code> - The brake mode for the drive motor. True is brake, false is coast.</dd>
+<dd><code>turnBrake</code> - The brake mode for the turn motor. True is brake, false is coast.</dd>
+</dl>
 </section>
 </li>
 <li>
@@ -442,6 +486,16 @@ loadScripts(document, 'script');</script>
  int&nbsp;CANStatus2,
  int&nbsp;CANStatus3,
  int&nbsp;CANStatus4)</span></div>
+<div class="block">Sets the NEO CAN Status Frames</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>m_motor</code> - The motor to set the status frames for</dd>
+<dd><code>CANStatus0</code> - The status frame 0 period</dd>
+<dd><code>CANStatus1</code> - The status frame 1 period</dd>
+<dd><code>CANStatus2</code> - The status frame 2 period</dd>
+<dd><code>CANStatus3</code> - The status frame 3 period</dd>
+<dd><code>CANStatus4</code> - The status frame 4 period</dd>
+</dl>
 </section>
 </li>
 <li>
@@ -454,6 +508,19 @@ loadScripts(document, 'script');</script>
 <dt>Parameters:</dt>
 <dd><code>desiredState</code> - The desired state of the swerve module.</dd>
 <dd><code>isOpenLoop</code> - Whether or not the drive motor should be in open loop.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setAngle(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)">
+<h3>setAngle</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setAngle</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;desiredState,
+ boolean&nbsp;ignoreSpeedRequirement)</span></div>
+<div class="block">Sets the angle of the module to the given angle in the desired state</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>desiredState</code> - The desired state of the swerve module.</dd>
+<dd><code>ignoreSpeedRequirement</code> - Whether or not to ignore the speed requirement.</dd>
 </dl>
 </section>
 </li>
@@ -473,6 +540,10 @@ loadScripts(document, 'script');</script>
 <h3>setAngle</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setAngle</span><wbr><span class="parameters">(double&nbsp;angle)</span></div>
 <div class="block">Sets angle of the module to the given angle in degrees. Ignores the jittering preventions though.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>angle</code> - The angle to set the module to in degrees.</dd>
+</dl>
 </section>
 </li>
 <li>
@@ -536,24 +607,44 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="getPosition()">
 <h3>getPosition</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.kinematics.SwerveModulePosition</span>&nbsp;<span class="element-name">getPosition</span>()</div>
+<div class="block">Returns the current position of the module.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The current position of the module.</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="getRawTurnPosition()">
 <h3>getRawTurnPosition</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getRawTurnPosition</span>()</div>
+<div class="block">Returns the raw return value of the turn encoder.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The raw return value of the turn encoder.</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="getRawDrivePosition()">
 <h3>getRawDrivePosition</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getRawDrivePosition</span>()</div>
+<div class="block">Returns the raw return value of the drive encoder.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The raw return value of the drive encoder.</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="getRawDriveVelocity()">
 <h3>getRawDriveVelocity</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getRawDriveVelocity</span>()</div>
+<div class="block">Returns the raw velocity value of the drive encoder.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The raw velocity value of the drive encoder.</dd>
+</dl>
 </section>
 </li>
 <li>
@@ -571,15 +662,23 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="getDriveData()">
 <h3>getDriveData</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getDriveData</span>()</div>
+<div class="block">Returns the values of the module in a string.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The values of the module in a string.</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="getBaseName()">
 <h3>getBaseName</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getBaseName</span>()</div>
+<div class="block">Returns the swerve module name for the IO system.</div>
 <dl class="notes">
 <dt>Overrides:</dt>
 <dd><code><a href="../utils/IO/IOLayer.html#getBaseName()">getBaseName</a></code>&nbsp;in class&nbsp;<code><a href="../utils/IO/IOLayer.html" title="class in frc.team_8840_lib.utils.IO">IOLayer</a></code></dd>
+<dt>Returns:</dt>
+<dd>The base name of the module for IO.</dd>
 </dl>
 </section>
 </li>

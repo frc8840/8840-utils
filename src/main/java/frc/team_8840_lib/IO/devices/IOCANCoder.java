@@ -46,6 +46,9 @@ public class IOCANCoder extends IOLayer {
      */
     @IOMethod(name = "absolute position", method_type = IOMethodType.READ, value_type = IOValue.DOUBLE)
     public double getAbsolutePosition() {
+        if (Robot.isReal() && encoder == null) {
+            Logger.Log("[" + getBaseName() + "] WARNING: CANCoder is null, and you're getting the absolute position.");
+        }
         if (encoder == null || this.encoderPort < 0) return isReal() ? 0 : this.cache;
         
         return isReal() ? encoder.getAbsolutePosition() : this.cache;
@@ -60,6 +63,10 @@ public class IOCANCoder extends IOLayer {
         this.cache = value;
     }
 
+    /**
+     * Configures all settings of the CANCoder
+     * @param config The configuration to set
+     */
     public void configAllSettings(CANCoderConfiguration config) {
         if (encoder == null || this.encoderPort < 0) return;
         

@@ -224,10 +224,16 @@ public class Logger implements Loggable {
 
     private static int cycle = 0;
 
+    private static boolean readyToSave = false;
+    public static void setReadyToSave(boolean ready) {
+        readyToSave = ready;
+    }
+
     private static void loadAndSaveAllAutoLogs() {
         writer.saveInfo("AutoLog Cycle " + cycle++ + (cycle < 3 ? " (skipped due to early cycle)" : ""));
 
-        if (cycle < 3) return;
+        if (cycle < 3 || !readyToSave) return;
+        //CHange to not run this until the robot is fully initialized.
         //We skip the first 3 since the robot is not fully initialized yet + it usually causes annoying errors in console.
         //Should be fine after the first one.
 

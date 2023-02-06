@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
+import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.controllers.swerve.structs.CurrentLimit;
 import frc.team_8840_lib.utils.controllers.swerve.structs.PIDStruct;
 
@@ -25,6 +26,8 @@ public class SwerveSettings {
     public double trackWidth = Units.inchesToMeters(21.73);
     public double wheelBase = Units.inchesToMeters(21.73);
     public double wheelDiameter = Units.inchesToMeters(3.94);
+
+    public boolean doManualConversion = Robot.isSimulation();
 
     public double wheelCircumference() {
         return wheelDiameter * Math.PI;

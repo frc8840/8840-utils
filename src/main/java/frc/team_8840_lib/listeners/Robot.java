@@ -267,6 +267,8 @@ public class Robot extends RobotBase {
         //TODO: figure out this stuff from above.
         if (!doQuickStart) DriverStationJNI.observeUserProgramStarting();
 
+        Logger.setReadyToSave(true);
+
         // Loop forever, calling the appropriate mode-dependent function
         while (!exit) {
             NotifierJNI.updateNotifierAlarm(notifier, (long) (System.currentTimeMillis() + DELTA_TIME * 1000));
