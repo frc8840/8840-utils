@@ -64,7 +64,7 @@ public class SparkMaxEncoderWrapper {
             return 0;
         }
 
-        return (encoder.getPosition() * (doManualConversion ? positionConversionFactor : 1)) - (doManualOffset ? offset : 0);
+        return (encoder.getPosition() * (doManualConversion ? positionConversionFactor : 1)) + (doManualOffset ? offset : 0);
     }
 
     /**
@@ -146,11 +146,17 @@ public class SparkMaxEncoderWrapper {
      * @return Calculated position
      */
     public double calculatePosition(double position) {
-        return (position / (doManualConversion ? positionConversionFactor : 1)) - (doManualOffset ? offset : 0);
+        return (position / (doManualConversion ? positionConversionFactor : 1)) + (doManualOffset ? offset : 0);
     }
 
+    /**
+     * Calculates the position using the offset and conversion factor. Uses the preset booleans for REV's API, and an argument for the offset.
+     * @param position The position to calculate
+     * @param ignoreOffset Whether to ignore the offset or not
+     * @return Calculated position
+     */
     public double calculatePosition(double position, boolean ignoreOffset) {
-        return (position / (doManualConversion ? positionConversionFactor : 1)) - (doManualOffset && !ignoreOffset ? offset : 0);
+        return (position / (doManualConversion ? positionConversionFactor : 1)) + (doManualOffset && !ignoreOffset ? offset : 0);
     }
 
     /**

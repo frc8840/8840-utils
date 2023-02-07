@@ -93,8 +93,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">SparkMaxPIDWrapper</span>
 <span class="extends-implements">extends <a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">Another fix for potential issues with REV's api. This is a wrapper for the onboard PID controller.
- TODO: Work on this IF there are issues with the onboard PID controller.</div>
+<div class="block">Another fix for potential issues with REV's api. This is a wrapper for the onboard PID controller.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -126,52 +125,55 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#calculateFF(double)" class="member-name-link">calculateFF</a><wbr>(double&nbsp;setpoint)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setFeedforward(double,double,double)" class="member-name-link">setFeedforward</a><wbr>(double&nbsp;kS,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setFeedbackDevice(frc.team_8840_lib.controllers.specifics.SparkMaxEncoderWrapper)" class="member-name-link">setFeedbackDevice</a><wbr>(<a href="SparkMaxEncoderWrapper.html" title="class in frc.team_8840_lib.controllers.specifics">SparkMaxEncoderWrapper</a>&nbsp;wrapper)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setFeedforward(double,double,double)" class="member-name-link">setFeedforward</a><wbr>(double&nbsp;kS,
  double&nbsp;kV,
  double&nbsp;kA)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the kS, kV, and kA of the feedforward</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPID(double,double,double,double,double)" class="member-name-link">setPID</a><wbr>(double&nbsp;kP,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPID(double,double,double,double,double)" class="member-name-link">setPID</a><wbr>(double&nbsp;kP,
  double&nbsp;kI,
  double&nbsp;kD,
  double&nbsp;kFF,
  double&nbsp;kIZone)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the kP, kI, kD, kFF, and kIZone of the onboard PID controller</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPIDProfile(double,double,double,edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints)" class="member-name-link">setPIDProfile</a><wbr>(double&nbsp;kP,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setPIDProfile(double,double,double,edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints)" class="member-name-link">setPIDProfile</a><wbr>(double&nbsp;kP,
  double&nbsp;kI,
  double&nbsp;kD,
  edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints&nbsp;constraints)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the kP, kI, kD, and TrapezoidProfile.Constraints of the local PID controller</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setReference(double,com.revrobotics.CANSparkMax.ControlType)" class="member-name-link">setReference</a><wbr>(double&nbsp;setpoint,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setReference(double,com.revrobotics.CANSparkMax.ControlType)" class="member-name-link">setReference</a><wbr>(double&nbsp;setpoint,
  com.revrobotics.CANSparkMax.ControlType&nbsp;controlType)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the reference of the PID controller.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setReference(double,com.revrobotics.CANSparkMax.ControlType,int,double)" class="member-name-link">setReference</a><wbr>(double&nbsp;setpoint,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setReference(double,com.revrobotics.CANSparkMax.ControlType,int,double)" class="member-name-link">setReference</a><wbr>(double&nbsp;setpoint,
  com.revrobotics.CANSparkMax.ControlType&nbsp;controlType,
  int&nbsp;pidSlot,
  double&nbsp;arbFeedforward)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the reference of the PID controller.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseManualPID(boolean)" class="member-name-link">setUseManualPID</a><wbr>(boolean&nbsp;useManualPID)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setUseManualPID(boolean)" class="member-name-link">setUseManualPID</a><wbr>(boolean&nbsp;useManualPID)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets whether to use the onboard PID controller or the local PID controller</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setWrapAround(double,double)" class="member-name-link">setWrapAround</a><wbr>(double&nbsp;min,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setWrapAround(double,double)" class="member-name-link">setWrapAround</a><wbr>(double&nbsp;min,
  double&nbsp;max)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the max and min output of the PID controller</div>
 </div>
 </div>
@@ -205,6 +207,12 @@ loadScripts(document, 'script');</script>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="setFeedbackDevice(frc.team_8840_lib.controllers.specifics.SparkMaxEncoderWrapper)">
+<h3>setFeedbackDevice</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setFeedbackDevice</span><wbr><span class="parameters">(<a href="SparkMaxEncoderWrapper.html" title="class in frc.team_8840_lib.controllers.specifics">SparkMaxEncoderWrapper</a>&nbsp;wrapper)</span></div>
+</section>
+</li>
 <li>
 <section class="detail" id="setPID(double,double,double,double,double)">
 <h3>setPID</h3>

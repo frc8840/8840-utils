@@ -49,8 +49,10 @@ public class SwerveSettings {
     public boolean driveInverted = false;
     public boolean turnInverted = false;
 
+    public boolean manualOffset = true;
+
     //PIDStruct follows (kp, ki, kd, kf)
-    public PIDStruct turnPID = new PIDStruct(0.6, 0.0, 12.0, 0.0);
+    public PIDStruct turnPID = new PIDStruct(0.99, 0.0, 0.0, 0.0);
     public PIDStruct drivePID = new PIDStruct(0.10, 0.0, 0.0, 0.0);
 
     public boolean useCurrentLimits = true;
@@ -60,6 +62,8 @@ public class SwerveSettings {
     //For NEOs
     public CurrentLimit secondaryDriveCurrentLimit = new CurrentLimit(25, 40, 0.1);
     public CurrentLimit secondaryTurnCurrentLimit = new CurrentLimit(25, 40, 0.1);
+
+    public double voltageCompensation = 12;
 
     public double driveKS = (0.667 / 12);
     public double driveKV = (2.44 / 12);
@@ -132,18 +136,30 @@ public class SwerveSettings {
             driveKV = 2.44 / 12;
             driveKA = 0.27 / 12;
 
-            //The PID values are different for the TalonFX
-            turnPID = new PIDStruct(0.6, 0.0, 12.0, 0.0);
-            drivePID = new PIDStruct(0.10, 0.0, 0.0, 0.0);
         } else if (this.type == SwerveType.SPARK_MAX) {
             //Drive KS, KV, and KA values are different for the SparkMax
             driveKS = 0.667;
             driveKV = 2.44;
             driveKA = 0.27;
+        }
+    }
 
-            //The PID values are different for the SparkMax
-            turnPID = new PIDStruct(0.99, 0.0, 0.0, 0.0);
-            drivePID = new PIDStruct(0.10, 0.0, 0.0, 0.0);
+    public static class SDS {
+        public static class MK4i {
+            public static class L1 {
+                public static final double maxSpeed_NEO = 12.0;
+                public static final double maxSpeed_Falcon500 = 13.5;
+            }
+
+            public static class L2 {
+                public static final double maxSpeed_NEO = 14.5;
+                public static final double maxSpeed_Falcon500 = 16.3;
+            }
+
+            public static class L3 {
+                public static final double maxSpeed_NEO = 16.0;
+                public static final double maxSpeed_Falcon500 = 18.0;
+            }
         }
     }
 }

@@ -33,6 +33,7 @@ import frc.team_8840_lib.utils.IO.IOMethodType;
 import frc.team_8840_lib.utils.IO.IOPermission;
 import frc.team_8840_lib.utils.IO.IOValue;
 import frc.team_8840_lib.utils.controllers.swerve.CTREConfig;
+import frc.team_8840_lib.utils.controllers.swerve.CTREModuleState;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveType;
 import frc.team_8840_lib.utils.controllers.swerve.conversions.FalconConversions;
 
@@ -286,9 +287,13 @@ public class SwerveModule extends IOLayer {
         driveNEO.setSecondaryCurrentLimit((int) Math.round(config.getSettings().secondaryDriveCurrentLimit.continuousCurrent));
         turnNEO.setSecondaryCurrentLimit((int) Math.round(config.getSettings().secondaryTurnCurrentLimit.continuousCurrent));
 
+        //set voltage compensation
+        turnNEO.enableVoltageCompensation(config.getSettings().voltageCompensation);
+        driveNEO.enableVoltageCompensation(config.getSettings().voltageCompensation);
+
         //Open loop and closed loop ramp rate
-        // driveNEO.setOpenLoopRampRate(config.getSettings().driveOpenRampRate);
-        // driveNEO.setClosedLoopRampRate(config.getSettings().driveClosedRampRate);
+        driveNEO.setOpenLoopRampRate(config.getSettings().driveOpenRampRate);
+        driveNEO.setClosedLoopRampRate(config.getSettings().driveClosedRampRate);
         
         //Set drive PID controller values
         neoPositionConversionFactor = config.getSettings().driveGearRatio * Math.PI * config.getSettings().wheelDiameter;
@@ -307,20 +312,22 @@ public class SwerveModule extends IOLayer {
         neoTurnPIDController.setI(config.getSettings().turnPID.kI);
         neoTurnPIDController.setD(config.getSettings().turnPID.kD);
         neoTurnPIDController.setFF(config.getSettings().turnPID.kF);
+        neoTurnPIDController.setIZone(config.getSettings().turnPID.kIZone);
 
         //Set drive PID controller values
         neoDrivePIDController.setP(config.getSettings().drivePID.kP);
         neoDrivePIDController.setI(config.getSettings().drivePID.kI);
         neoDrivePIDController.setD(config.getSettings().drivePID.kD);
         neoDrivePIDController.setFF(config.getSettings().drivePID.kF);
+        neoDrivePIDController.setIZone(config.getSettings().drivePID.kIZone);
         
         //Make the NEO turn PID controller wrap around from [0, 2pi]
         neoTurnPIDController.setPositionPIDWrappingEnabled(true);
         neoTurnPIDController.setPositionPIDWrappingMinInput(
-            neoTurnEncoder.calculatePosition(0, true)
+            neoTurnEncoder.calculatePosition(-180, true)
         );
         neoTurnPIDController.setPositionPIDWrappingMaxInput(
-            neoTurnEncoder.calculatePosition(2 * Math.PI, true)
+            neoTurnEncoder.calculatePosition(180, true)
         );
 
         //Burn flash
@@ -388,17 +395,29 @@ public class SwerveModule extends IOLayer {
             this.turnTalonFX.setSelectedSensorPosition(absPos);
         } else if (this.config.getSettings().getType() == SwerveType.SPARK_MAX) {
             double newPosition = getAbsoluteAngle().getDegrees() - config.getSettings().angleOffsets[privateID];
-            Logger.Log("[" + getBaseName() + "] Resetting to absolute position: " + newPosition + " degrees.");
-            REVLibError status = neoTurnEncoder.setPosition(newPosition);
-            Logger.Log("[" + getBaseName() + "] Reset to absolute position: " + neoTurnEncoder.getPosition() + " degrees (should be " + newPosition + " degrees. Status: " + status.name() + ")");
 
-            if (Math.abs(neoTurnEncoder.getPosition() - newPosition) > 0.1) {
-                Logger.Log("[" + getBaseName() + "] Spark Maxes are being dumb and stupid (woo!). Doing the manual offsetting...");
+            if (!config.getSettings().manualOffset) {
+                Logger.Log("[" + getBaseName() + "] Resetting to absolute position: " + newPosition + " degrees.");
+                REVLibError status = neoTurnEncoder.setPosition(-newPosition);
+                Logger.Log("[" + getBaseName() + "] Reset to absolute position: " + neoTurnEncoder.getPosition() + " degrees (should be " + newPosition + " degrees. Status: " + status.name() + ")");
+            }
+
+            if (Math.abs(neoTurnEncoder.getPosition() - newPosition) > 0.1 || config.getSettings().manualOffset) {
+                double newPos = angleCANCoder.getAbsolutePosition() - config.getSettings().angleOffsets[privateID];
+
+                if (!config.getSettings().manualOffset) {
+                    Logger.Log("[" + getBaseName() + "] Spark Maxes are being dumb and stupid (woo!). Doing the manual offsetting...");
+                } else {
+                    Logger.Log("[" + getBaseName() + "] Doing manual offsetting (based on setting)...");
+                    Logger.Log("[" + getBaseName() + "] Angle Offset: " + config.getSettings().angleOffsets[privateID] + " degrees, current position: " + angleCANCoder.getAbsolutePosition() + " degrees. New position: " + newPos + " degrees.");
+                }
 
                 neoTurnEncoder.setManualOffset(true);
-                neoDriveEncoder.setManualOffset(true);
+                neoTurnEncoder.setPosition(
+                    newPos
+                );
 
-                Logger.Log("[" + getBaseName() + "] TRY 2: Reset to absolute position: " + neoTurnEncoder.getPosition() + " degrees (should be " + newPosition + " degrees.)");
+                Logger.Log("[" + getBaseName() + "] " + (!config.getSettings().manualOffset ? "TRY 2 " : "") + "Reset to absolute position: " + neoTurnEncoder.getPosition() + " degrees " + (!config.getSettings().manualOffset ? "(should be " + newPosition + " degrees.)" : "(should be " + config.getSettings().angleOffsets[privateID] + " degrees.)"));
             }
         }
     }
@@ -492,6 +511,11 @@ public class SwerveModule extends IOLayer {
                         feedforward.calculate(desiredState.speedMetersPerSecond)
                 );
             } else if (getType() == SwerveType.SPARK_MAX) {
+                if (Math.abs(desiredState.speedMetersPerSecond) < this.config.getSettings().relativeThreshold()) {
+                    neoDrivePIDController.setReference(0, CANSparkMax.ControlType.kVelocity);
+                    return;
+                }
+
                 //Drive neo PID controller takes in the conversion factor
                 neoDrivePIDController.setReference(
                         neoDriveEncoder.calculateVelocity(desiredState.speedMetersPerSecond),
@@ -519,7 +543,8 @@ public class SwerveModule extends IOLayer {
         } else if (this.getType() == SwerveType.SPARK_MAX) {
             neoTurnPIDController.setReference(
                 neoTurnEncoder.calculatePosition(angle),
-                CANSparkMax.ControlType.kPosition
+                CANSparkMax.ControlType.kPosition,
+                0
             );
         }
 
@@ -550,7 +575,7 @@ public class SwerveModule extends IOLayer {
      * @param isOpenLoop Whether the drive motor should be in open loop.
      * */
     public void setDesiredState(SwerveModuleState state, boolean isOpenLoop) {
-        SwerveModuleState optimizedState = SwerveModuleState.optimize(state, getRotation());
+        SwerveModuleState optimizedState = CTREModuleState.optimize(state, getRotation());
 
         this.setAngle(optimizedState);
         this.setSpeed(optimizedState, isOpenLoop);
@@ -712,6 +737,22 @@ public class SwerveModule extends IOLayer {
         }
 
         return new SwerveModuleState(velocity, angle);
+    }
+    
+    /**
+     * Get encoder for the drive motor
+     * @return The encoder for the drive motor
+     */
+    public SparkMaxEncoderWrapper getDriveEncoder() {
+        return neoDriveEncoder;
+    }
+
+    /**
+     * Get encoder for the turn motor
+     * @return The encoder for the turn motor
+     */
+    public SparkMaxEncoderWrapper getTurnEncoder() {
+        return neoTurnEncoder;
     }
 
     /**

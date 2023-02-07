@@ -6,6 +6,10 @@ import frc.team_8840_lib.listeners.EventListener;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.controllers.SCType;
 
+/**
+ * This is an example of how to use the ControllerGroup class. This example is for a motor that pulses.
+ * @author Jaiden Grimminck
+ */
 public class PulsingMotor extends EventListener {
 
     private ControllerGroup motor;

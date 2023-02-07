@@ -19,6 +19,10 @@ import java.util.TimerTask;
 
 import com.revrobotics.REVPhysicsSim;
 
+/**
+ * This is another example on how to use the SwerveDrive class. This example is for autonomous, and uses the PathPlanner class to generate a path.
+ * @author Jaiden Grimminck
+ */
 public class AutonomousExample extends EventListener {
     private SwerveGroup swerveDrive;
     private PathPlanner pathPlanner;

@@ -11,6 +11,10 @@ import frc.team_8840_lib.utils.controllers.SCType;
 import frc.team_8840_lib.utils.controls.Axis;
 import frc.team_8840_lib.utils.time.SubscriptionType;
 
+/**
+ * An example of a tank drive robot.
+ * @author Jaiden Grimminck
+ */
 public class TankDrive extends EventListener {
 
     private ControllerGroup drive;

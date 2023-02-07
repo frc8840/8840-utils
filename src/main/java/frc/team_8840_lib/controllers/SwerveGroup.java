@@ -367,6 +367,14 @@ public class SwerveGroup implements Loggable {
     // }
 
     /**
+     * Returns the modules of the swerve drive.
+     * @return The modules of the swerve drive
+     */
+    public SwerveModule[] getModules() {
+        return modules;
+    }
+
+    /**
      * Returns the settings of the swerve drive.
      * @return The settings of the swerve drive
      * */

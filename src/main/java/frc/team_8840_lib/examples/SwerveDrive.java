@@ -18,6 +18,12 @@ import frc.team_8840_lib.utils.math.MathUtils;
 
 import java.util.TimerTask;
 
+/**
+ * This example goes more into detail about initializing the SwerveDrive class.
+ * See the AutonomousExample file for better usage on driving/autonomous.
+ * @see frc.team_8840_lib.examples.AutonomousExample
+ * @author Jaiden Grimminck
+ */
 public class SwerveDrive extends EventListener {
     private SwerveGroup swerveDrive;
 

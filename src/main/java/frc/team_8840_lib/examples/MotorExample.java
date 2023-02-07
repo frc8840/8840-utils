@@ -7,6 +7,10 @@ import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.controllers.SCType;
 import frc.team_8840_lib.utils.time.SubscriptionType;
 
+/**
+ * This is an example of making some motors move at different times during autonomous.
+ * @author Jaiden Grimminck
+ */
 public class MotorExample extends EventListener {
 
     ControllerGroup kGroup;

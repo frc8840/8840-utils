@@ -115,8 +115,11 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color"><code><a href="#kI" class="member-name-link">kI</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>double</code></div>
-<div class="col-second odd-row-color"><code><a href="#kP" class="member-name-link">kP</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#kIZone" class="member-name-link">kIZone</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>double</code></div>
+<div class="col-second even-row-color"><code><a href="#kP" class="member-name-link">kP</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -128,10 +131,20 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(double,double,double,double)" class="member-name-link">PIDStruct</a><wbr>(double&nbsp;kp,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(double,double,double)" class="member-name-link">PIDStruct</a><wbr>(double&nbsp;kp,
+ double&nbsp;ki,
+ double&nbsp;kd)</code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(double,double,double,double)" class="member-name-link">PIDStruct</a><wbr>(double&nbsp;kp,
  double&nbsp;ki,
  double&nbsp;kd,
  double&nbsp;kf)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(double,double,double,double,double)" class="member-name-link">PIDStruct</a><wbr>(double&nbsp;kp,
+ double&nbsp;ki,
+ double&nbsp;kd,
+ double&nbsp;kf,
+ double&nbsp;kIZone)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -194,6 +207,12 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">kF</span></div>
 </section>
 </li>
+<li>
+<section class="detail" id="kIZone">
+<h3>kIZone</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">kIZone</span></div>
+</section>
+</li>
 </ul>
 </section>
 </li>
@@ -203,12 +222,30 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="&lt;init&gt;(double,double,double)">
+<h3>PIDStruct</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">PIDStruct</span><wbr><span class="parameters">(double&nbsp;kp,
+ double&nbsp;ki,
+ double&nbsp;kd)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="&lt;init&gt;(double,double,double,double)">
 <h3>PIDStruct</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">PIDStruct</span><wbr><span class="parameters">(double&nbsp;kp,
  double&nbsp;ki,
  double&nbsp;kd,
  double&nbsp;kf)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="&lt;init&gt;(double,double,double,double,double)">
+<h3>PIDStruct</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">PIDStruct</span><wbr><span class="parameters">(double&nbsp;kp,
+ double&nbsp;ki,
+ double&nbsp;kd,
+ double&nbsp;kf,
+ double&nbsp;kIZone)</span></div>
 </section>
 </li>
 </ul>

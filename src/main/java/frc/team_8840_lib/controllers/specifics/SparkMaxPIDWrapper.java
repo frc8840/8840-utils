@@ -8,10 +8,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.RobotController;
 
 /**
  * Another fix for potential issues with REV's api. This is a wrapper for the onboard PID controller.
- * TODO: Work on this IF there are issues with the onboard PID controller.
  * 
  * @author Jaiden Grimminck
  */
@@ -33,8 +33,13 @@ public class SparkMaxPIDWrapper {
     boolean useManualPID = false;
     
     public SparkMaxPIDWrapper(CANSparkMax sparkMax) {
-        onboardPIDController = sparkMax.getPIDController();
         controllerRef = sparkMax;
+        onboardPIDController = sparkMax.getPIDController();
+    }
+
+    public void setFeedbackDevice(SparkMaxEncoderWrapper wrapper) {
+        encoder = wrapper;
+        if (!useManualPID) onboardPIDController.setFeedbackDevice(encoder.getEncoder());
     }
 
     /**
@@ -117,7 +122,19 @@ public class SparkMaxPIDWrapper {
         if (!useManualPID) {
             onboardPIDController.setReference(setpoint, controlType);
         } else {
-            //TODO: Implement manual PID
+            double currentPosition = encoder.getPosition();
+
+            double pidOutput = 0;
+            if (useProfiledPIDController) {
+                pidOutput = profiledPIDController.calculate(currentPosition, setpoint);
+            } else {
+                pidOutput = pidController.calculate(currentPosition, setpoint);
+            }
+
+            //Set the voltage of the motor
+            double batteryVoltage = RobotController.getBatteryVoltage();
+            
+            controllerRef.setVoltage((pidOutput) * batteryVoltage);
         }
     }
 
@@ -132,7 +149,19 @@ public class SparkMaxPIDWrapper {
         if (!useManualPID) {
             onboardPIDController.setReference(setpoint, controlType, pidSlot, arbFeedforward);
         } else {
+            double currentPosition = encoder.getPosition();
 
+            double pidOutput = 0;
+            if (useProfiledPIDController) {
+                pidOutput = profiledPIDController.calculate(currentPosition, setpoint);
+            } else {
+                pidOutput = pidController.calculate(currentPosition, setpoint);
+            }
+
+            //Set the voltage of the motor
+            double batteryVoltage = RobotController.getBatteryVoltage();
+
+            controllerRef.setVoltage((pidOutput + arbFeedforward) * batteryVoltage);
         }
     }
 
