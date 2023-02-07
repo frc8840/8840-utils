@@ -335,7 +335,7 @@ public class SwerveModule extends IOLayer {
         turnNEO.burnFlash();
 
         resetToAbsolute();
-        neoDriveEncoder.setPosition(0);
+        neoDriveEncoder.getEncoder().setPosition(0);
 
         //https://github.com/frc3512/SwerveBot-2022/blob/9d31afd05df6c630d5acb4ec2cf5d734c9093bf8/src/main/java/frc/lib/util/CANSparkMaxUtil.java#L67
         setNeoCANStatusFrames(driveNEO, 10, 20, 500, 500, 500);
@@ -403,6 +403,8 @@ public class SwerveModule extends IOLayer {
             }
 
             if (Math.abs(neoTurnEncoder.getPosition() - newPosition) > 0.1 || config.getSettings().manualOffset) {
+                neoTurnEncoder.getEncoder().setPosition(0); //Zero it out first.
+                
                 double newPos = angleCANCoder.getAbsolutePosition() - config.getSettings().angleOffsets[privateID];
 
                 if (!config.getSettings().manualOffset) {
