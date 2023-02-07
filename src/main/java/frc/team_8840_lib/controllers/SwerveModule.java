@@ -406,7 +406,7 @@ public class SwerveModule extends IOLayer {
                 double newPos = angleCANCoder.getAbsolutePosition() - config.getSettings().angleOffsets[privateID];
 
                 if (!config.getSettings().manualOffset) {
-                    Logger.Log("[" + getBaseName() + "] Spark Maxes are being dumb and stupid (woo!). Doing the manual offsetting...");
+                    Logger.Log("[" + getBaseName() + "] Spark Maxes are not working. Doing the manual offsetting...");
                 } else {
                     Logger.Log("[" + getBaseName() + "] Doing manual offsetting (based on setting)...");
                     Logger.Log("[" + getBaseName() + "] Angle Offset: " + config.getSettings().angleOffsets[privateID] + " degrees, current position: " + angleCANCoder.getAbsolutePosition() + " degrees. New position: " + newPos + " degrees.");

@@ -144,18 +144,33 @@ public class SwerveSettings {
         }
     }
 
+    /**
+     * A list of settings for the Swerve Drive Specialties.
+     */
     public static class SDS {
+        /**
+         * A list of settings for the MK4i.
+         */
         public static class MK4i {
+            /**
+             * A list of settings for the MK4i Level 1.
+             */
             public static class L1 {
                 public static final double maxSpeed_NEO = 12.0;
                 public static final double maxSpeed_Falcon500 = 13.5;
             }
 
+            /**
+             * A list of settings for the MK4i Level 2.
+             */
             public static class L2 {
                 public static final double maxSpeed_NEO = 14.5;
                 public static final double maxSpeed_Falcon500 = 16.3;
             }
 
+            /**
+             * A list of settings for the MK4i Level 3.
+             */
             public static class L3 {
                 public static final double maxSpeed_NEO = 16.0;
                 public static final double maxSpeed_Falcon500 = 18.0;
