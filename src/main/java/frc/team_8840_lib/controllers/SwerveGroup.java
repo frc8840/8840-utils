@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.*;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team_8840_lib.info.console.AutoLog;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.info.console.Logger.LogType;
@@ -20,20 +21,30 @@ import frc.team_8840_lib.utils.logging.Loggable;
 import frc.team_8840_lib.utils.math.MathUtils;
 
 /**
- * Based on the wonderful work of Team 364
- * <a href="https://github.com/Team364/BaseFalconSwerve">Repo Here</a>
+ * Your standard swerve drive class. 
+ * 
+ * Based on the wonderful work of Team 364. 
+ * <a href="https://github.com/Team364/BaseFalconSwerve">Repo Here</a> 
+ * 
+ * Uses CANCoders, Pigeon, and Talons/NEOs for the swerve modules. 
+ * 
+ * @author Jaiden Grimminck
  * */
 public class SwerveGroup implements Loggable {
     private String name;
 
     public String getName() { return name; }
 
-    private final String[] moduleNames = {
+    private static final String[] moduleNames = {
             "Top Right",
             "Bottom Right",
             "Top Left",
             "Bottom Left"
     };
+
+    public static String getModName(int i) {
+        return moduleNames[i];
+    }
 
     public static enum ModuleIndex {
         kTOP_RIGHT(0),
@@ -249,6 +260,36 @@ public class SwerveGroup implements Loggable {
     }
 
     /**
+     * Return SwerveModuleStates for drive
+     * @param translation2d Translation for the robot
+     * @param rotation Rotation of the robot, in radians.
+     * @param fieldRelative Whether the translation is field relative or not
+     */
+    public SwerveModuleState[] driveStates(Translation2d translation2d, double rotation, boolean fieldRelative, boolean applyDesaturation) {
+        ChassisSpeeds chassisSpeeds = (
+            fieldRelative ? 
+            ChassisSpeeds.fromFieldRelativeSpeeds(
+                translation2d.getX(),
+                translation2d.getY(),
+                rotation, getAngle()
+            ) :
+            new ChassisSpeeds(
+                translation2d.getX(),
+                translation2d.getY(),
+                rotation
+            )
+        );
+
+        SwerveModuleState[] states = settings.getKinematics().toSwerveModuleStates(chassisSpeeds);
+
+        if (applyDesaturation) {
+            SwerveDriveKinematics.desaturateWheelSpeeds(states, settings.maxSpeed);
+        }
+
+        return states;
+    }
+
+    /**
      * Sets the module states of the robot using a list of states.
      * It's recommended to use {@link #drive(Translation2d, double, boolean, boolean)} instead of this directly since this can be dangerous to use for things other than testing.
      * @param states States for each module
@@ -267,27 +308,88 @@ public class SwerveGroup implements Loggable {
         updateOdometry();
     }
 
-    public void applyXBrake() {
-        //Turn the modules so they form an "x" with the directions of the wheels
-        //This is especially useful when the robot is stopped since it can prevent other robots from pushing it
+    /**
+     * Sets the module states of the robot using a list of states.
+     * It's recommended to use {@link #drive(Translation2d, double, boolean, boolean)} instead of this directly since this can be dangerous to use for things other than testing.
+     * @param states States for each module
+     *               The order of the states is as follows:
+     *               Front Left, Front Right, Back Left, Back Right
+     * @param isOpenLoop Whether to use open loop or closed loop
+     * @param ignoreAngleLimit Whether to ignore the angle limit or not
+     * */
+    public void setModuleStates(SwerveModuleState[] states, boolean isOpenLoop, boolean ignoreAngleLimit) {
+        //Desaturate the states to make sure that the robot doesn't go faster than the max speed
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, settings.maxSpeed);
 
-        //Get the current states
-        SwerveModuleState[] states = getModuleStates();
+        //Loop through, and set the states
+        for (int i = 0; i < 4; i++) {
+            modules[i].setDesiredState(states[i], isOpenLoop, ignoreAngleLimit);
+        }
 
-        //Set the states
-        states[0] = new SwerveModuleState(0, new Rotation2d(-Math.PI / 4));
-        states[1] = new SwerveModuleState(0, new Rotation2d(Math.PI / 4));
-        states[2] = new SwerveModuleState(0, new Rotation2d(-Math.PI / 4));
-        states[3] = new SwerveModuleState(0, new Rotation2d(Math.PI / 4));
-
-        //Set the states
-        setModuleStates(states, false);
+        //Update odometry
+        updateOdometry();
     }
 
+    /**
+     * Rotates the robot in place.
+     * @param radiansPerSecond The speed at which the robot should rotate, in radians per second.
+     */
+    public void spin(double radiansPerSecond) {
+        //Create a chassis speeds object with the correct rotation
+        ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, radiansPerSecond);
+
+        //Set the angle of the robot to the correct angle to rotate in place
+        SwerveModuleState[] states = settings.getKinematics().toSwerveModuleStates(chassisSpeeds);
+
+        //For debugging purpaces, print the speeds and angles of each module.
+        for (int i = 0; i < 4; i++) {
+            SmartDashboard.putNumber(getModName(i) + "/speed", states[i].speedMetersPerSecond);
+            SmartDashboard.putNumber(getModName(i) + "/angle", states[i].angle.getDegrees());
+        }
+
+        //Set the module states, open loop (true). Ignore optimization (true) since this is being buggy.
+        setModuleStates(states, true, true);
+    }
+
+
+    /**
+     * Sets the module rotations to form an "x" with the directions of the wheels.
+     * This is especially useful when the robot is stopped since it can prevent other robots from pushing it.
+     */
+    public void applyXBrake() {
+        //Turn the modules so they form an "x" with the directions of the wheels
+        //This is especially useful when the robot is stopped since it can prevent other robots from pushing it.
+
+        Rotation2d x1 = Rotation2d.fromDegrees(45);
+        Rotation2d x2 = Rotation2d.fromDegrees(135);
+
+        //Set the module states, but only the angles. Ignore the angle jitter prevention.
+        modules[0].setAngle(new SwerveModuleState(0, x1), true);
+        modules[1].setAngle(new SwerveModuleState(0, x2), true);
+        modules[2].setAngle(new SwerveModuleState(0, x2), true);
+        modules[3].setAngle(new SwerveModuleState(0, x1), true);
+    }
+
+    /**
+     * Sets all module speeds to 0
+     */
+    public void stop() {
+        setSpeed(0);
+    }
+
+    /**
+     * Sets the brake modes of all the modules
+     * @param brake Whether to brake (true) or coast (false)
+     */
     public void setBrakeModes(boolean brake) {
         loop((module, i) -> module.setBrakeMode(brake));
     }
 
+    /**
+     * Set the drive brake and steer brake modes of all the modules
+     * @param driveBrake Whether to brake (true) the drive motors
+     * @param steerBrake Whether to brake (true) the steer motors
+     */
     public void setIndividualBrakeModes(boolean driveBrake, boolean steerBrake) {
         loop((module, i) -> module.setIndividualBrakeMode(driveBrake, steerBrake));
     }
@@ -336,6 +438,38 @@ public class SwerveGroup implements Loggable {
     public void resetOdometry(Pose2d pose) {
         odometry.resetPosition(getAngle(), getSwervePositions(), pose);
         //pose_odometry.resetPosition(pose, getAngle());
+    }
+
+    /**
+     * Whether to provide power to the modules or not.
+     * @param providePowerToThem Whether to provide power to the modules or not
+     */
+    public void providePower(boolean providePowerToThem) {
+        loop((module, i) -> {
+            module.noRun = !providePowerToThem;
+        });
+    }
+
+    /**
+     * Whether to do optimization in the modules or not.
+     * @param doOptimization Whether to provide power to the modules or not
+     */
+    public void doStateOptimization(boolean doOptimization) {
+        loop((module, i) -> {
+            module.doOptimization = doOptimization;
+        });
+    }
+
+    public void doSetAngle(boolean doSetAngle) {
+        loop((module, i) -> {
+            module.doSetAngle = doSetAngle;
+        });
+    }
+
+    public void doSetSpeed(boolean doSetSpeed) {
+        loop((module, i) -> {
+            module.doSetSpeed = doSetSpeed;
+        });
     }
 
     /**
@@ -396,7 +530,7 @@ public class SwerveGroup implements Loggable {
      * @return Module name
      */
     public String getModuleName(int i) {
-        return this.moduleNames[i];
+        return moduleNames[i];
     }
 
     public SwerveModulePosition[] getSwervePositions() {
@@ -436,23 +570,29 @@ public class SwerveGroup implements Loggable {
         //CommunicationManager.getInstance().updateFieldObjectPose("Estimated " + getName(), getEstimatedPose());
     }
 
-    @AutoLog(logtype = LogType.BYTE_ARRAY, name = "Swerve Drive Module Speeds")
-    public byte[] logSpeeds() {
-        byte[] speeds = new byte[4];
-        
+    /**
+     * Logs the speeds of the modules
+     * @return The speeds of the modules
+     */
+    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Swerve Drive Module Speeds")
+    public double[] logSpeeds() {
+        double[] speeds = new double[4];
         loop((module, i) -> {
-            speeds[i] = (byte) module.getState().speedMetersPerSecond;
+            speeds[i] = module.getState().speedMetersPerSecond;
         });
 
         return speeds;
     }
 
-    @AutoLog(logtype = LogType.BYTE_ARRAY, name = "Swerve Drive Module Angles")
-    public byte[] logAngles() {
-        byte[] angles = new byte[4];
-
+    /**
+     * Logs the angles of the modules
+     * @return The angles of the modules
+     */
+    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Swerve Drive Module Angles")
+    public double[] logAngles() {
+        double[] angles = new double[4];
         loop((module, i) -> {
-            angles[i] = (byte) module.getState().angle.getDegrees();
+            angles[i] = module.getState().angle.getDegrees();
         });
 
         return angles;

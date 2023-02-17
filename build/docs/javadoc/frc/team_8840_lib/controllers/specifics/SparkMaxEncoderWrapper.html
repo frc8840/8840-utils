@@ -140,10 +140,18 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Calculates the velocity using the conversion factor.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.revrobotics.RelativeEncoder</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getEncoder()" class="member-name-link">getEncoder</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#doSubtractionOfStart(boolean)" class="member-name-link">doSubtractionOfStart</a><wbr>(boolean&nbsp;subtractStartingPosition)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.revrobotics.RelativeEncoder</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getEncoder()" class="member-name-link">getEncoder</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the encoder</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getOffset()" class="member-name-link">getOffset</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the offset of the encoder</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPosition()" class="member-name-link">getPosition</a>()</code></div>
@@ -290,6 +298,12 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="doSubtractionOfStart(boolean)">
+<h3>doSubtractionOfStart</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">doSubtractionOfStart</span><wbr><span class="parameters">(boolean&nbsp;subtractStartingPosition)</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="setPositionConversionFactor(double)">
 <h3>setPositionConversionFactor</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">com.revrobotics.REVLibError</span>&nbsp;<span class="element-name">setPositionConversionFactor</span><wbr><span class="parameters">(double&nbsp;positionConversionFactor)</span></div>
@@ -362,6 +376,17 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Returns:</dt>
 <dd>Calculated velocity</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getOffset()">
+<h3>getOffset</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">getOffset</span>()</div>
+<div class="block">Returns the offset of the encoder</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The offset of the encoder</dd>
 </dl>
 </section>
 </li>

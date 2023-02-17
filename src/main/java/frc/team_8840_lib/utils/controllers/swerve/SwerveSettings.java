@@ -8,6 +8,7 @@ import edu.wpi.first.math.util.Units;
 import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.controllers.swerve.structs.CurrentLimit;
 import frc.team_8840_lib.utils.controllers.swerve.structs.PIDStruct;
+import frc.team_8840_lib.utils.math.operators.Operation;
 
 //A lot of these values are taken from Team 364's Constants.java file, esp the PID values: these can be fine-tuned since it's an instantiable class though, so it's not a big deal
 public class SwerveSettings {
@@ -74,12 +75,87 @@ public class SwerveSettings {
     public CANSparkMax.IdleMode driveIdleMode = CANSparkMax.IdleMode.kBrake;
     public CANSparkMax.IdleMode turnIdleMode = CANSparkMax.IdleMode.kBrake;
 
+    public Operation[] finalAngleCalculation = new Operation[] {
+        Operation.IDENTITY,
+        Operation.IDENTITY,
+        Operation.IDENTITY,
+        Operation.IDENTITY
+    };
+
+    public Operation[] finalSpeedCalculation = new Operation[] {
+        Operation.IDENTITY,
+        Operation.IDENTITY,
+        Operation.IDENTITY,
+        Operation.IDENTITY
+    };
+
+    public boolean useAngleCalculations = true;
+    public boolean useSpeedCalculations = true;
+
     public double[] angleOffsets = new double[]{0, 0, 0, 0};
 
     //Threshold used for driving. If the magnitude of the joystick is less than this value, the robot will not move.
     public double threshold = 0.05;
     //Whether to use the threshold as a percentage of the max speed or just a value.
     public boolean useThresholdAsPercentage = false;
+
+    private boolean[] reversedDrive = new boolean[] {false, false, false, false};
+
+    private boolean[] reversedTurnEncoders = new boolean[] {false, false, false, false};
+
+    /**
+     * Returns whether the drive motor for the given index is reversed.
+     * @param index The index of the drive motor.
+     * @return Whether the drive motor for the given index is reversed.
+     */
+    public boolean getReverseDrive(int index) {
+        if (index > reversedDrive.length || index < 0) {
+            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for the reversedDrive array (length " + reversedDrive.length + ")");
+        }
+
+        return reversedDrive[index];
+    }
+
+    /**
+     * Reverses the drive motor for the given indexes.
+     * @param indexes The indexes of the drive motors to reverse.
+     */
+    public void reverseDrive(int... indexes) {
+        for (int i : indexes) {
+            if (i > reversedDrive.length || i < 0) {
+                throw new IndexOutOfBoundsException("Index " + i + " is out of bounds for the reversedDrive array (length " + reversedDrive.length + ")");
+            }
+
+            reversedDrive[i] = true;
+        }
+    }
+
+    /**
+     * Returns whether the encoder for the given index is reversed.
+     * @param index The index of the encoder.
+     * @return Whether the encoder for the given index is reversed.
+     */
+    public boolean getEncoderIsReversed(int index) {
+        if (index > reversedTurnEncoders.length || index < 0) {
+            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds for the reversedTurnEncoders array (length " + reversedTurnEncoders.length + ")");
+        }
+
+        return reversedTurnEncoders[index];
+    }
+
+    /**
+     * Inverts the encoder for the given indexes.
+     * @param indexes The indexes of the encoders to invert.
+     */
+    public void invertEncoder(int... indexes) {
+        for (int i : indexes) {
+            if (i > reversedTurnEncoders.length || i < 0) {
+                throw new IndexOutOfBoundsException("Index " + i + " is out of bounds for the reversedTurnEncoders array (length " + reversedTurnEncoders.length + ")");
+            }
+
+            reversedTurnEncoders[i] = true;
+        }
+    }
 
     /**
      * Gets the min speed for the drive motors using threshold as a percentage of max speed (0.01% by default)
@@ -108,10 +184,10 @@ public class SwerveSettings {
      * */
     public Translation2d[] getPositions() {
         return new Translation2d[] {
-            new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
-            new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
-            new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
-            new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0)
+            new Translation2d(trackWidth / 2.0, wheelBase / 2.0),
+            new Translation2d(trackWidth / 2.0, -wheelBase / 2.0),
+            new Translation2d(-trackWidth / 2.0, wheelBase / 2.0),
+            new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0)
         };
     }
 

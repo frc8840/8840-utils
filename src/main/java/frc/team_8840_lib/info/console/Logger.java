@@ -3,6 +3,8 @@ package frc.team_8840_lib.info.console;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -212,6 +214,23 @@ public class Logger implements Loggable {
         DOUBLE_ARRAY,
         BYTE_ARRAY;
 
+        public String smallString() {
+            switch(this) {
+                case STRING:
+                    return "s";
+                case DOUBLE:
+                    return "d";
+                case STRING_ARRAY:
+                    return "S";
+                case DOUBLE_ARRAY:
+                    return "D";
+                case BYTE_ARRAY:
+                    return "B";
+                default:
+                    return "s";
+            }
+        }
+
         public static final byte STRING_CORRESPONDENCE = 1;
         public static final byte DOUBLE_CORRESPONDENCE = 2;
         public static final byte STRING_ARRAY_CORRESPONDENCE = 3;
@@ -224,12 +243,105 @@ public class Logger implements Loggable {
 
     private static int cycle = 0;
 
+    private static HashMap<String, Integer> nameAssignedToMap = new HashMap<>();
+    private static int nameAssignedTo = 0;
+
+    private static HashMap<Integer, String> lastAssign = new HashMap<>();
+
     private static boolean readyToSave = false;
     public static void setReadyToSave(boolean ready) {
         readyToSave = ready;
     }
 
     private static void loadAndSaveAllAutoLogs() {
+        writer.saveInfo("ALC" + cycle++ + (cycle < 3 ? "(s)" : ""));
+
+        if (cycle < 3 || !readyToSave) return;
+
+        try {
+            for (Loggable klass : loggingClasses) {
+                for (Method method : klass.getClass().getMethods()) {
+                    AutoLog autoLogInfo = method.getAnnotation(AutoLog.class);
+
+                    if (autoLogInfo == null) continue;
+                    
+                    String name = autoLogInfo.name();
+                    LogType logType = autoLogInfo.logtype();
+                    
+                    if (name.contains("/")) {
+                        //replace all slashes with underscores, just in case.
+                        name = name.replaceAll("/", "_");
+                    }
+
+                    if (autoLogInfo != null) {
+                        if (nameAssignedToMap.get(name) == null) {
+                            nameAssignedToMap.put(name, nameAssignedTo++);
+                            writer.saveInfo("a" + name + logType.smallString() + "/" + nameAssignedToMap.get(name));
+                        }
+
+                        int assignedTo = nameAssignedToMap.get(name);
+                        String assignable = "";
+
+                        try {
+                            switch (logType) {
+                                case STRING:
+                                    assignable = (String) method.invoke(klass);
+                                    break;
+                                case DOUBLE:
+                                    assignable = "" + (Double) method.invoke(klass);
+                                    break;
+                                case STRING_ARRAY:
+                                    //save as string, separated by commas
+                                    assignable = Arrays.toString((String[]) method.invoke(klass));
+                                    break;
+                                case DOUBLE_ARRAY:
+                                    double[] doubles = (double[]) method.invoke(klass);
+
+                                    //Convert to a string
+                                    String doubleString = "[";
+
+                                    for (double d : doubles) {
+                                        doubleString += d + ",";
+                                    }
+
+                                    doubleString = doubleString.substring(0, doubleString.length() - 1) + "]";
+
+                                    assignable = doubleString;
+                                    break;
+                                case BYTE_ARRAY:
+                                    byte[] bytes = (byte[]) method.invoke(klass);
+
+                                    //Convert to a string
+                                    String byteString = "";
+                                    
+                                    for (byte b : bytes) {
+                                        byteString += (char) b;
+                                    }
+
+                                    assignable = byteString;
+                                    break;
+                            }
+                        } catch (Exception e) {
+                            Logger.Log("e/" + assignedTo + " [Logger] Issue w/ auto log " + name + ". Skipping past this log, but this may lead to logging missing information.", TimeStamp.None);
+                            e.printStackTrace();
+                        }
+
+                        if (assignable.length() > 0) {
+                            if (lastAssign.get(assignedTo) != null && lastAssign.get(assignedTo).equals(assignable)) continue;
+
+                            writer.saveInfo("d" + assignedTo + "/" + assignable);
+
+                            lastAssign.put(assignedTo, assignable);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void loadAndSaveAllAutoLogsThroughBytes() {
         writer.saveInfo("AutoLog Cycle " + cycle++ + (cycle < 3 ? " (skipped due to early cycle)" : ""));
 
         if (cycle < 3 || !readyToSave) return;

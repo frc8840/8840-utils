@@ -98,8 +98,12 @@ loadScripts(document, 'script');</script>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">SwerveGroup</span>
 <span class="extends-implements">extends <a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
 implements <a href="../utils/logging/Loggable.html" title="interface in frc.team_8840_lib.utils.logging">Loggable</a></span></div>
-<div class="block">Based on the wonderful work of Team 364
- <a href="https://github.com/Team364/BaseFalconSwerve">Repo Here</a></div>
+<div class="block">Your standard swerve drive class. 
+ 
+ Based on the wonderful work of Team 364. 
+ <a href="https://github.com/Team364/BaseFalconSwerve">Repo Here</a> 
+ 
+ Uses CANCoders, Pigeon, and Talons/NEOs for the swerve modules.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -143,7 +147,7 @@ implements <a href="../utils/logging/Loggable.html" title="interface in frc.team
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button><button id="method-summary-table-tab6" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab6', 3)" class="table-tab">Deprecated Methods</button></div>
+<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button><button id="method-summary-table-tab6" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab6', 3)" class="table-tab">Deprecated Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel">
 <div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
 <div class="table-header col-first">Modifier and Type</div>
@@ -151,56 +155,89 @@ implements <a href="../utils/logging/Loggable.html" title="interface in frc.team
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyXBrake()" class="member-name-link">applyXBrake</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the module rotations to form an "x" with the directions of the wheels.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#doSetAngle(boolean)" class="member-name-link">doSetAngle</a><wbr>(boolean&nbsp;doSetAngle)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#doSetSpeed(boolean)" class="member-name-link">doSetSpeed</a><wbr>(boolean&nbsp;doSetSpeed)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.geometry.Translation2d,double,boolean,boolean)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translation,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#doStateOptimization(boolean)" class="member-name-link">doStateOptimization</a><wbr>(boolean&nbsp;doOptimization)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Whether to do optimization in the modules or not.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.geometry.Translation2d,double,boolean,boolean)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translation,
  double&nbsp;rotation,
  boolean&nbsp;fieldRelative,
  boolean&nbsp;openLoop)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the speed and rotation of each module using a translation and rotation.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getModuleName(int)" class="member-name-link">getModuleName</a><wbr>(int&nbsp;i)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.SwerveModuleState[]</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#driveStates(edu.wpi.first.math.geometry.Translation2d,double,boolean,boolean)" class="member-name-link">driveStates</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translation2d,
+ double&nbsp;rotation,
+ boolean&nbsp;fieldRelative,
+ boolean&nbsp;applyDesaturation)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Return SwerveModuleStates for drive</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static <a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#getModName(int)" class="member-name-link">getModName</a><wbr>(int&nbsp;i)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getModuleName(int)" class="member-name-link">getModuleName</a><wbr>(int&nbsp;i)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the name of module 0 to 4</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="SwerveModule.html" title="class in frc.team_8840_lib.controllers">SwerveModule</a>[]</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getModules()" class="member-name-link">getModules</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="SwerveModule.html" title="class in frc.team_8840_lib.controllers">SwerveModule</a>[]</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getModules()" class="member-name-link">getModules</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the modules of the swerve drive.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.SwerveModuleState[]</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getModuleStates()" class="member-name-link">getModuleStates</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.SwerveModuleState[]</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getModuleStates()" class="member-name-link">getModuleStates</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the modules states of the swerve drive</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getName()" class="member-name-link">getName</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Pose2d</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPose()" class="member-name-link">getPose</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getName()" class="member-name-link">getName</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Pose2d</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPose()" class="member-name-link">getPose</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the current pose of the robot.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../utils/controllers/swerve/SwerveSettings.html" title="class in frc.team_8840_lib.utils.controllers.swerve">SwerveSettings</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSettings()" class="member-name-link">getSettings</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../utils/controllers/swerve/SwerveSettings.html" title="class in frc.team_8840_lib.utils.controllers.swerve">SwerveSettings</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSettings()" class="member-name-link">getSettings</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the settings of the swerve drive.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.SwerveModulePosition[]</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSwervePositions()" class="member-name-link">getSwervePositions</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>byte[]</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#logAngles()" class="member-name-link">logAngles</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.SwerveModulePosition[]</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSwervePositions()" class="member-name-link">getSwervePositions</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>byte[]</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#logSpeeds()" class="member-name-link">logSpeeds</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#loop(frc.team_8840_lib.utils.interfaces.SwerveLoop)" class="member-name-link">loop</a><wbr>(<a href="../utils/interfaces/SwerveLoop.html" title="interface in frc.team_8840_lib.utils.interfaces">SwerveLoop</a>&nbsp;s_loop)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double[]</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#logAngles()" class="member-name-link">logAngles</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Logs the angles of the modules</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double[]</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#logSpeeds()" class="member-name-link">logSpeeds</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Logs the speeds of the modules</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#loop(frc.team_8840_lib.utils.interfaces.SwerveLoop)" class="member-name-link">loop</a><wbr>(<a href="../utils/interfaces/SwerveLoop.html" title="interface in frc.team_8840_lib.utils.interfaces">SwerveLoop</a>&nbsp;s_loop)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Uses a lambda to loop through each module.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#providePower(boolean)" class="member-name-link">providePower</a><wbr>(boolean&nbsp;providePowerToThem)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Whether to provide power to the modules or not.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#ready()" class="member-name-link">ready</a>()</code></div>
@@ -217,11 +254,15 @@ implements <a href="../utils/logging/Loggable.html" title="interface in frc.team
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setBrakeModes(boolean)" class="member-name-link">setBrakeModes</a><wbr>(boolean&nbsp;brake)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the brake modes of all the modules</div>
+</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setIndividualBrakeModes(boolean,boolean)" class="member-name-link">setIndividualBrakeModes</a><wbr>(boolean&nbsp;driveBrake,
  boolean&nbsp;steerBrake)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Set the drive brake and steer brake modes of all the modules</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setModuleStates(edu.wpi.first.math.kinematics.SwerveModuleState%5B%5D)" class="member-name-link">setModuleStates</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState[]&nbsp;states)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -234,33 +275,50 @@ implements <a href="../utils/logging/Loggable.html" title="interface in frc.team
 <div class="block">Sets the module states of the robot using a list of states.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(double)" class="member-name-link">setSpeed</a><wbr>(double&nbsp;value)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setModuleStates(edu.wpi.first.math.kinematics.SwerveModuleState%5B%5D,boolean,boolean)" class="member-name-link">setModuleStates</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState[]&nbsp;states,
+ boolean&nbsp;isOpenLoop,
+ boolean&nbsp;ignoreAngleLimit)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the module states of the robot using a list of states.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(double)" class="member-name-link">setSpeed</a><wbr>(double&nbsp;value)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the speed of every module.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#setState(edu.wpi.first.math.kinematics.SwerveModuleState)" class="member-name-link">setState</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6">
-<div class="block"><span class="deprecated-label">Deprecated.</span>
-<div class="deprecation-comment">Use <a href="#setModuleStates(edu.wpi.first.math.kinematics.SwerveModuleState%5B%5D)"><code>setModuleStates(SwerveModuleState[])</code></a> instead.</div>
-</div>
-</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#setState(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)" class="member-name-link">setState</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
- boolean&nbsp;openLoop)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#setState(edu.wpi.first.math.kinematics.SwerveModuleState)" class="member-name-link">setState</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6">
 <div class="block"><span class="deprecated-label">Deprecated.</span>
 <div class="deprecation-comment">Use <a href="#setModuleStates(edu.wpi.first.math.kinematics.SwerveModuleState%5B%5D)"><code>setModuleStates(SwerveModuleState[])</code></a> instead.</div>
 </div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateFieldRobot()" class="member-name-link">updateFieldRobot</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Updates the swerve drive simulation model.</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6"><code><a href="#setState(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)" class="member-name-link">setState</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
+ boolean&nbsp;openLoop)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4 method-summary-table-tab6">
+<div class="block"><span class="deprecated-label">Deprecated.</span>
+<div class="deprecation-comment">Use <a href="#setModuleStates(edu.wpi.first.math.kinematics.SwerveModuleState%5B%5D)"><code>setModuleStates(SwerveModuleState[])</code></a> instead.</div>
+</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateOdometry()" class="member-name-link">updateOdometry</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#spin(double)" class="member-name-link">spin</a><wbr>(double&nbsp;radiansPerSecond)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Rotates the robot in place.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets all module speeds to 0</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateFieldRobot()" class="member-name-link">updateFieldRobot</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Updates the swerve drive simulation model.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateOdometry()" class="member-name-link">updateOdometry</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Updates the odometry of the robot using the current position of the robot.</div>
 </div>
 </div>
@@ -313,6 +371,12 @@ implements <a href="../utils/logging/Loggable.html" title="interface in frc.team
 <section class="detail" id="getName()">
 <h3>getName</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getName</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getModName(int)">
+<h3>getModName</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type"><a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">getModName</span><wbr><span class="parameters">(int&nbsp;i)</span></div>
 </section>
 </li>
 <li>
@@ -377,6 +441,22 @@ implements <a href="../utils/logging/Loggable.html" title="interface in frc.team
 </section>
 </li>
 <li>
+<section class="detail" id="driveStates(edu.wpi.first.math.geometry.Translation2d,double,boolean,boolean)">
+<h3>driveStates</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.kinematics.SwerveModuleState[]</span>&nbsp;<span class="element-name">driveStates</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;translation2d,
+ double&nbsp;rotation,
+ boolean&nbsp;fieldRelative,
+ boolean&nbsp;applyDesaturation)</span></div>
+<div class="block">Return SwerveModuleStates for drive</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>translation2d</code> - Translation for the robot</dd>
+<dd><code>rotation</code> - Rotation of the robot, in radians.</dd>
+<dd><code>fieldRelative</code> - Whether the translation is field relative or not</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="setModuleStates(edu.wpi.first.math.kinematics.SwerveModuleState[],boolean)">
 <h3>setModuleStates</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setModuleStates</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.SwerveModuleState[]&nbsp;states,
@@ -393,15 +473,58 @@ implements <a href="../utils/logging/Loggable.html" title="interface in frc.team
 </section>
 </li>
 <li>
+<section class="detail" id="setModuleStates(edu.wpi.first.math.kinematics.SwerveModuleState[],boolean,boolean)">
+<h3>setModuleStates</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setModuleStates</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.SwerveModuleState[]&nbsp;states,
+ boolean&nbsp;isOpenLoop,
+ boolean&nbsp;ignoreAngleLimit)</span></div>
+<div class="block">Sets the module states of the robot using a list of states.
+ It's recommended to use <a href="#drive(edu.wpi.first.math.geometry.Translation2d,double,boolean,boolean)"><code>drive(Translation2d, double, boolean, boolean)</code></a> instead of this directly since this can be dangerous to use for things other than testing.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>states</code> - States for each module
+               The order of the states is as follows:
+               Front Left, Front Right, Back Left, Back Right</dd>
+<dd><code>isOpenLoop</code> - Whether to use open loop or closed loop</dd>
+<dd><code>ignoreAngleLimit</code> - Whether to ignore the angle limit or not</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="spin(double)">
+<h3>spin</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">spin</span><wbr><span class="parameters">(double&nbsp;radiansPerSecond)</span></div>
+<div class="block">Rotates the robot in place.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>radiansPerSecond</code> - The speed at which the robot should rotate, in radians per second.</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="applyXBrake()">
 <h3>applyXBrake</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">applyXBrake</span>()</div>
+<div class="block">Sets the module rotations to form an "x" with the directions of the wheels.
+ This is especially useful when the robot is stopped since it can prevent other robots from pushing it.</div>
+</section>
+</li>
+<li>
+<section class="detail" id="stop()">
+<h3>stop</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">stop</span>()</div>
+<div class="block">Sets all module speeds to 0</div>
 </section>
 </li>
 <li>
 <section class="detail" id="setBrakeModes(boolean)">
 <h3>setBrakeModes</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setBrakeModes</span><wbr><span class="parameters">(boolean&nbsp;brake)</span></div>
+<div class="block">Sets the brake modes of all the modules</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>brake</code> - Whether to brake (true) or coast (false)</dd>
+</dl>
 </section>
 </li>
 <li>
@@ -409,6 +532,12 @@ implements <a href="../utils/logging/Loggable.html" title="interface in frc.team
 <h3>setIndividualBrakeModes</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setIndividualBrakeModes</span><wbr><span class="parameters">(boolean&nbsp;driveBrake,
  boolean&nbsp;steerBrake)</span></div>
+<div class="block">Set the drive brake and steer brake modes of all the modules</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>driveBrake</code> - Whether to brake (true) the drive motors</dd>
+<dd><code>steerBrake</code> - Whether to brake (true) the steer motors</dd>
+</dl>
 </section>
 </li>
 <li>
@@ -465,6 +594,40 @@ implements <a href="../utils/logging/Loggable.html" title="interface in frc.team
 <dt>Parameters:</dt>
 <dd><code>pose</code> - The pose to reset the odometry to</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="providePower(boolean)">
+<h3>providePower</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">providePower</span><wbr><span class="parameters">(boolean&nbsp;providePowerToThem)</span></div>
+<div class="block">Whether to provide power to the modules or not.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>providePowerToThem</code> - Whether to provide power to the modules or not</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="doStateOptimization(boolean)">
+<h3>doStateOptimization</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">doStateOptimization</span><wbr><span class="parameters">(boolean&nbsp;doOptimization)</span></div>
+<div class="block">Whether to do optimization in the modules or not.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>doOptimization</code> - Whether to provide power to the modules or not</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="doSetAngle(boolean)">
+<h3>doSetAngle</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">doSetAngle</span><wbr><span class="parameters">(boolean&nbsp;doSetAngle)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="doSetSpeed(boolean)">
+<h3>doSetSpeed</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">doSetSpeed</span><wbr><span class="parameters">(boolean&nbsp;doSetSpeed)</span></div>
 </section>
 </li>
 <li>
@@ -536,13 +699,23 @@ implements <a href="../utils/logging/Loggable.html" title="interface in frc.team
 <li>
 <section class="detail" id="logSpeeds()">
 <h3>logSpeeds</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">byte[]</span>&nbsp;<span class="element-name">logSpeeds</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double[]</span>&nbsp;<span class="element-name">logSpeeds</span>()</div>
+<div class="block">Logs the speeds of the modules</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The speeds of the modules</dd>
+</dl>
 </section>
 </li>
 <li>
 <section class="detail" id="logAngles()">
 <h3>logAngles</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">byte[]</span>&nbsp;<span class="element-name">logAngles</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double[]</span>&nbsp;<span class="element-name">logAngles</span>()</div>
+<div class="block">Logs the angles of the modules</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The angles of the modules</dd>
+</dl>
 </section>
 </li>
 </ul>

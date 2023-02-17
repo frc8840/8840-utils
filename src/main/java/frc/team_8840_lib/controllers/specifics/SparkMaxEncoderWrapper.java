@@ -17,6 +17,8 @@ public class SparkMaxEncoderWrapper {
 
     private double offset = 0; //Offset is subtracted from the position
 
+    private double startingPosition = 0;
+
     private double positionConversionFactor = 1;
     private double velocityConversionFactor = 1;
 
@@ -64,7 +66,7 @@ public class SparkMaxEncoderWrapper {
             return 0;
         }
 
-        return (encoder.getPosition() * (doManualConversion ? positionConversionFactor : 1)) + (doManualOffset ? offset : 0);
+        return ((encoder.getPosition() - startingPosition) * (doManualConversion ? positionConversionFactor : 1)) + (doManualOffset ? offset : 0);
     }
 
     /**
@@ -94,6 +96,15 @@ public class SparkMaxEncoderWrapper {
      */
     public void setManualOffset(boolean doManualOffset) {
         this.doManualOffset = doManualOffset;
+    }
+
+    public void doSubtractionOfStart(boolean subtractStartingPosition) {
+        if (subtractStartingPosition) {
+            startingPosition = encoder.getPosition();
+            Logger.Log("[SparkMaxEncoder] Starting position: " + startingPosition + ", subtracting for 0 degree base.");
+        } else {
+            startingPosition = 0;
+        }
     }
 
     /**
@@ -146,7 +157,7 @@ public class SparkMaxEncoderWrapper {
      * @return Calculated position
      */
     public double calculatePosition(double position) {
-        return (position / (doManualConversion ? positionConversionFactor : 1)) + (doManualOffset ? offset : 0);
+        return (position / (doManualConversion ? positionConversionFactor : 1)) - (doManualOffset ? offset : 0) + startingPosition;
     }
 
     /**
@@ -156,7 +167,7 @@ public class SparkMaxEncoderWrapper {
      * @return Calculated position
      */
     public double calculatePosition(double position, boolean ignoreOffset) {
-        return (position / (doManualConversion ? positionConversionFactor : 1)) + (doManualOffset && !ignoreOffset ? offset : 0);
+        return ((position) / (doManualConversion ? positionConversionFactor : 1)) - (doManualOffset && !ignoreOffset ? offset : 0) + startingPosition;
     }
 
     /**
@@ -167,4 +178,11 @@ public class SparkMaxEncoderWrapper {
         return velocity / (doManualConversion ? velocityConversionFactor : 1);
     }
 
+    /**
+     * Returns the offset of the encoder
+     * @return The offset of the encoder
+     */
+    public double getOffset() {
+        return offset;
+    }
 }

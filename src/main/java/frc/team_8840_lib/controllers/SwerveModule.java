@@ -16,15 +16,18 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team_8840_lib.IO.devices.IOCANCoder;
 import frc.team_8840_lib.controllers.specifics.SparkMaxEncoderWrapper;
 import frc.team_8840_lib.info.console.Logger;
+import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
@@ -34,8 +37,10 @@ import frc.team_8840_lib.utils.IO.IOPermission;
 import frc.team_8840_lib.utils.IO.IOValue;
 import frc.team_8840_lib.utils.controllers.swerve.CTREConfig;
 import frc.team_8840_lib.utils.controllers.swerve.CTREModuleState;
+import frc.team_8840_lib.utils.controllers.swerve.SwerveOptimization;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveType;
 import frc.team_8840_lib.utils.controllers.swerve.conversions.FalconConversions;
+import frc.team_8840_lib.utils.math.MathUtils;
 
 /**
  * This class is used to control a swerve module. It is meant to be used with the SwerveDrive class.
@@ -84,6 +89,8 @@ public class SwerveModule extends IOLayer {
 
     private Rotation2d lastAngle;
 
+    private Rotation2d targetAngle;
+
     //Angle encoder - used for both NEO and Falcon
     private IOCANCoder angleCANCoder;
 
@@ -92,6 +99,19 @@ public class SwerveModule extends IOLayer {
 
     //Private ID is a number between 0 and 3 which is used to identify the module
     private int privateID;
+
+    //Whether to provide power to the motors or not
+    public boolean noRun = false;
+
+    //Whether to do the optimization or not
+    public boolean doOptimization = true;
+
+    public boolean doSetAngle = true;
+    
+    public boolean doSetSpeed = true;
+
+    private Rotation2d desiredAngle = Rotation2d.fromDegrees(0);
+    private double desiredT = 0;
 
     /**
      * Get the private ID of the module
@@ -138,6 +158,8 @@ public class SwerveModule extends IOLayer {
         speedCache = 0;
 
         lastAngle = Rotation2d.fromDegrees(0);
+
+        targetAngle = Rotation2d.fromDegrees(0);
 
         doManualConversion = config.getSettings().doManualConversion;
         //angleCache = Rotation2d.fromDegrees(0);
@@ -273,7 +295,7 @@ public class SwerveModule extends IOLayer {
 
         //Inverted
         turnNEO.setInverted(config.getSettings().turnInverted);
-        driveNEO.setInverted(config.getSettings().driveInverted);
+        driveNEO.setInverted(config.getSettings().getReverseDrive(this.getIndex()) ? !config.getSettings().driveInverted : config.getSettings().driveInverted);
 
         //Idle mode
         turnNEO.setIdleMode(config.getSettings().turnIdleMode);
@@ -294,6 +316,9 @@ public class SwerveModule extends IOLayer {
         //Open loop and closed loop ramp rate
         driveNEO.setOpenLoopRampRate(config.getSettings().driveOpenRampRate);
         driveNEO.setClosedLoopRampRate(config.getSettings().driveClosedRampRate);
+
+        //Invert encoder (illegal method, will figure out substitute later)
+        //neoTurnEncoder.setInverted(config.getSettings().getEncoderIsReversed(getIndex()));
         
         //Set drive PID controller values
         neoPositionConversionFactor = config.getSettings().driveGearRatio * Math.PI * config.getSettings().wheelDiameter;
@@ -396,15 +421,20 @@ public class SwerveModule extends IOLayer {
         } else if (this.config.getSettings().getType() == SwerveType.SPARK_MAX) {
             double newPosition = getAbsoluteAngle().getDegrees() - config.getSettings().angleOffsets[privateID];
 
-            if (!config.getSettings().manualOffset) {
+            if (!config.getSettings().manualOffset && !RobotBase.isSimulation()) {
                 Logger.Log("[" + getBaseName() + "] Resetting to absolute position: " + newPosition + " degrees.");
                 REVLibError status = neoTurnEncoder.setPosition(-newPosition);
                 Logger.Log("[" + getBaseName() + "] Reset to absolute position: " + neoTurnEncoder.getPosition() + " degrees (should be " + newPosition + " degrees. Status: " + status.name() + ")");
             }
 
-            if (Math.abs(neoTurnEncoder.getPosition() - newPosition) > 0.1 || config.getSettings().manualOffset) {
-                neoTurnEncoder.getEncoder().setPosition(0); //Zero it out first.
+            if ((Math.abs(neoTurnEncoder.getPosition() - newPosition) > 0.1 || config.getSettings().manualOffset) && !RobotBase.isSimulation()) {
+                neoTurnEncoder.setPosition(0);
                 
+                if (Math.abs(neoTurnEncoder.getPosition()) > 0.1) {
+                    Logger.Log("[" + getBaseName() + "] Reset Drive Encoder to 0 failed, setting manual subtraction.");
+                    neoTurnEncoder.doSubtractionOfStart(config.getSettings().manualOffset);
+                }
+
                 double newPos = angleCANCoder.getAbsolutePosition() - config.getSettings().angleOffsets[privateID];
 
                 if (!config.getSettings().manualOffset) {
@@ -420,6 +450,10 @@ public class SwerveModule extends IOLayer {
                 );
 
                 Logger.Log("[" + getBaseName() + "] " + (!config.getSettings().manualOffset ? "TRY 2 " : "") + "Reset to absolute position: " + neoTurnEncoder.getPosition() + " degrees " + (!config.getSettings().manualOffset ? "(should be " + newPosition + " degrees.)" : "(should be " + config.getSettings().angleOffsets[privateID] + " degrees.)"));
+            }
+
+            if (RobotBase.isSimulation()) {
+                Logger.Log("[" + getBaseName() + "] Skipped configuration of Spark Max encoder start position due to simulation.");
             }
         }
     }
@@ -471,7 +505,10 @@ public class SwerveModule extends IOLayer {
                 driveTalonFX.set(TalonFXControlMode.PercentOutput, speed);
             }
         } else if (this.getType() == SwerveType.SPARK_MAX) {
-            driveNEO.set(speed);
+            CommunicationManager.getInstance().updateInfo(
+                getBaseName(), "set_drive", speed
+            );
+            if (!noRun) driveNEO.set(speed);
         }
     }
 
@@ -514,17 +551,19 @@ public class SwerveModule extends IOLayer {
                 );
             } else if (getType() == SwerveType.SPARK_MAX) {
                 if (Math.abs(desiredState.speedMetersPerSecond) < this.config.getSettings().relativeThreshold()) {
-                    neoDrivePIDController.setReference(0, CANSparkMax.ControlType.kVelocity);
+                    if (!noRun) neoDrivePIDController.setReference(0, CANSparkMax.ControlType.kVelocity);
                     return;
                 }
 
                 //Drive neo PID controller takes in the conversion factor
-                neoDrivePIDController.setReference(
+                if (!noRun) {
+                    neoDrivePIDController.setReference(
                         neoDriveEncoder.calculateVelocity(desiredState.speedMetersPerSecond),
                         CANSparkMax.ControlType.kVelocity,
                         0,
                         feedforward.calculate(neoDriveEncoder.calculateVelocity(desiredState.speedMetersPerSecond))
-                );
+                    );
+                }
             }
         }
     }
@@ -532,22 +571,38 @@ public class SwerveModule extends IOLayer {
     /**
      * Sets the angle of the module to the given angle in the desired state
      * @param desiredState The desired state of the swerve module.
-     * @param ignoreSpeedRequirement Whether or not to ignore the speed requirement.
+     * @param ignoreAngleLimit Whether or not to ignore the angle limit.
      * */
-    public void setAngle(SwerveModuleState desiredState, boolean ignoreSpeedRequirement) {
+    public void setAngle(SwerveModuleState desiredState, boolean ignoreAngleLimit) {
         double angle = desiredState.angle.getDegrees();
-        if (Math.abs(desiredState.speedMetersPerSecond) <= this.config.getSettings().relativeThreshold() && !ignoreSpeedRequirement) {
-            angle = lastAngle.getDegrees();
+
+        // if (Math.abs(desiredState.speedMetersPerSecond) <= this.config.getSettings().relativeThreshold() && !ignoreSpeedRequirement) {
+        //     angle = lastAngle.getDegrees();
+        // }
+
+        double difference = Math.abs(angle - lastAngle.getDegrees());
+        
+        if (difference > 179 && !ignoreAngleLimit) { //Stop jittering
+            //Logger.Log("[" + getBaseName() + "] Angle difference is too large! (" + difference + ")");
+            return;
+        }
+
+        if (difference < 0.2 && !ignoreAngleLimit) {
+            return;
         }
 
         if (this.getType() == SwerveType.FALCON_500) {
             turnTalonFX.set(ControlMode.Position, FalconConversions.degreesToFalcon(angle, config.getSettings().angleGearRatio));
         } else if (this.getType() == SwerveType.SPARK_MAX) {
-            neoTurnPIDController.setReference(
-                neoTurnEncoder.calculatePosition(angle),
-                CANSparkMax.ControlType.kPosition,
-                0
-            );
+            CommunicationManager.getInstance().updateInfo(getBaseName(), "set_angle", neoTurnEncoder.calculatePosition(angle));
+            CommunicationManager.getInstance().updateInfo(getBaseName(), "angle", angle);
+            if (!noRun) {
+                neoTurnPIDController.setReference(
+                    neoTurnEncoder.calculatePosition(angle),
+                    CANSparkMax.ControlType.kPosition,
+                    0
+                );
+            }
         }
 
         lastAngle = Rotation2d.fromDegrees(angle);
@@ -571,17 +626,61 @@ public class SwerveModule extends IOLayer {
         this.setAngle(new SwerveModuleState(0, Rotation2d.fromDegrees(angle)), true);
     }
 
+    private Rotation2d lastSetAngle = Rotation2d.fromDegrees(0);
+    private double lastSetSpeed = 0;
+
     /**
      * Sets the angle and speed of the module to the given state.
      * @param state The desired state of the swerve module.
      * @param isOpenLoop Whether the drive motor should be in open loop.
      * */
     public void setDesiredState(SwerveModuleState state, boolean isOpenLoop) {
-        SwerveModuleState optimizedState = CTREModuleState.optimize(state, getRotation());
+        SwerveModuleState optimizedState = doOptimization ? CTREModuleState.optimize(state, lastSetAngle) : state;
 
-        this.setAngle(optimizedState);
-        this.setSpeed(optimizedState, isOpenLoop);
+        double difference = Math.abs(optimizedState.angle.getDegrees() - lastSetAngle.getDegrees());
 
+        boolean isActualDifference = true;
+
+        difference = difference % 360;
+        if (difference > 179) {
+            isActualDifference = false; //Stop the module from jittering
+        }
+        //Logger.Log("[" + getBaseName() + "] Difference: " + difference + ", " + isActualDifference);
+
+        if (this.doSetAngle && isActualDifference) this.setAngle(optimizedState);
+
+        double speedDifference = Math.abs(optimizedState.speedMetersPerSecond - lastSetSpeed);
+        boolean sameSpeed = speedDifference < 0.01;
+
+        if (this.doSetSpeed && !sameSpeed) this.setSpeed(optimizedState, isOpenLoop);
+
+        lastSetSpeed = optimizedState.speedMetersPerSecond;
+        lastSetAngle = optimizedState.angle;
+
+ 
+        speedCache = optimizedState.speedMetersPerSecond;
+    }
+
+    /**
+     * Sets the angle and speed of the module to the given state.
+     * @param state The desired state of the swerve module.
+     * @param isOpenLoop Whether the drive motor should be in open loop.
+     * @param ignoreAngleLimit Whether or not to ignore the angle limit.
+     * */
+    public void setDesiredState(SwerveModuleState state, boolean isOpenLoop, boolean ignoreAngleLimit) {
+        SwerveModuleState optimizedState = state;
+
+        if (this.doSetAngle) this.setAngle(optimizedState, ignoreAngleLimit);
+
+        double speedDifference = Math.abs(optimizedState.speedMetersPerSecond - lastSetSpeed);
+        boolean sameSpeed = speedDifference < 0.01;
+
+        if (this.doSetSpeed && !sameSpeed) this.setSpeed(optimizedState, isOpenLoop);
+
+        lastSetSpeed = optimizedState.speedMetersPerSecond;
+        lastSetAngle = optimizedState.angle;
+
+ 
         speedCache = optimizedState.speedMetersPerSecond;
     }
 

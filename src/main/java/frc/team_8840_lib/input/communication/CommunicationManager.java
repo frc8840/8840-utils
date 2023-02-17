@@ -2,6 +2,7 @@ package frc.team_8840_lib.input.communication;
 
 import com.sun.net.httpserver.HttpExchange;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.BooleanArrayPublisher;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
@@ -717,6 +718,23 @@ public class CommunicationManager {
         if (!pushingLargeAmount) SmartDashboard.updateValues();
     }
 
+    public CommunicationManager logSwerveStates(String tab, String key, SwerveModuleState[] states) {
+        if (states.length == 0) return this;
+
+        for (int i = 0; i < states.length; i++) {
+            updateInfo(
+                tab, key + "/" + SwerveGroup.getModName(i) + "/angle", 
+                states[i].angle.getDegrees()
+            );
+            updateInfo(
+                tab, key + "/" + SwerveGroup.getModName(i) + "/speed",
+                states[i].speedMetersPerSecond
+            );
+        }
+
+        return this;
+    }
+    
     public NetworkTableEntry get(String tab, String key) {
         return table.getEntry(f(tab, key));
     }

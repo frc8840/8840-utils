@@ -59,7 +59,7 @@ public class FileWriter extends LogWriter {
         }
         
         //Append string to file
-        String str = "Successfully generated log file at " + new Date().getTime() + "";
+        String str = "Successfully generated log file at " + new Date().getTime() + ".\n";
         try {
             java.io.FileWriter fw = new java.io.FileWriter(file, true);
             fw.write(str);

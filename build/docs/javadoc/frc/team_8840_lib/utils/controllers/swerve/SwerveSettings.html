@@ -167,6 +167,12 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code><a href="structs/PIDStruct.html" title="class in frc.team_8840_lib.utils.controllers.swerve.structs">PIDStruct</a></code></div>
 <div class="col-second even-row-color"><code><a href="#drivePID" class="member-name-link">drivePID</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="../../math/operators/Operation.html" title="class in frc.team_8840_lib.utils.math.operators">Operation</a>[]</code></div>
+<div class="col-second odd-row-color"><code><a href="#finalAngleCalculation" class="member-name-link">finalAngleCalculation</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code><a href="../../math/operators/Operation.html" title="class in frc.team_8840_lib.utils.math.operators">Operation</a>[]</code></div>
+<div class="col-second even-row-color"><code><a href="#finalSpeedCalculation" class="member-name-link">finalSpeedCalculation</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>boolean</code></div>
 <div class="col-second odd-row-color"><code><a href="#invertGyro" class="member-name-link">invertGyro</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
@@ -213,7 +219,13 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color"><code><a href="#turnPID" class="member-name-link">turnPID</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>boolean</code></div>
-<div class="col-second even-row-color"><code><a href="#useCurrentLimits" class="member-name-link">useCurrentLimits</a></code></div>
+<div class="col-second even-row-color"><code><a href="#useAngleCalculations" class="member-name-link">useAngleCalculations</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>boolean</code></div>
+<div class="col-second odd-row-color"><code><a href="#useCurrentLimits" class="member-name-link">useCurrentLimits</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>boolean</code></div>
+<div class="col-second even-row-color"><code><a href="#useSpeedCalculations" class="member-name-link">useSpeedCalculations</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>boolean</code></div>
 <div class="col-second odd-row-color"><code><a href="#useThresholdAsPercentage" class="member-name-link">useThresholdAsPercentage</a></code></div>
@@ -260,23 +272,43 @@ loadScripts(document, 'script');</script>
 <div class="block">This function adjusts any values that may be different between the two swerve types
  Use at your own risk, I would do adjustments AFTER calling this function.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.SwerveDriveKinematics</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getKinematics()" class="member-name-link">getKinematics</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getEncoderIsReversed(int)" class="member-name-link">getEncoderIsReversed</a><wbr>(int&nbsp;index)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns whether the encoder for the given index is reversed.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.kinematics.SwerveDriveKinematics</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getKinematics()" class="member-name-link">getKinematics</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the kinematics for the swerve drive</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Translation2d[]</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPositions()" class="member-name-link">getPositions</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Translation2d[]</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPositions()" class="member-name-link">getPositions</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the calculated positions of the modules with the given track width and wheel base</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getReverseDrive(int)" class="member-name-link">getReverseDrive</a><wbr>(int&nbsp;index)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns whether the drive motor for the given index is reversed.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="SwerveType.html" title="enum class in frc.team_8840_lib.utils.controllers.swerve">SwerveType</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#relativeThreshold()" class="member-name-link">relativeThreshold</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#invertEncoder(int...)" class="member-name-link">invertEncoder</a><wbr>(int...&nbsp;indexes)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Inverts the encoder for the given indexes.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#relativeThreshold()" class="member-name-link">relativeThreshold</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Gets the min speed for the drive motors using threshold as a percentage of max speed (0.01% by default)</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#reverseDrive(int...)" class="member-name-link">reverseDrive</a><wbr>(int...&nbsp;indexes)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Reverses the drive motor for the given indexes.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateKinematics()" class="member-name-link">updateKinematics</a>()</code></div>
@@ -496,6 +528,30 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="finalAngleCalculation">
+<h3>finalAngleCalculation</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../math/operators/Operation.html" title="class in frc.team_8840_lib.utils.math.operators">Operation</a>[]</span>&nbsp;<span class="element-name">finalAngleCalculation</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="finalSpeedCalculation">
+<h3>finalSpeedCalculation</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../math/operators/Operation.html" title="class in frc.team_8840_lib.utils.math.operators">Operation</a>[]</span>&nbsp;<span class="element-name">finalSpeedCalculation</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="useAngleCalculations">
+<h3>useAngleCalculations</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">useAngleCalculations</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="useSpeedCalculations">
+<h3>useSpeedCalculations</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">useSpeedCalculations</span></div>
+</section>
+</li>
+<li>
 <section class="detail" id="angleOffsets">
 <h3>angleOffsets</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double[]</span>&nbsp;<span class="element-name">angleOffsets</span></div>
@@ -545,6 +601,54 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="wheelCircumference()">
 <h3>wheelCircumference</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">wheelCircumference</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getReverseDrive(int)">
+<h3>getReverseDrive</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">getReverseDrive</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
+<div class="block">Returns whether the drive motor for the given index is reversed.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>index</code> - The index of the drive motor.</dd>
+<dt>Returns:</dt>
+<dd>Whether the drive motor for the given index is reversed.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="reverseDrive(int...)">
+<h3>reverseDrive</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">reverseDrive</span><wbr><span class="parameters">(int...&nbsp;indexes)</span></div>
+<div class="block">Reverses the drive motor for the given indexes.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>indexes</code> - The indexes of the drive motors to reverse.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getEncoderIsReversed(int)">
+<h3>getEncoderIsReversed</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">getEncoderIsReversed</span><wbr><span class="parameters">(int&nbsp;index)</span></div>
+<div class="block">Returns whether the encoder for the given index is reversed.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>index</code> - The index of the encoder.</dd>
+<dt>Returns:</dt>
+<dd>Whether the encoder for the given index is reversed.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="invertEncoder(int...)">
+<h3>invertEncoder</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">invertEncoder</span><wbr><span class="parameters">(int...&nbsp;indexes)</span></div>
+<div class="block">Inverts the encoder for the given indexes.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>indexes</code> - The indexes of the encoders to invert.</dd>
+</dl>
 </section>
 </li>
 <li>

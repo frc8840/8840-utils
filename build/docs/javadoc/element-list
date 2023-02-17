@@ -28,5 +28,7 @@ frc.team_8840_lib.utils.interfaces
 frc.team_8840_lib.utils.IO
 frc.team_8840_lib.utils.logging
 frc.team_8840_lib.utils.math
+frc.team_8840_lib.utils.math.operators
+frc.team_8840_lib.utils.math.operators.specifics
 frc.team_8840_lib.utils.pathplanner
 frc.team_8840_lib.utils.time

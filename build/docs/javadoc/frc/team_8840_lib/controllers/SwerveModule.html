@@ -113,11 +113,23 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>com.revrobotics.SparkMaxPIDController</code></div>
-<div class="col-second even-row-color"><code><a href="#neoDrivePIDController" class="member-name-link">neoDrivePIDController</a></code></div>
+<div class="col-first even-row-color"><code>boolean</code></div>
+<div class="col-second even-row-color"><code><a href="#doOptimization" class="member-name-link">doOptimization</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>boolean</code></div>
+<div class="col-second odd-row-color"><code><a href="#doSetAngle" class="member-name-link">doSetAngle</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>boolean</code></div>
+<div class="col-second even-row-color"><code><a href="#doSetSpeed" class="member-name-link">doSetSpeed</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>com.revrobotics.SparkMaxPIDController</code></div>
-<div class="col-second odd-row-color"><code><a href="#neoTurnPIDController" class="member-name-link">neoTurnPIDController</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#neoDrivePIDController" class="member-name-link">neoDrivePIDController</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>com.revrobotics.SparkMaxPIDController</code></div>
+<div class="col-second even-row-color"><code><a href="#neoTurnPIDController" class="member-name-link">neoTurnPIDController</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>boolean</code></div>
+<div class="col-second odd-row-color"><code><a href="#noRun" class="member-name-link">noRun</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
@@ -279,7 +291,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setAngle(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)" class="member-name-link">setAngle</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;desiredState,
- boolean&nbsp;ignoreSpeedRequirement)</code></div>
+ boolean&nbsp;ignoreAngleLimit)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the angle of the module to the given angle in the desired state</div>
 </div>
@@ -295,30 +307,37 @@ loadScripts(document, 'script');</script>
 <div class="block">Sets the angle and speed of the module to the given state.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setIndividualBrakeMode(boolean,boolean)" class="member-name-link">setIndividualBrakeMode</a><wbr>(boolean&nbsp;driveBrake,
- boolean&nbsp;turnBrake)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDesiredState(edu.wpi.first.math.kinematics.SwerveModuleState,boolean,boolean)" class="member-name-link">setDesiredState</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
+ boolean&nbsp;isOpenLoop,
+ boolean&nbsp;ignoreAngleLimit)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Sets the individual brake modes for the drive and turn motors</div>
+<div class="block">Sets the angle and speed of the module to the given state.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeoCANStatusFrames(com.revrobotics.CANSparkMax,int,int,int,int,int)" class="member-name-link">setNeoCANStatusFrames</a><wbr>(com.revrobotics.CANSparkMax&nbsp;m_motor,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setIndividualBrakeMode(boolean,boolean)" class="member-name-link">setIndividualBrakeMode</a><wbr>(boolean&nbsp;driveBrake,
+ boolean&nbsp;turnBrake)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the individual brake modes for the drive and turn motors</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeoCANStatusFrames(com.revrobotics.CANSparkMax,int,int,int,int,int)" class="member-name-link">setNeoCANStatusFrames</a><wbr>(com.revrobotics.CANSparkMax&nbsp;m_motor,
  int&nbsp;CANStatus0,
  int&nbsp;CANStatus1,
  int&nbsp;CANStatus2,
  int&nbsp;CANStatus3,
  int&nbsp;CANStatus4)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the NEO CAN Status Frames</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(double)" class="member-name-link">setSpeed</a><wbr>(double&nbsp;speed)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(double)" class="member-name-link">setSpeed</a><wbr>(double&nbsp;speed)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the % output of the drive motor to the given value</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)" class="member-name-link">setSpeed</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;desiredState,
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)" class="member-name-link">setSpeed</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;desiredState,
  boolean&nbsp;isOpenLoop)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the speed of the drive motor using the desired state.</div>
 </div>
 </div>
@@ -351,6 +370,30 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="neoTurnPIDController">
 <h3>neoTurnPIDController</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">com.revrobotics.SparkMaxPIDController</span>&nbsp;<span class="element-name">neoTurnPIDController</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="noRun">
+<h3>noRun</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">noRun</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="doOptimization">
+<h3>doOptimization</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">doOptimization</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="doSetAngle">
+<h3>doSetAngle</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">doSetAngle</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="doSetSpeed">
+<h3>doSetSpeed</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">doSetSpeed</span></div>
 </section>
 </li>
 </ul>
@@ -525,12 +568,12 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="setAngle(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)">
 <h3>setAngle</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setAngle</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;desiredState,
- boolean&nbsp;ignoreSpeedRequirement)</span></div>
+ boolean&nbsp;ignoreAngleLimit)</span></div>
 <div class="block">Sets the angle of the module to the given angle in the desired state</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>desiredState</code> - The desired state of the swerve module.</dd>
-<dd><code>ignoreSpeedRequirement</code> - Whether or not to ignore the speed requirement.</dd>
+<dd><code>ignoreAngleLimit</code> - Whether or not to ignore the angle limit.</dd>
 </dl>
 </section>
 </li>
@@ -566,6 +609,21 @@ loadScripts(document, 'script');</script>
 <dt>Parameters:</dt>
 <dd><code>state</code> - The desired state of the swerve module.</dd>
 <dd><code>isOpenLoop</code> - Whether the drive motor should be in open loop.</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setDesiredState(edu.wpi.first.math.kinematics.SwerveModuleState,boolean,boolean)">
+<h3>setDesiredState</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setDesiredState</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
+ boolean&nbsp;isOpenLoop,
+ boolean&nbsp;ignoreAngleLimit)</span></div>
+<div class="block">Sets the angle and speed of the module to the given state.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>state</code> - The desired state of the swerve module.</dd>
+<dd><code>isOpenLoop</code> - Whether the drive motor should be in open loop.</dd>
+<dd><code>ignoreAngleLimit</code> - Whether or not to ignore the angle limit.</dd>
 </dl>
 </section>
 </li>
