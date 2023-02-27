@@ -80,11 +80,15 @@ public class SwerveGroup implements Loggable {
     //The config for the swerve drive
     private CTREConfig config;
 
-    //A list of modules
-    private SwerveModule[] modules;
+    private SwerveModule topLeft;
+    private SwerveModule topRight;
+    private SwerveModule bottomLeft;
+    private SwerveModule bottomRight;
 
     private boolean fullyReady = false;
     public boolean ready() { return fullyReady; }
+
+    private ChassisSpeeds lastChassisSpeeds;
 
     /**
      * Creates a new swerve group (4 modules)
@@ -130,13 +134,39 @@ public class SwerveGroup implements Loggable {
         //     VecBuilder.fill(0.1, 0.1, 0.1)
         // );
 
-        //Create a new module list
-        modules = new SwerveModule[4];
+        //Create the modules
+        topLeft = new SwerveModule(
+            driveIDs[ModuleIndex.kTOP_LEFT.getIndex()], 
+            steerIDs[ModuleIndex.kTOP_LEFT.getIndex()], 
+            encoderIDs[ModuleIndex.kTOP_LEFT.getIndex()], 
+            ModuleIndex.kTOP_LEFT.getIndex(),
+            config
+        );
 
-        //Then instantiate the list
-        for (int i = 0; i < 4; i++) {
-            modules[i] = new SwerveModule(this.driveIDs[i], this.steerIDs[i], this.encoderIDs[i], i, this.config);
-        }
+        topRight = new SwerveModule(
+            driveIDs[ModuleIndex.kTOP_RIGHT.getIndex()], 
+            steerIDs[ModuleIndex.kTOP_RIGHT.getIndex()], 
+            encoderIDs[ModuleIndex.kTOP_RIGHT.getIndex()], 
+            ModuleIndex.kTOP_RIGHT.getIndex(),
+            config
+        );
+
+        bottomLeft = new SwerveModule(
+            driveIDs[ModuleIndex.kBOTTOM_LEFT.getIndex()], 
+            steerIDs[ModuleIndex.kBOTTOM_LEFT.getIndex()], 
+            encoderIDs[ModuleIndex.kBOTTOM_LEFT.getIndex()], 
+            ModuleIndex.kBOTTOM_LEFT.getIndex(),
+            config
+        );
+
+        bottomRight = new SwerveModule(
+            driveIDs[ModuleIndex.kBOTTOM_RIGHT.getIndex()], 
+            steerIDs[ModuleIndex.kBOTTOM_RIGHT.getIndex()], 
+            encoderIDs[ModuleIndex.kBOTTOM_RIGHT.getIndex()], 
+            ModuleIndex.kBOTTOM_RIGHT.getIndex(),
+            config
+        );
+        
 
         TimerTask whenReady = new TimerTask() {
             @Override
@@ -155,13 +185,27 @@ public class SwerveGroup implements Loggable {
             @Override
             public void run() {
                 int count = 0;
-                int[] ready = new int[modules.length];
+                int[] ready = new int[4];
 
-                for (SwerveModule module : modules) {
-                    if (module.ready()) {
-                        count++;
-                        ready[module.getIndex()] = 1;
-                    }
+                //Check if each module is ready
+                if (topLeft.ready()) {
+                    count++;
+                    ready[0] = 1;
+                }
+
+                if (topRight.ready()) {
+                    count++;
+                    ready[1] = 1;
+                }
+
+                if (bottomLeft.ready()) {
+                    count++;
+                    ready[2] = 1;
+                }
+
+                if (bottomRight.ready()) {
+                    count++;
+                    ready[3] = 1;
                 }
 
                 if (count != lastAmountReady) {
@@ -180,7 +224,7 @@ public class SwerveGroup implements Loggable {
                     lastAmountReady = count;
                 }
 
-                if (count == modules.length) {
+                if (count == 4) {
                     whenReady.run();
                     this.cancel();
                 }
@@ -200,9 +244,10 @@ public class SwerveGroup implements Loggable {
      * @param value Speeds for each module
      * */
     public void setSpeed(double value) {
-        for (SwerveModule module : modules) {
-            module.setSpeed(value);
-        }
+        topLeft.setSpeed(value);
+        topRight.setSpeed(value);
+        bottomLeft.setSpeed(value);
+        bottomRight.setSpeed(value);
     }
 
     /**
@@ -212,9 +257,10 @@ public class SwerveGroup implements Loggable {
      * */
     @Deprecated
     public void setState(SwerveModuleState state, boolean openLoop) {
-        for (SwerveModule module : modules) {
-            module.setDesiredState(state, openLoop);
-        }
+        topLeft.setDesiredState(state, openLoop);
+        topRight.setDesiredState(state, openLoop);
+        bottomLeft.setDesiredState(state, openLoop);
+        bottomRight.setDesiredState(state, openLoop);
     }
 
     /**
@@ -257,6 +303,8 @@ public class SwerveGroup implements Loggable {
 
         //Set the module states
         setModuleStates(states, openLoop);
+
+        lastChassisSpeeds = chassisSpeeds;
     }
 
     /**
@@ -301,9 +349,25 @@ public class SwerveGroup implements Loggable {
         //Desaturate the states to make sure that the robot doesn't go faster than the max speed
         SwerveDriveKinematics.desaturateWheelSpeeds(states, settings.maxSpeed);
 
-        for (int i = 0; i < 4; i++) {
-            modules[i].setDesiredState(states[i], isOpenLoop);
-        }
+        topLeft.setDesiredState(
+            states[ModuleIndex.kTOP_LEFT.getIndex()], 
+            isOpenLoop
+        );
+
+        topRight.setDesiredState(
+            states[ModuleIndex.kTOP_RIGHT.getIndex()], 
+            isOpenLoop
+        );
+
+        bottomLeft.setDesiredState(
+            states[ModuleIndex.kBOTTOM_LEFT.getIndex()], 
+            isOpenLoop
+        );
+
+        bottomRight.setDesiredState(
+            states[ModuleIndex.kBOTTOM_RIGHT.getIndex()], 
+            isOpenLoop
+        );
 
         updateOdometry();
     }
@@ -321,10 +385,29 @@ public class SwerveGroup implements Loggable {
         //Desaturate the states to make sure that the robot doesn't go faster than the max speed
         SwerveDriveKinematics.desaturateWheelSpeeds(states, settings.maxSpeed);
 
-        //Loop through, and set the states
-        for (int i = 0; i < 4; i++) {
-            modules[i].setDesiredState(states[i], isOpenLoop, ignoreAngleLimit);
-        }
+        topLeft.setDesiredState(
+            states[ModuleIndex.kTOP_LEFT.getIndex()], 
+            isOpenLoop,
+            ignoreAngleLimit
+        );
+
+        topRight.setDesiredState(
+            states[ModuleIndex.kTOP_RIGHT.getIndex()], 
+            isOpenLoop,
+            ignoreAngleLimit
+        );
+
+        bottomLeft.setDesiredState(
+            states[ModuleIndex.kBOTTOM_LEFT.getIndex()], 
+            isOpenLoop,
+            ignoreAngleLimit
+        );
+
+        bottomRight.setDesiredState(
+            states[ModuleIndex.kBOTTOM_RIGHT.getIndex()], 
+            isOpenLoop,
+            ignoreAngleLimit
+        );
 
         //Update odometry
         updateOdometry();
@@ -349,6 +432,8 @@ public class SwerveGroup implements Loggable {
 
         //Set the module states, open loop (true). Ignore optimization (true) since this is being buggy.
         setModuleStates(states, true, true);
+
+        lastChassisSpeeds = chassisSpeeds;
     }
 
 
@@ -364,10 +449,12 @@ public class SwerveGroup implements Loggable {
         Rotation2d x2 = Rotation2d.fromDegrees(135);
 
         //Set the module states, but only the angles. Ignore the angle jitter prevention.
-        modules[0].setAngle(new SwerveModuleState(0, x1), true);
-        modules[1].setAngle(new SwerveModuleState(0, x2), true);
-        modules[2].setAngle(new SwerveModuleState(0, x2), true);
-        modules[3].setAngle(new SwerveModuleState(0, x1), true);
+        topRight.setAngle(new SwerveModuleState(0, x1), true);
+        bottomRight.setAngle(new SwerveModuleState(0, x2), true);
+        topLeft.setAngle(new SwerveModuleState(0, x2), true);
+        bottomLeft.setAngle(new SwerveModuleState(0, x1), true);
+
+        lastChassisSpeeds = new ChassisSpeeds(0, 0, 0);
     }
 
     /**
@@ -375,6 +462,8 @@ public class SwerveGroup implements Loggable {
      */
     public void stop() {
         setSpeed(0);
+
+        lastChassisSpeeds = new ChassisSpeeds(0, 0, 0);
     }
 
     /**
@@ -426,6 +515,7 @@ public class SwerveGroup implements Loggable {
      * @param s_loop The lambda to use. Takes in the module and the index of the module.
      */
     public void loop(SwerveLoop s_loop) {
+        SwerveModule[] modules = getModules();
         for (int i = 0; i < 4; i++) {
             s_loop.run(modules[i], i);
         }
@@ -505,7 +595,12 @@ public class SwerveGroup implements Loggable {
      * @return The modules of the swerve drive
      */
     public SwerveModule[] getModules() {
-        return modules;
+        return new SwerveModule[] {
+            topRight,
+            bottomRight,
+            topLeft,
+            bottomLeft
+        };
     }
 
     /**
@@ -533,7 +628,12 @@ public class SwerveGroup implements Loggable {
         return moduleNames[i];
     }
 
+    public ChassisSpeeds getVelocity() {
+        return lastChassisSpeeds;
+    }
+    
     public SwerveModulePosition[] getSwervePositions() {
+        SwerveModule[] modules = getModules();
         return new SwerveModulePosition[] {
             modules[0].getPosition(),
             modules[1].getPosition(),
@@ -562,7 +662,7 @@ public class SwerveGroup implements Loggable {
                 this.name + " Module " + i, 
                 new Pose2d(
                     modulePosition,
-                    modules[i].getState().angle.plus(getAngle())
+                    getModules()[i].getState().angle.plus(getAngle())
                 )
             );
         }
@@ -593,6 +693,34 @@ public class SwerveGroup implements Loggable {
         double[] angles = new double[4];
         loop((module, i) -> {
             angles[i] = module.getState().angle.getDegrees();
+        });
+
+        return angles;
+    }
+
+    /**
+     * Logs the desired speeds of the modules
+     * @return The desired speeds of the modules
+     */
+    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Desired Swerve Drive Module Speeds")
+    public double[] logDesiredSpeeds() {
+        double[] speeds = new double[4];
+        loop((module, i) -> {
+            speeds[i] = module.desiredSpeed;
+        });
+
+        return speeds;
+    }
+
+    /**
+     * Logs the desired angles of the modules
+     * @return The desired angles of the modules
+     */
+    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Desired Swerve Drive Module Angles")
+    public double[] logDesiredAngles() {
+        double[] angles = new double[4];
+        loop((module, i) -> {
+            angles[i] = module.desiredAngle.getDegrees();
         });
 
         return angles;

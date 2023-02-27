@@ -11,11 +11,11 @@ public class DashboardModule {
         ModuleBuilder.registerModule(this.getClass().getSimpleName(), this);
     }
 
-    public void addModule(DashboardComponent module) {
+    public void addComponent(DashboardComponent module) {
         modules.add(module);
     }
 
-    public void addModule(DashboardComponent ...module) {
+    public void addComponent(DashboardComponent ...module) {
         for (DashboardComponent m : module) {
             modules.add(m);
         }

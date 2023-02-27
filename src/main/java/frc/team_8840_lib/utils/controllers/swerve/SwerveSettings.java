@@ -184,10 +184,10 @@ public class SwerveSettings {
      * */
     public Translation2d[] getPositions() {
         return new Translation2d[] {
-            new Translation2d(trackWidth / 2.0, wheelBase / 2.0),
-            new Translation2d(trackWidth / 2.0, -wheelBase / 2.0),
-            new Translation2d(-trackWidth / 2.0, wheelBase / 2.0),
-            new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0)
+            new Translation2d(trackWidth / 2.0, wheelBase / 2.0), //TOP RIGHT
+            new Translation2d(-trackWidth / 2.0, wheelBase / 2.0), //tech TOP LEFT, but it's actually the bottom right
+            new Translation2d(trackWidth / 2.0, -wheelBase / 2.0), //tech BOTTOM RIGHT, but it's actually the top left
+            new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0) //BOTTOM LEFT
         };
     }
 

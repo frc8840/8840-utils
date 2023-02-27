@@ -16,14 +16,12 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team_8840_lib.IO.devices.IOCANCoder;
 import frc.team_8840_lib.controllers.specifics.SparkMaxEncoderWrapper;
 import frc.team_8840_lib.info.console.Logger;
@@ -37,10 +35,8 @@ import frc.team_8840_lib.utils.IO.IOPermission;
 import frc.team_8840_lib.utils.IO.IOValue;
 import frc.team_8840_lib.utils.controllers.swerve.CTREConfig;
 import frc.team_8840_lib.utils.controllers.swerve.CTREModuleState;
-import frc.team_8840_lib.utils.controllers.swerve.SwerveOptimization;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveType;
 import frc.team_8840_lib.utils.controllers.swerve.conversions.FalconConversions;
-import frc.team_8840_lib.utils.math.MathUtils;
 
 /**
  * This class is used to control a swerve module. It is meant to be used with the SwerveDrive class.
@@ -89,8 +85,6 @@ public class SwerveModule extends IOLayer {
 
     private Rotation2d lastAngle;
 
-    private Rotation2d targetAngle;
-
     //Angle encoder - used for both NEO and Falcon
     private IOCANCoder angleCANCoder;
 
@@ -110,8 +104,9 @@ public class SwerveModule extends IOLayer {
     
     public boolean doSetSpeed = true;
 
-    private Rotation2d desiredAngle = Rotation2d.fromDegrees(0);
-    private double desiredT = 0;
+    //Set/Desired angle and speed
+    public Rotation2d desiredAngle = new Rotation2d(0);
+    public double desiredSpeed = 0;
 
     /**
      * Get the private ID of the module
@@ -134,6 +129,12 @@ public class SwerveModule extends IOLayer {
 
     //Whether to do the manual conversion or not for the NEO. If false, it will use the REV API. If true, it will do manual conversion
     private boolean doManualConversion = true;
+
+    //Ignore the angle limits when true (for driving). This will be called once, and then set to false.
+    private boolean ignoreAngleLimitsOnce = false;
+    public void triggerIgnoreAngleLimitsOnce() {
+        ignoreAngleLimitsOnce = true;
+    }
 
     /**
      * Constructor for the swerve module
@@ -158,8 +159,6 @@ public class SwerveModule extends IOLayer {
         speedCache = 0;
 
         lastAngle = Rotation2d.fromDegrees(0);
-
-        targetAngle = Rotation2d.fromDegrees(0);
 
         doManualConversion = config.getSettings().doManualConversion;
         //angleCache = Rotation2d.fromDegrees(0);
@@ -506,8 +505,11 @@ public class SwerveModule extends IOLayer {
             }
         } else if (this.getType() == SwerveType.SPARK_MAX) {
             CommunicationManager.getInstance().updateInfo(
-                getBaseName(), "set_drive", speed
+                "desired_swerve_drive", privateID + "/speed", 
+                speed * config.getSettings().maxSpeed
             );
+            desiredSpeed = speed * config.getSettings().maxSpeed;
+
             if (!noRun) driveNEO.set(speed);
         }
     }
@@ -594,8 +596,12 @@ public class SwerveModule extends IOLayer {
         if (this.getType() == SwerveType.FALCON_500) {
             turnTalonFX.set(ControlMode.Position, FalconConversions.degreesToFalcon(angle, config.getSettings().angleGearRatio));
         } else if (this.getType() == SwerveType.SPARK_MAX) {
-            CommunicationManager.getInstance().updateInfo(getBaseName(), "set_angle", neoTurnEncoder.calculatePosition(angle));
-            CommunicationManager.getInstance().updateInfo(getBaseName(), "angle", angle);
+            CommunicationManager.getInstance().updateInfo(
+                "desired_swerve_drive", privateID + "/rotation", 
+                angle
+            );
+            desiredAngle = Rotation2d.fromDegrees(angle);
+
             if (!noRun) {
                 neoTurnPIDController.setReference(
                     neoTurnEncoder.calculatePosition(angle),
@@ -635,6 +641,12 @@ public class SwerveModule extends IOLayer {
      * @param isOpenLoop Whether the drive motor should be in open loop.
      * */
     public void setDesiredState(SwerveModuleState state, boolean isOpenLoop) {
+        if (this.ignoreAngleLimitsOnce) {
+            this.setDesiredState(state, isOpenLoop, true);
+            this.ignoreAngleLimitsOnce = false;
+            return;
+        }
+
         SwerveModuleState optimizedState = doOptimization ? CTREModuleState.optimize(state, lastSetAngle) : state;
 
         double difference = Math.abs(optimizedState.angle.getDegrees() - lastSetAngle.getDegrees());
@@ -650,7 +662,9 @@ public class SwerveModule extends IOLayer {
         if (this.doSetAngle && isActualDifference) this.setAngle(optimizedState);
 
         double speedDifference = Math.abs(optimizedState.speedMetersPerSecond - lastSetSpeed);
-        boolean sameSpeed = speedDifference < 0.01;
+        //It's the same speed if the difference is less than 0.01m/s.
+        //If the speed is less than 0.01m/s, then we'll say it can change due to the fact that it may be wanting to be 0 but is kept at 0.01m/s.
+        boolean sameSpeed = speedDifference < 0.01 && Math.abs(optimizedState.speedMetersPerSecond) > 0.01;
 
         if (this.doSetSpeed && !sameSpeed) this.setSpeed(optimizedState, isOpenLoop);
 
@@ -673,7 +687,9 @@ public class SwerveModule extends IOLayer {
         if (this.doSetAngle) this.setAngle(optimizedState, ignoreAngleLimit);
 
         double speedDifference = Math.abs(optimizedState.speedMetersPerSecond - lastSetSpeed);
-        boolean sameSpeed = speedDifference < 0.01;
+        //It's the same speed if the difference is less than 0.01m/s.
+        //If the speed is less than 0.01m/s, then we'll say it can change due to the fact that it may be wanting to be 0 but is kept at 0.01m/s.
+        boolean sameSpeed = speedDifference < 0.01 && Math.abs(optimizedState.speedMetersPerSecond) > 0.01;
 
         if (this.doSetSpeed && !sameSpeed) this.setSpeed(optimizedState, isOpenLoop);
 

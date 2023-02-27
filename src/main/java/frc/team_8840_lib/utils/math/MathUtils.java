@@ -1,5 +1,7 @@
 package frc.team_8840_lib.utils.math;
 
+import edu.wpi.first.math.geometry.Translation2d;
+
 public class MathUtils {
     public static double sigmoid(double x) {
         return 1 / (1 + Math.exp(-x));
@@ -62,5 +64,35 @@ public class MathUtils {
         if (a < end0) return 0;
         if (a > 9.5 + end0) return 1;
         return Math.min(Math.max(1.018 * sigmoid(a - (4.5 + end0)) - 0.0112, 0), 1);
+    }
+
+    /**
+     * Clamps a value between a min and max
+     * @param value Value to clamp
+     */
+    public static double clamp(double value, double min, double max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    /**
+     * Returns the distance between two Translation2d objects
+     * @param a First Translation2d
+     * @param b Second Translation2d
+     * @return Distance between the two Translation2d objects
+     */
+    public static double distance(Translation2d a, Translation2d b) {
+        return Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getY() - b.getY(), 2));
+    }
+
+    /**
+     * Returns the distance between (x1, y1) and (x2, y2)
+     * @param x1 x value of first point
+     * @param y1 y value of first point
+     * @param x2 x value of second point
+     * @param y2 y value of second point
+     * @return Distance between the two points
+     */
+    public static double distance(double x1, double y1, double x2, double y2) {
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 }

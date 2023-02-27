@@ -8,6 +8,7 @@ frc.team_8840_lib.info.time
 frc.team_8840_lib.input.communication
 frc.team_8840_lib.input.communication.dashboard
 frc.team_8840_lib.input.communication.dashboard.components
+frc.team_8840_lib.input.communication.dashboard.components.canvas
 frc.team_8840_lib.input.communication.dashboard.modules
 frc.team_8840_lib.input.communication.server
 frc.team_8840_lib.input.controls
@@ -30,5 +31,6 @@ frc.team_8840_lib.utils.logging
 frc.team_8840_lib.utils.math
 frc.team_8840_lib.utils.math.operators
 frc.team_8840_lib.utils.math.operators.specifics
+frc.team_8840_lib.utils.math.units
 frc.team_8840_lib.utils.pathplanner
 frc.team_8840_lib.utils.time

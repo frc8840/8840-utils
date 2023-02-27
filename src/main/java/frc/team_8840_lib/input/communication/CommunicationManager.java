@@ -59,6 +59,10 @@ public class CommunicationManager {
         NetworkTableInstance.getDefault().flush(); //idk why this is here but yeah
     }
 
+    public static String base() {
+        return "8840-lib";
+    }
+
     private ArrayList<String> createdTitles;
     private NetworkTable table;
     private HashMap<String, Publisher> entries;
@@ -72,7 +76,7 @@ public class CommunicationManager {
 
         ntinst.startServer();
 
-        table = ntinst.getTable("8840-lib");
+        table = ntinst.getTable(base());
 
         createdTitles = new ArrayList<>();
         entries = new HashMap<>();

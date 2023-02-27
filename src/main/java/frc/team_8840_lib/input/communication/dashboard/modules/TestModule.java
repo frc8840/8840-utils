@@ -12,7 +12,7 @@ public class TestModule extends DashboardModule {
     public void build() {
         this.startNewComponent();
         
-        this.addModule(
+        this.addComponent(
             new Title("Module Test"),
             new Text("This is a test module!"),
             new Text("This is confirming that a few components are working!"),

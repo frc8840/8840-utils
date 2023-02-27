@@ -186,6 +186,7 @@ public class Robot extends RobotBase {
     }
 
     boolean doQuickStart = false;
+    boolean robotReady = false;
     
     /**
      * Quick start the robot. This is not recommended for normal use.
@@ -265,7 +266,9 @@ public class Robot extends RobotBase {
         //also might want to figure out how to make this call if the robot reboots or something to prevent the robot from
         //loosing a crap ton of points. Maybe an empty listener if the robot reboots? or just call this earlier.
         //TODO: figure out this stuff from above.
-        if (!doQuickStart) DriverStationJNI.observeUserProgramStarting();
+        if (!doQuickStart) DriverStationJNI.observeUserProgramStarting(); 
+
+        robotReady = true;
 
         Logger.setReadyToSave(true);
 
@@ -419,6 +422,10 @@ public class Robot extends RobotBase {
     public void close() {
         NotifierJNI.stopNotifier(notifier);
         NotifierJNI.cleanNotifier(notifier);
+    }
+
+    public boolean ready() {
+        return robotReady;
     }
 
     private void printLoopOverrunMessage() {
