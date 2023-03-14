@@ -26,6 +26,14 @@ public class RectangleBounds {
         return new Translation2d(x, y);
     }
 
+    public double getCenterX() {
+        return x + width / 2;
+    }
+
+    public double getCenterY() {
+        return y + height / 2;
+    }
+
     public double getX() {
         return x;
     }

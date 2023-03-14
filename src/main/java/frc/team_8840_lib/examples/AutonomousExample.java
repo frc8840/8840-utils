@@ -4,11 +4,14 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.team_8840_lib.controllers.SwerveGroup;
+import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.input.controls.GameController;
 import frc.team_8840_lib.listeners.EventListener;
 import frc.team_8840_lib.listeners.Robot;
+import frc.team_8840_lib.pathing.PathConjugate;
 import frc.team_8840_lib.pathing.PathPlanner;
+import frc.team_8840_lib.pathing.PathConjugate.ConjugateType;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.controllers.Pigeon;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
@@ -25,7 +28,6 @@ import com.revrobotics.REVPhysicsSim;
  */
 public class AutonomousExample extends EventListener {
     private SwerveGroup swerveDrive;
-    private PathPlanner pathPlanner;
 
     @Override
     public void robotInit() {
@@ -57,15 +59,56 @@ public class AutonomousExample extends EventListener {
             }
         }, GamePhase.Autonomous);
 
-        //This is the new method that'll be used for waiting for the dashboard to send the path from 8840-app
-        CommunicationManager.getInstance().waitForAutonomousPath(points -> {
-            if (points.length == 0) {
-                //Ignore it. This can happen to request the autonomous to be set to nothing, but we can ignore it.
-                return;
-            }
-            pathPlanner = new PathPlanner();
-            pathPlanner.updateTimePoints(points);
-        });
+        /**
+         * This is an example of constructing a path.
+         * Since this is an example, we'll create a "wait for path" to be sent 
+         * from the dashboard.
+         * This SHOULD NOT be used in a real robot, as it will cause the robot to
+         * not move at all.
+         * This should be used for testing purposes only.
+         */
+        PathPlanner.addAuto("default", new PathPlanner(
+            PathConjugate.waitForPath(),
+            PathConjugate.runOnce(() -> {
+                Logger.Log("Finished running path!");
+                swerveDrive.stop();
+            })
+        ));
+
+        /**
+         * This is another example of constructing a path, featuring:
+         * • A runOnce command
+         * • A command
+         * • A path segment loaded from a file
+            <code>
+            String homePath = System.getProperty("user.home");
+            //... add this to the auto with PathPlanner#addAuto
+            new PathPlanner(
+                PathConjugate.runOnce(
+                    () -> {
+                        Logger.Log("Auto Start!");
+                    }
+                ),
+                PathConjugate.command(
+                    new MoveFlywheel(),
+                ),
+                PathConjugate.command(
+                    new StopFlywheel(),
+                ),
+                PathConjugate.loadPathFromFile(Path.of(homePath, "8840appdata", "segment_1_0000000.json")),
+                PathConjugate.loadPathFromFile(Path.of(homePath, "8840appdata", "segment_2_0000000.json")),
+                PathConjugate.command(
+                    new WhatEverCommand(),
+                )
+            );
+            </code>
+
+            Note: this code should be surrounded with a try and catch statement 
+            since it can throw an IOException. 
+            If you are confident that the file exists, you can run 
+            `PathConjugate#loadPathFromFile(Path path, PathMovement default)` 
+            instead.
+        */
 
         CommunicationManager.getInstance().createField();
 
@@ -98,9 +141,11 @@ public class AutonomousExample extends EventListener {
     @Override
     public void onAutonomousEnable() {
         // if (pathPlanner == null) return;
-
-        pathPlanner.reset();
-        swerveDrive.resetOdometry(pathPlanner.getLastPose());
+        PathPlanner.getSelectedAuto().start();
+        swerveDrive.resetOdometry(
+            //Get the first pose of the first path segment
+            PathPlanner.getSelectedAuto().getFirstMovement().getPath().getLastPose()
+        );
     }
 
     @Override
@@ -109,21 +154,22 @@ public class AutonomousExample extends EventListener {
     }
 
     public void onFixedAutonomous() {
-        // if (pathPlanner == null) return;
+        if (!PathPlanner.getSelectedAuto().finished()) {
+            if (PathPlanner.getSelectedAuto().getCurrentType() == ConjugateType.Path) {
+                Pose2d pose = PathPlanner.getSelectedAuto().current().getPath().moveToNext();
+                Pose2d lastPose = PathPlanner.getSelectedAuto().current().getPath().getLastPose();
 
-        if (!pathPlanner.finished()) {
-            Pose2d pose = pathPlanner.moveToNext();
-            Pose2d lastPose = pathPlanner.getLastPose();
+                //Find Difference between the two poses
+                double xDiff = (pose.getTranslation().getX() - lastPose.getTranslation().getX());
+                double yDiff = (pose.getTranslation().getY() - lastPose.getTranslation().getY());
 
-            //Find Difference between the two poses
-            double xDiff = (pose.getTranslation().getX() - lastPose.getTranslation().getX());
-            double yDiff = (pose.getTranslation().getY() - lastPose.getTranslation().getY());
+                //Create a new translation with the difference
+                Translation2d translation = new Translation2d(xDiff / Robot.DELTA_TIME, yDiff / Robot.DELTA_TIME);
 
-            //Create a new translation with the difference
-            Translation2d translation = new Translation2d(xDiff / Robot.DELTA_TIME, yDiff / Robot.DELTA_TIME);
-
-            //Use pose to calculate the swerve module states
-            swerveDrive.drive(translation, pose.getRotation().getRadians(), true, false);
+                //Use pose to calculate the swerve module states
+                swerveDrive.drive(translation, pose.getRotation().getRadians(), true, false);
+            }
+            PathPlanner.getSelectedAuto().fixedExecute();
         }
     }
 

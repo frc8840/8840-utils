@@ -27,12 +27,32 @@ public class CanvasSupplier {
         }
     }
 
+    public static enum IfOperation {
+        EQUAL("="),
+        NOT_EQUAL("!"),
+        GREATER_THAN(">"),
+        LESS_THAN("<"),
+        GREATER_THAN_OR_EQUAL("G"),
+        LESS_THAN_OR_EQUAL("L");
+
+        private String operator;
+
+        private IfOperation(String operator) {
+            this.operator = operator;
+        }
+
+        public String getOperator() {
+            return operator;
+        }
+    }
+
     public static enum Type {
         NT_VALUE,
         CALCULATION,
         PERCENTAGE,
         NUMBER,
-        STRING;
+        STRING,
+        IF_STATEMENT;
 
         public String encode() {
             switch (this) {
@@ -46,6 +66,8 @@ public class CanvasSupplier {
                     return "p";
                 case STRING:
                     return "s";
+                case IF_STATEMENT:
+                    return "i";
             }
 
             return "";
@@ -53,6 +75,7 @@ public class CanvasSupplier {
 
         public static Type[] STRICT_NUMBERS = new Type[] { NUMBER, CALCULATION, PERCENTAGE };
         public static Type[] NUMBERS = new Type[] { NUMBER, CALCULATION, PERCENTAGE, NT_VALUE };
+        public static Type[] LOOSE_NUMBERS = new Type[] { NUMBER, CALCULATION, PERCENTAGE, NT_VALUE, IF_STATEMENT };
         public static Type[] STRICT_STRINGS = new Type[] { STRING };
         public static Type[] STRINGS = new Type[] { STRING, NT_VALUE };
     }
@@ -93,8 +116,26 @@ public class CanvasSupplier {
         this.type = type;
     }
 
+    public CanvasSupplier ifStatement(CanvasSupplier leftHand, CanvasSupplier rightHand, IfOperation ifOperation, CanvasSupplier trueValue) {
+        String value = leftHand.toString() + "|" + ifOperation.getOperator() + "|" + rightHand.toString() + "|" + trueValue.toString();
+
+        //Encode value to base64
+        value = Base64.getEncoder().encodeToString(value.getBytes());
+
+        return new CanvasSupplier(value, CanvasSupplier.Type.IF_STATEMENT);
+    }
+
+    public CanvasSupplier ifElseStatement(CanvasSupplier leftHand, CanvasSupplier rightHand, IfOperation ifOperation, CanvasSupplier trueValue, CanvasSupplier falseValue) {
+        String value = leftHand.toString() + "|e" + ifOperation.getOperator() + "|" + rightHand.toString() + "|" + trueValue.toString() + "|" + falseValue.toString();
+
+        //Encode value to base64
+        value = Base64.getEncoder().encodeToString(value.getBytes());
+
+        return new CanvasSupplier(value, CanvasSupplier.Type.IF_STATEMENT);
+    }
+
     public CanvasSupplier calc(Calculation operation, CanvasSupplier other) {
-        if (!CanvasSupplier.allOfType(CanvasSupplier.Type.NUMBERS, this, other)) {
+        if (!CanvasSupplier.allOfType(CanvasSupplier.Type.LOOSE_NUMBERS, this, other)) {
             throw new IllegalArgumentException("All arguments must be numbers! (operate)");
         }
 
@@ -107,7 +148,7 @@ public class CanvasSupplier {
     }
 
     public CanvasSupplier calc(Calculation operation, String other) {
-        if (!CanvasSupplier.allOfType(CanvasSupplier.Type.NUMBERS, this)) {
+        if (!CanvasSupplier.allOfType(CanvasSupplier.Type.LOOSE_NUMBERS, this)) {
             throw new IllegalArgumentException("All arguments must be numbers! (operate)");
         }
 

@@ -145,9 +145,16 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#init()" class="member-name-link">init</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="CommunicationManager.html" title="class in frc.team_8840_lib.input.communication">CommunicationManager</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#logSwerveStates(java.lang.String,java.lang.String,edu.wpi.first.math.kinematics.SwerveModuleState%5B%5D)" class="member-name-link">logSwerveStates</a><wbr>(<a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;tab,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#legacyWaitForAutonomousPath(frc.team_8840_lib.utils.pathplanner.PathCallback)" class="member-name-link">legacyWaitForAutonomousPath</a><wbr>(<a href="../../utils/pathplanner/PathCallback.html" title="interface in frc.team_8840_lib.utils.pathplanner">PathCallback</a>&nbsp;callback)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="CommunicationManager.html" title="class in frc.team_8840_lib.input.communication">CommunicationManager</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#logSwerveStates(java.lang.String,java.lang.String,edu.wpi.first.math.kinematics.SwerveModuleState%5B%5D)" class="member-name-link">logSwerveStates</a><wbr>(<a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;tab,
  <a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
  edu.wpi.first.math.kinematics.SwerveModuleState[]&nbsp;states)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../utils/pathplanner/TimePoint.html" title="class in frc.team_8840_lib.utils.pathplanner">TimePoint</a>[]</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#readAndParsePath(org.json.JSONObject,boolean)" class="member-name-link">readAndParsePath</a><wbr>(org.json.JSONObject&nbsp;json,
+ boolean&nbsp;toLastMovementPoint)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateFieldObjectPose(java.lang.String,edu.wpi.first.math.geometry.Pose2d)" class="member-name-link">updateFieldObjectPose</a><wbr>(<a href="https://download.java.net/java/early_access/jdk19/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;name,
@@ -216,7 +223,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateSwerveInfo(frc.team_8840_lib.controllers.SwerveGroup)" class="member-name-link">updateSwerveInfo</a><wbr>(<a href="../../controllers/SwerveGroup.html" title="class in frc.team_8840_lib.controllers">SwerveGroup</a>&nbsp;swerveGroup)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="CommunicationManager.html" title="class in frc.team_8840_lib.input.communication">CommunicationManager</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#waitForAutonomousPath(frc.team_8840_lib.utils.pathplanner.PathCallback)" class="member-name-link">waitForAutonomousPath</a><wbr>(<a href="../../utils/pathplanner/PathCallback.html" title="interface in frc.team_8840_lib.utils.pathplanner">PathCallback</a>&nbsp;callback)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#waitForAutonomousPath(frc.team_8840_lib.utils.interfaces.Callback)" class="member-name-link">waitForAutonomousPath</a><wbr>(<a href="../../utils/interfaces/Callback.html" title="interface in frc.team_8840_lib.utils.interfaces">Callback</a>&nbsp;callback)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
@@ -276,9 +283,22 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="waitForAutonomousPath(frc.team_8840_lib.utils.pathplanner.PathCallback)">
+<section class="detail" id="legacyWaitForAutonomousPath(frc.team_8840_lib.utils.pathplanner.PathCallback)">
+<h3>legacyWaitForAutonomousPath</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="CommunicationManager.html" title="class in frc.team_8840_lib.input.communication">CommunicationManager</a></span>&nbsp;<span class="element-name">legacyWaitForAutonomousPath</span><wbr><span class="parameters">(<a href="../../utils/pathplanner/PathCallback.html" title="interface in frc.team_8840_lib.utils.pathplanner">PathCallback</a>&nbsp;callback)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="waitForAutonomousPath(frc.team_8840_lib.utils.interfaces.Callback)">
 <h3>waitForAutonomousPath</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="CommunicationManager.html" title="class in frc.team_8840_lib.input.communication">CommunicationManager</a></span>&nbsp;<span class="element-name">waitForAutonomousPath</span><wbr><span class="parameters">(<a href="../../utils/pathplanner/PathCallback.html" title="interface in frc.team_8840_lib.utils.pathplanner">PathCallback</a>&nbsp;callback)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="CommunicationManager.html" title="class in frc.team_8840_lib.input.communication">CommunicationManager</a></span>&nbsp;<span class="element-name">waitForAutonomousPath</span><wbr><span class="parameters">(<a href="../../utils/interfaces/Callback.html" title="interface in frc.team_8840_lib.utils.interfaces">Callback</a>&nbsp;callback)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="readAndParsePath(org.json.JSONObject,boolean)">
+<h3>readAndParsePath</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../utils/pathplanner/TimePoint.html" title="class in frc.team_8840_lib.utils.pathplanner">TimePoint</a>[]</span>&nbsp;<span class="element-name">readAndParsePath</span><wbr><span class="parameters">(org.json.JSONObject&nbsp;json,
+ boolean&nbsp;toLastMovementPoint)</span></div>
 </section>
 </li>
 <li>

@@ -59,6 +59,14 @@ public class CanvasDisplay extends DashboardComponent {
         return leftSide.calc(operator, rightSide);
     }
 
+    public CanvasSupplier If(CanvasSupplier leftSide, CanvasSupplier.IfOperation operator, CanvasSupplier rightSide, CanvasSupplier trueValue) {
+        return leftSide.ifStatement(leftSide, rightSide, operator, trueValue);
+    }
+
+    public CanvasSupplier IfElse(CanvasSupplier leftSide, CanvasSupplier.IfOperation operator, CanvasSupplier rightSide, CanvasSupplier trueValue, CanvasSupplier falseValue) {
+        return leftSide.ifElseStatement(leftSide, rightSide, operator, trueValue, falseValue);
+    }
+
     public CanvasSupplier mathf(CanvasSupplier leftSide, String func) {
         if (!CanvasSupplier.allOfType(CanvasSupplier.Type.NUMBERS, leftSide)) {
             throw new IllegalArgumentException("All arguments must be numbers! (mathf)");
@@ -86,7 +94,7 @@ public class CanvasDisplay extends DashboardComponent {
 
     //Colors
     public void fillStyle(CanvasSupplier color) {
-        if (!CanvasSupplier.allOfType(Type.STRINGS, color)) {
+        if (!CanvasSupplier.allOfType(Type.STRINGS, color) && !CanvasSupplier.allOfType(Type.IF_STATEMENT, color)) {
             throw new IllegalArgumentException("All arguments must be strings! (color)");
         }
 
@@ -100,7 +108,7 @@ public class CanvasDisplay extends DashboardComponent {
     }
 
     public void strokeStyle(CanvasSupplier color) {
-        if (!CanvasSupplier.allOfType(Type.STRINGS, color)) {
+        if (!CanvasSupplier.allOfType(Type.STRINGS, color) && !CanvasSupplier.allOfType(Type.IF_STATEMENT, color)) {
             throw new IllegalArgumentException("All arguments must be strings! (color)");
         }
 
@@ -143,7 +151,7 @@ public class CanvasDisplay extends DashboardComponent {
 
     //Shapes
     public void line(CanvasSupplier x1, CanvasSupplier y1, CanvasSupplier x2, CanvasSupplier y2) {
-        if (!CanvasSupplier.allOfType(Type.NUMBERS, x1, y1, x2, y2)) {
+        if (!CanvasSupplier.allOfType(Type.LOOSE_NUMBERS, x1, y1, x2, y2)) {
             throw new IllegalArgumentException("All arguments must be numbers! (x1, y1, x2, y2)");
         }
 
@@ -160,7 +168,7 @@ public class CanvasDisplay extends DashboardComponent {
     }
 
     public void rect(CanvasSupplier x, CanvasSupplier y, CanvasSupplier width, CanvasSupplier height, boolean fill) {
-        if (!CanvasSupplier.allOfType(Type.NUMBERS, x, y, width, height)) {
+        if (!CanvasSupplier.allOfType(Type.LOOSE_NUMBERS, x, y, width, height)) {
             throw new IllegalArgumentException("All arguments must be numbers! (x, y, width, height)");
         }
 
@@ -177,7 +185,7 @@ public class CanvasDisplay extends DashboardComponent {
     }
 
     public void circle(CanvasSupplier x, CanvasSupplier y, CanvasSupplier radius, boolean filled) {
-        if (!CanvasSupplier.allOfType(Type.NUMBERS, x, y, radius)) {
+        if (!CanvasSupplier.allOfType(Type.LOOSE_NUMBERS, x, y, radius)) {
             throw new IllegalArgumentException("All arguments must be numbers! (x, y, radius)");
         }
 
@@ -186,7 +194,7 @@ public class CanvasDisplay extends DashboardComponent {
         args.put("x", x.toString());
         args.put("y", y.toString());
         args.put("radius", radius.toString());
-        args.put("filled", filled ? "true" : "false");
+        args.put("filled", s(filled ? "true" : "false").toString());
         
         addCommand(
             new CanvasCommand("circle", args)

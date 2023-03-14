@@ -25,11 +25,15 @@ import frc.team_8840_lib.input.communication.dashboard.ModuleBuilder;
 import frc.team_8840_lib.input.communication.server.HTTPServer;
 import frc.team_8840_lib.listeners.Preferences;
 import frc.team_8840_lib.listeners.Robot;
+import frc.team_8840_lib.pathing.PathConjugate;
+import frc.team_8840_lib.pathing.PathPlanner;
+import frc.team_8840_lib.pathing.PathConjugate.ConjugateType;
 import frc.team_8840_lib.utils.http.Constructor;
 import frc.team_8840_lib.utils.http.IP;
 import frc.team_8840_lib.utils.http.Route;
 import frc.team_8840_lib.utils.http.html.Element;
 import frc.team_8840_lib.utils.http.html.EncodingUtil;
+import frc.team_8840_lib.utils.interfaces.Callback;
 import frc.team_8840_lib.utils.pathplanner.PathCallback;
 import frc.team_8840_lib.utils.pathplanner.TimePoint;
 import org.json.JSONArray;
@@ -85,6 +89,7 @@ public class CommunicationManager {
             /**
              * According to rule R704 and Table 9-5 Open FMS Ports, ports 5800-5810 are open to UDP/TCP traffic.
              * This means that we are allowed to host a server on any of the ports in this range, so we choose 5805.
+             * TODO: allow the user to change the port number in the preferences.
              * */
             server = new HTTPServer(5805);
 
@@ -220,7 +225,34 @@ public class CommunicationManager {
                 }
             }));
 
-            server.route(new Route("/auto_path", new Constructor() {
+            server.route(new Route("/get_registered_paths", new Constructor() {
+                /**
+                 * Returns a list of the paths that are registered in the PathPlanner class.
+                 * /get_registered_paths, GET Request
+                 * 
+                 * Looking for the paths stored in file? Use /auto_path with a GET request.
+                 */
+                @Override
+                public Route.Resolution finish(HttpExchange req, Route.Resolution res) {
+                    if (!req.getRequestMethod().equalsIgnoreCase("GET")) {
+                        return res.json(this.error("Invalid request method.")).status(400);
+                    }
+
+                    String[] keys = PathPlanner.getAutoNames();
+
+                    String keyString = "";
+
+                    for (String key : keys) {
+                        keyString += "\"" + key + "\", ";
+                    }
+
+                    keyString = keyString.length() > 0 ? keyString.substring(0, keyString.length() - 2) : "";
+
+                    return res.json("{\"success\": true, \"paths\": [" + keyString + "], \"selected_path\": \"" + PathPlanner.getSelectedAutoName() + "\"}");
+                }
+            }));
+
+            server.route(new Route("/auto/path", new Constructor() {
                 /**
                  * Examples of requests for the /auto_path endpoint:
                  * /auto_path, POST Request with payload from 8840-app
@@ -270,55 +302,76 @@ public class CommunicationManager {
                     JSONObject json = new JSONObject(body);
 
                     if (json.has("selection")) {
-                        String selection = json.getString("selection");
+                        if (json.has("legacy")) { //Legacy support.
+                            String selection = json.getString("selection");
 
-                        if (selection == null || selection.equals("")) {
-                            Logger.Log("Received empty selection, clearing current auto path.");
-                            currentAutoPath = "";
-                            pathCallback.onPathComplete(new TimePoint[0]);
-                            return res.json("{\"success\": true, \"message\": \"Selection was empty, cleared current auto path.\"}");
-                        }
-
-                        if (folder.exists()) {
-                            File[] files = folder.listFiles();
-                            for (File file : files) {
-                                //Ignore any hidden files.
-                                if (file.toString().startsWith(".")) continue;
-
-                                if (file.getName().equals(selection + ".json")) {
-                                    String fileContents;
-
-                                    //Read file
-                                    try {
-                                        fileContents = new String(Files.readAllBytes(file.toPath()));
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                        Logger.Log("There was an error while reading the file. Did the file get corrupted?");
-                                        return res.json(this.error("There was an issue reading the file.")).status(500);
-                                    }
-
-                                    JSONObject fileJson = new JSONObject(fileContents);
-
-                                    int points = readAndParsePath(fileJson);
-
-                                    if (points == -1) {
-                                        Logger.Log("There was an error while parsing the file. Did you edit the JSON?");
-                                        return res.json(this.error("There was an issue parsing the JSON.")).status(500);
-                                    }
-
-                                    currentAutoPath = EncodingUtil.fileProofName(fileJson.getString("name"));
-
-                                    Logger.Log("Successfully loaded autonomous path " + currentAutoPath + " with " + points + " points from file.");
-
-                                    return res.json("{\"success\": true, \"message\": \"Set to path with " + points + " data points.\"}");
-                                }
+                            if (selection == null || selection.equals("")) {
+                                Logger.Log("Received empty selection, clearing current auto path.");
+                                currentAutoPath = "";
+                                legacyPathCallback.onPathComplete(new TimePoint[0]);
+                                return res.json("{\"success\": true, \"message\": \"Selection was empty, cleared current auto path.\"}");
                             }
 
-                            Logger.Log("The file " + selection + " was not found. Was the file deleted, or was the request malformed?");
-                            return res.json(this.error("The selected autonomous path was not found.")).status(404);
-                        } else {
-                            Logger.Log("The folder " + folder.getAbsolutePath() + " was not found. Maybe you haven't saved any paths yet?");
-                            return res.json(this.error("No autonomous paths were found.")).status(404);
+                            if (folder.exists()) {
+                                File[] files = folder.listFiles();
+                                for (File file : files) {
+                                    //Ignore any hidden files.
+                                    if (file.toString().startsWith(".")) continue;
+
+                                    if (file.getName().equals(selection + ".json")) {
+                                        String fileContents;
+
+                                        //Read file
+                                        try {
+                                            fileContents = new String(Files.readAllBytes(file.toPath()));
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                            Logger.Log("There was an error while reading the file. Did the file get corrupted?");
+                                            return res.json(this.error("There was an issue reading the file.")).status(500);
+                                        }
+
+                                        JSONObject fileJson = new JSONObject(fileContents);
+
+                                        TimePoint[] points = readAndParsePath(fileJson, true);
+
+                                        if (points == null || points.length == 0) {
+                                            Logger.Log("There was an error while parsing the file. Did you edit the JSON?");
+                                            return res.json(this.error("There was an issue parsing the JSON.")).status(500);
+                                        }
+
+                                        currentAutoPath = EncodingUtil.fileProofName(fileJson.getString("name"));
+
+                                        Logger.Log("Successfully loaded autonomous path " + currentAutoPath + " with " + points + " points from file.");
+
+                                        return res.json("{\"success\": true, \"message\": \"Set to path with " + points + " data points.\"}");
+                                    }
+                                }
+
+                                Logger.Log("The file " + selection + " was not found. Was the file deleted, or was the request malformed?");
+                                return res.json(this.error("The selected autonomous path was not found.")).status(404);
+                            } else {
+                                Logger.Log("The folder " + folder.getAbsolutePath() + " was not found. Maybe you haven't saved any paths yet?");
+                                return res.json(this.error("No autonomous paths were found.")).status(404);
+                            }
+                        } else { //Else if it's not legacy method.
+                            String selection = json.getString("selection");
+
+                            Logger.Log("Recieved selection: " + selection + ".");
+
+                            //check if selection is in keys
+                            if (selection == null || !PathPlanner.validAuto(selection)) {
+                                Logger.Log("Recieved invalid selection, not setting current auto path to " + selection + ".");
+                                return res.json(this.error("Invalid selection.")).status(400);
+                            }
+
+                            PathPlanner.selectAuto(selection);
+
+                            Logger.Log("Successfully set current auto path to " + selection + ".");
+
+                            currentAutoPath = selection;
+                            pathCallback.run();
+
+                            return res.json("{\"success\": true, \"message\": \"Set to path " + selection + ".\"}").status(200);
                         }
                     }
 
@@ -359,12 +412,14 @@ public class CommunicationManager {
                         return res.json(this.error("Failed to write to file for autonomous path.")).status(500);
                     }
 
-                    int points = readAndParsePath(json);
+                    TimePoint[] points = readAndParsePath(json, true);
 
-                    if (points == -1) {
+                    if (points == null || points.length == 0) {
                         Logger.Log("There was an error while parsing the JSON.");
                         return res.json(this.error("There was an issue parsing the JSON.")).status(500);
                     }
+
+                    legacyPathCallback.onPathComplete(points);
 
                     currentAutoPath = autoName;
 
@@ -427,6 +482,66 @@ public class CommunicationManager {
 
             server.route(new Route("/custom_modules", ModuleBuilder.getConstructor()));
 
+            server.route(new Route("/auto/selected", new Constructor() {
+                @Override
+                public Route.Resolution finish(HttpExchange req, Route.Resolution res) {
+                    if (!req.getRequestMethod().equals("GET")) {
+                        return res.json(this.error("Invalid request method.")).status(405);
+                    }
+
+                    JSONObject json = new JSONObject();
+
+                    JSONArray pathConjugates = new JSONArray();
+
+                    for (PathConjugate conjugate : PathPlanner.getSelectedAuto().getAllConjugates()) {
+                        JSONObject conjugateParent = new JSONObject();
+
+                        //First off, we'll do the info about the conjugate
+                        JSONObject info = new JSONObject();
+
+                        info.put("type", conjugate.getType().name());
+                        info.put("name", conjugate.getName());
+
+                        conjugateParent.put(".info", info);
+
+                        //Now we'll do the actual path, if it's a path object.
+                        if (conjugate.getType() == ConjugateType.Path) {
+                            JSONArray path = new JSONArray();
+
+                            for (TimePoint point : conjugate.getPath().getAllPoints()) {
+                                JSONObject pointParent = new JSONObject();
+
+                                pointParent.put("x", point.getX());
+                                pointParent.put("y", point.getY());
+                                pointParent.put("d", point.getAngle());
+                                //we don't need these two (for now), TODO: check if we actually need them.
+                                // pointParent.put("v", point.getVelocity());
+                                // pointParent.put("t", point.getTime());
+
+                                path.put(pointParent);
+                            }
+
+                            conjugateParent.put("path", path);
+                        }
+
+                        pathConjugates.put(conjugateParent);
+                    }
+
+                    json.put("conjugates", pathConjugates);
+
+                    JSONObject generalInfoObject = new JSONObject();
+
+                    generalInfoObject.put("name", PathPlanner.getSelectedAutoName());
+                    generalInfoObject.put("set_name", currentAutoPath);
+                    generalInfoObject.put("number", PathPlanner.getSelectedAuto().getAllConjugates().length);
+
+                    json.put(".info", generalInfoObject);
+                    json.put("success", true);
+
+                    return res.json(json.toString());
+                }
+            }));
+            
             server.listen();
 
             String ip_addr = IP.getIP();
@@ -439,22 +554,33 @@ public class CommunicationManager {
         updateStatus("Network Communication", "Connected");
     }
 
-    private PathCallback pathCallback = (points -> {
-        Logger.Log("Received new autonomous path (default callback).");
+    private PathCallback legacyPathCallback = (points -> {
+        Logger.Log("[LEGACY_PATHING] Received new autonomous path (default callback).");
+    });
+
+    private Callback pathCallback = (() -> {
+        Logger.Log("[PATHING] Received new autonomous path (default callback).");
     });
 
     private String currentAutoPath = "";
 
-    public CommunicationManager waitForAutonomousPath(PathCallback callback) {
-        pathCallback = callback;
-        Logger.Log("Registered new autonomous path callback.");
+    public CommunicationManager legacyWaitForAutonomousPath(PathCallback callback) {
+        legacyPathCallback = callback;
+        Logger.Log("[PATHING] Registered new legacy autonomous path callback.");
         return this;
     }
 
-    private int readAndParsePath(JSONObject json) {
+    public CommunicationManager waitForAutonomousPath(Callback callback) {
+        pathCallback = callback;
+        Logger.Log("[PATHING] Registered new autonomous path callback.");
+        return this;
+    }
+
+    public TimePoint[] readAndParsePath(JSONObject json, boolean toLastMovementPoint) {
         JSONArray timeline = json.getJSONArray("generatedTimeline");
 
         TimePoint[] points = new TimePoint[timeline.length()];
+        int lastMovementIndex = -1;
         for (int i = 0; i < timeline.length(); i++) {
             JSONArray point = timeline.getJSONArray(i);
 
@@ -464,19 +590,31 @@ public class CommunicationManager {
                 timePoint.parseFromJSON(point);
             } catch (Exception e) {
                 e.printStackTrace();
-                return -1;
+                return null;
             }
 
             points[i] = timePoint;
+
+            if (timePoint.driving) {
+                lastMovementIndex = i;
+            }
         }
 
-        Logger.Log("Read through each point.");
+        if (toLastMovementPoint && lastMovementIndex > -1) {
+            TimePoint[] newPoints = new TimePoint[lastMovementIndex + 1];
+            System.arraycopy(points, 0, newPoints, 0, lastMovementIndex + 1);
+            points = newPoints;
+        }
 
-        pathCallback.onPathComplete(points);
+        return points;
 
-        Logger.Log("Finished reading the path.");
+        // Logger.Log("Read through each point.");
 
-        return points.length;
+        // pathCallback.onPathComplete(points);
+
+        // Logger.Log("Finished reading the path.");
+
+        // return points.length;
     }
 
     public CommunicationManager updateStatus(String service, String status) {

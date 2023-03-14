@@ -495,6 +495,17 @@ public class SwerveModule extends IOLayer {
             speed = Math.signum(speed);
         }
 
+        //If the speed is 0 and robot is a simulation, since open loop doesn't work in simul, use PID.
+        if (speed == 0 && Robot.isSimulation()) {
+            setSpeed(
+                new SwerveModuleState(
+                    0, Rotation2d.fromDegrees(0)
+                ), false
+            );
+            this.driveSpeed = 0;
+            return;
+        }
+
         this.driveSpeed = speed * config.getSettings().maxSpeed;
 
         if (this.getType() == SwerveType.FALCON_500) {

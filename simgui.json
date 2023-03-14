@@ -229,7 +229,6 @@
           },
           "open": true
         },
-        "open": true,
         "simcontrols": {
           "joystick": {
             "open": true
@@ -261,7 +260,8 @@
       "SmartDashboard": {
         "Field": {
           "open": true
-        }
+        },
+        "open": true
       }
     }
   }

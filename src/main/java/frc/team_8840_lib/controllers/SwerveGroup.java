@@ -171,6 +171,7 @@ public class SwerveGroup implements Loggable {
         TimerTask whenReady = new TimerTask() {
             @Override
             public void run() {
+                Logger.Log("[Swerve] Initializing odometry with angle of " + getAngle() + ".");
                 //Set the odometry
                 odometry = new SwerveDriveOdometry(settings.getKinematics(), getAngle(), getSwervePositions());
 
@@ -436,6 +437,12 @@ public class SwerveGroup implements Loggable {
         lastChassisSpeeds = chassisSpeeds;
     }
 
+    public void resetToAbsolute() {
+        topLeft.resetToAbsolute();
+        topRight.resetToAbsolute();
+        bottomLeft.resetToAbsolute();
+        bottomRight.resetToAbsolute();
+    }
 
     /**
      * Sets the module rotations to form an "x" with the directions of the wheels.
@@ -615,8 +622,9 @@ public class SwerveGroup implements Loggable {
      * Returns the angle of the gyroscope on the robot.
      * @return The angle of the gyroscope on the robot
      * */
-    private Rotation2d getAngle() {
-        return gyro.getAngle(this.settings.invertGyro);
+    public Rotation2d getAngle() {
+        double yaw = gyro.getYawPitchRoll()[0];
+        return this.settings.invertGyro ? Rotation2d.fromDegrees(360 - yaw) : Rotation2d.fromDegrees(yaw);
     }
 
     /**
