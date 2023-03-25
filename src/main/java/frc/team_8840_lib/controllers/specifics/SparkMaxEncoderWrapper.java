@@ -5,6 +5,12 @@ import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 
 import frc.team_8840_lib.info.console.Logger;
+import frc.team_8840_lib.utils.IO.IOAccess;
+import frc.team_8840_lib.utils.IO.IOLayer;
+import frc.team_8840_lib.utils.IO.IOMethod;
+import frc.team_8840_lib.utils.IO.IOMethodType;
+import frc.team_8840_lib.utils.IO.IOPermission;
+import frc.team_8840_lib.utils.IO.IOValue;
 
 /**
  * A wrapper to stop issues with the SparkMax encoder. We've had a lot of issues
@@ -12,7 +18,8 @@ import frc.team_8840_lib.info.console.Logger;
  * 
  * @author Jaiden Grimminck
  */
-public class SparkMaxEncoderWrapper {
+@IOAccess(IOPermission.READ)
+public class SparkMaxEncoderWrapper extends IOLayer {
     private RelativeEncoder encoder;
 
     private double offset = 0; //Offset is subtracted from the position
@@ -31,6 +38,8 @@ public class SparkMaxEncoderWrapper {
      * @param sparkMax The speed controller to get the encoder from
      */
     public SparkMaxEncoderWrapper(CANSparkMax sparkMax) {
+        super();
+        
         encoder = sparkMax.getEncoder();
     }
 
@@ -60,9 +69,10 @@ public class SparkMaxEncoderWrapper {
      * Sets the offset of the encoder
      * @return The position of the encoder
      */
+    @IOMethod(name="Position", value_type=IOValue.DOUBLE, method_type = IOMethodType.READ)
     public double getPosition() {
         if (encoder == null) {
-            Logger.Log("[SparkMaxEncoder] WARNING: Encoder is null, and you're getting the position.");
+            //Logger.Log("[SparkMaxEncoder] WARNING: Encoder is null, and you're getting the position.");
             return 0;
         }
 

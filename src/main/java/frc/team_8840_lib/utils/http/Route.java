@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 
+import org.json.JSONObject;
+
 public class Route implements HttpHandler {
 
     private String path;
@@ -81,6 +83,14 @@ public class Route implements HttpHandler {
 
         public Resolution json(String json) {
             this.json = json;
+            this.contentType = ContentType.JSON;
+            setHeader("Content-Type", "application/json");
+            status(200);
+            return this;
+        }
+
+        public Resolution json(JSONObject json) {
+            this.json = json.toString();
             this.contentType = ContentType.JSON;
             setHeader("Content-Type", "application/json");
             status(200);

@@ -77,6 +77,8 @@ public class SwerveGroup implements Loggable {
     //gyroscope
     private Pigeon gyro;
 
+    private Rotation2d gyroStartOffset = Rotation2d.fromDegrees(0);
+
     //The config for the swerve drive
     private CTREConfig config;
 
@@ -619,12 +621,26 @@ public class SwerveGroup implements Loggable {
     }
 
     /**
+     * Sets the start offset of the gyroscope.
+     * @param offset The offset to set the gyroscope to
+     */
+    public void setGyroStartOffset(Rotation2d offset) {
+        this.gyroStartOffset = offset;
+    }
+
+    public void triggerNoOptimization() {
+        loop((module, i) -> {
+            module.triggerIgnoreAngleLimitsOnce();
+        });
+    }
+
+    /**
      * Returns the angle of the gyroscope on the robot.
      * @return The angle of the gyroscope on the robot
      * */
     public Rotation2d getAngle() {
         double yaw = gyro.getYawPitchRoll()[0];
-        return this.settings.invertGyro ? Rotation2d.fromDegrees(360 - yaw) : Rotation2d.fromDegrees(yaw);
+        return (this.settings.invertGyro ? Rotation2d.fromDegrees(360 - yaw) : Rotation2d.fromDegrees(yaw)).plus(this.gyroStartOffset);
     }
 
     /**

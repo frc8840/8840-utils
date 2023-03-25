@@ -28,6 +28,7 @@ import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.pathing.PathConjugate;
 import frc.team_8840_lib.pathing.PathPlanner;
 import frc.team_8840_lib.pathing.PathConjugate.ConjugateType;
+import frc.team_8840_lib.utils.files.FileUtils;
 import frc.team_8840_lib.utils.http.Constructor;
 import frc.team_8840_lib.utils.http.IP;
 import frc.team_8840_lib.utils.http.Route;
@@ -43,9 +44,12 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class CommunicationManager {
@@ -542,6 +546,122 @@ public class CommunicationManager {
                 }
             }));
             
+            server.route(new Route("/files", new Constructor() {
+                //This method will either return a list of files in the 8840 directory, or it will upload a file to the 8840 directory.
+                @Override
+                public Route.Resolution finish(HttpExchange req, Route.Resolution res) {
+                    String reqMethod = req.getRequestMethod();
+                    if (!reqMethod.equals("POST")) {
+                        return res.json(this.error("Invalid request method.")).status(405);
+                    }
+
+                    JSONObject json;
+
+                    try {
+                        json = new JSONObject(new String(req.getRequestBody().readAllBytes()));
+                    } catch (Exception e) {
+                        return res.json(this.error("Invalid JSON code.")).status(400);
+                    }
+
+                    String home = System.getProperty("user.home");
+
+                    if (json.has("folder")) {
+                        Path parentFolder = Path.of(home, "8840appdata");
+
+                        //System.out.println("Folder: " + json.getString("folder"));
+                        
+                        if (json.getString("folder").equalsIgnoreCase("paths")) {
+                            parentFolder = Path.of(home, "8840appdata");
+                        } else if (json.getString("folder").equalsIgnoreCase("logs")) {
+                            parentFolder = Path.of(home, "8840applogs");
+                        } else {
+                            return res.json(this.error("Invalid folder name.")).status(400);
+                        }
+
+                        //Get every single file in the 8840appdata folder, including files in subfolders.
+                        List<File> files = FileUtils.listall(parentFolder.toAbsolutePath().toString());
+
+                        JSONArray filesArray = new JSONArray();
+
+                        for (File file : files) {
+                            JSONObject fileObject = new JSONObject();
+
+                            if (file.getName().startsWith(".")) continue;
+
+                            fileObject.put("name", file.getName());
+                            fileObject.put("path", file.getAbsolutePath());
+                            fileObject.put("size", file.length());
+
+                            filesArray.put(fileObject);
+                        }
+                        
+                        JSONObject response = new JSONObject();
+
+                        response.put("success", true);
+                        response.put("files", filesArray);
+
+                        return res.json(response);
+                    }
+
+                    if (json.has("data") && json.has("path")) {
+                        String encodedData = json.getString("data");
+
+                        if (encodedData.equalsIgnoreCase("FOLDER")) {
+                            String path = json.getString("path");
+
+                            if (path == null) {
+                                return res.json(this.error("Invalid JSON format.")).status(400);
+                            }
+
+                            FileUtils.mkdir(Path.of(home, path));
+
+                            Logger.Log("[FileSystem] Successfully created folder at " + path + ".");
+
+                            return res.json("{\"success\": true, \"refresh\": true}");
+                        }
+                        
+                        //Encoded data is in base64, so we need to decode it.
+                        byte[] decodedData = Base64.getDecoder().decode(encodedData);
+
+                        String data = new String(decodedData);
+
+                        String path = json.getString("path");
+
+                        if (data == null || path == null) {
+                            return res.json(this.error("Invalid JSON format.")).status(400);
+                        }
+
+                        FileUtils.write(Path.of(home, path), data);
+
+                        Logger.Log("[FileSystem] Successfully wrote file to " + path + ".");
+                        
+                        return res.json("{\"success\": true, \"refresh\": true}");
+                    }
+
+                    if (json.has("path")) {
+                        String path = json.getString("path");
+
+                        if (path == null) {
+                            return res.json(this.error("Invalid JSON format.")).status(400);
+                        }
+
+                        String data = FileUtils.read(Path.of(home, path));
+
+                        Logger.Log("[FileSystem] Successfully deleted file at " + path + ".");
+
+                        String encodedData = Base64.getEncoder().encodeToString(data.getBytes());
+
+                        JSONObject response = new JSONObject();
+                        response.put("success", true);
+                        response.put("data", encodedData);
+
+                        return res.json(response);
+                    }
+
+                    return res.json(this.error("Invalid JSON format.")).status(400);
+                }
+            }));
+
             server.listen();
 
             String ip_addr = IP.getIP();

@@ -23,6 +23,7 @@ frc.team_8840_lib.utils.controllers.swerve
 frc.team_8840_lib.utils.controllers.swerve.conversions
 frc.team_8840_lib.utils.controllers.swerve.structs
 frc.team_8840_lib.utils.controls
+frc.team_8840_lib.utils.files
 frc.team_8840_lib.utils.http
 frc.team_8840_lib.utils.http.html
 frc.team_8840_lib.utils.interfaces

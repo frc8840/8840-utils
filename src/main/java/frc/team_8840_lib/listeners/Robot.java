@@ -19,6 +19,19 @@ import frc.team_8840_lib.utils.interfaces.Callback;
 import frc.team_8840_lib.utils.time.TimeStamp;
 
 public class Robot extends RobotBase {
+    public static enum OS {
+        WINDOWS, MAC, LINUX, UNKNOWN;
+    }
+
+    public static OS os() {
+        String os = System.getProperty("os.name").toLowerCase();
+        
+        if (os.contains("win")) return OS.WINDOWS;
+        else if (os.contains("mac")) return OS.MAC;
+        else if (os.contains("nix") || os.contains("nux") || os.contains("aix")) return OS.LINUX;
+        else return OS.UNKNOWN;
+    }
+
     private static Robot instance;
     public static FrameworkUtil getInstance() { 
         return frameworkUtil;
