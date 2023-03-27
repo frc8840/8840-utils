@@ -3,6 +3,7 @@ package frc.team_8840_lib.pathing;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.input.communication.CommunicationManager;
@@ -98,6 +99,16 @@ public class PathConjugate {
 
             finished = true;
         }
+    }
+
+    public PathConjugate addRotationGoal(Rotation2d angle) {
+        if (type != ConjugateType.Path) {
+            throw new IllegalStateException("Cannot add rotation goal to non-path command!");
+        }
+
+        ((PathMovement) command).addRotationGoal(angle);
+
+        return this;
     }
 
     public PathMovement getPath() {

@@ -19,6 +19,9 @@ import frc.team_8840_lib.utils.pathplanner.TimePoint;
 public class PathMovement extends CommandBase {
     private TimePoint[] timePoints;
 
+    private Rotation2d angleGoal = Rotation2d.fromDegrees(0);
+    private boolean hasAngleGoal = false;
+
     private double atTime = 0;
     private int atIndex = 0;
 
@@ -67,6 +70,21 @@ public class PathMovement extends CommandBase {
         timePoints = points;
     }
 
+    public PathMovement addRotationGoal(Rotation2d angleGoal) {
+        this.angleGoal = angleGoal;
+        hasAngleGoal = true;
+
+        return this;
+    }
+
+    public boolean hasRotationGoal() {
+        return hasAngleGoal;
+    }
+
+    public Rotation2d getRotationGoal() {
+        return angleGoal;
+    }
+
     @Override
     public void initialize() {
         if (timePoints.length == 0) {
@@ -88,10 +106,14 @@ public class PathMovement extends CommandBase {
 
     public Pose2d getLastPose() {
         if (atIndex <= 1) {
-            System.out.println(timePoints[1].getPose().getX() + ", " + timePoints[1].getPose().getY());
+            //System.out.println(timePoints[1].getPose().getX() + ", " + timePoints[1].getPose().getY());
             return timePoints[1].getPose();
         }
         return timePoints[atIndex - 1].getPose();
+    }
+
+    public Pose2d getFinalPose() {
+        return timePoints[timePoints.length - 1].getPose();
     }
 
     public Pose2d getPose() {
