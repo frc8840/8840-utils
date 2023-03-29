@@ -180,8 +180,14 @@ public class SwerveModule extends IOLayer {
                     thisModule.driveNEO = new CANSparkMax(thisModule.drivePort, CANSparkMaxLowLevel.MotorType.kBrushless);
                     thisModule.turnNEO = new CANSparkMax(thisModule.turnPort, CANSparkMaxLowLevel.MotorType.kBrushless);
         
-                    thisModule.neoDriveEncoder = new SparkMaxEncoderWrapper(driveNEO);
-                    thisModule.neoTurnEncoder = new SparkMaxEncoderWrapper(turnNEO);
+                    thisModule.neoDriveEncoder = new SparkMaxEncoderWrapper(
+                        driveNEO,
+                        "D" + thisModule.privateID + "-" + thisModule.drivePort
+                    );
+                    thisModule.neoTurnEncoder = new SparkMaxEncoderWrapper(
+                        turnNEO,
+                        "T" + thisModule.privateID + "-" + thisModule.turnPort
+                    );
         
                     thisModule.neoDrivePIDController = driveNEO.getPIDController();
                     thisModule.neoTurnPIDController = turnNEO.getPIDController();
@@ -567,6 +573,11 @@ public class SwerveModule extends IOLayer {
                     if (!noRun) neoDrivePIDController.setReference(0, CANSparkMax.ControlType.kVelocity);
                     return;
                 }
+
+                CommunicationManager.getInstance().updateInfo(
+                    "desired_swerve_drive", privateID + "/speed", 
+                    desiredState.speedMetersPerSecond
+                );
 
                 //Drive neo PID controller takes in the conversion factor
                 if (!noRun) {

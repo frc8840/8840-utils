@@ -186,6 +186,9 @@
             }
           },
           "Swerve Module 0": {
+            "0": {
+              "open": true
+            },
             "Drive Encoder Position": {
               "0": {
                 "open": true
@@ -199,7 +202,8 @@
               "0": {
                 "open": true
               }
-            }
+            },
+            "open": true
           },
           "Swerve Module 1": {
             ".info": {
@@ -225,10 +229,12 @@
             },
             "Initialized": {
               "open": true
-            }
+            },
+            "open": true
           },
           "open": true
         },
+        "open": true,
         "simcontrols": {
           "joystick": {
             "open": true

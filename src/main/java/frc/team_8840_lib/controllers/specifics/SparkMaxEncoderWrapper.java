@@ -31,6 +31,8 @@ public class SparkMaxEncoderWrapper extends IOLayer {
 
     private boolean doManualOffset = false;
     private boolean doManualConversion = false;
+    
+    private String specificIdentifier = "";
 
     /**
      * Creates a new SparkMaxEncoderWrapper
@@ -41,6 +43,19 @@ public class SparkMaxEncoderWrapper extends IOLayer {
         super();
         
         encoder = sparkMax.getEncoder();
+    }
+
+    /**
+     * Creates a new SparkMaxEncoderWrapper
+     * 
+     * @param sparkMax The speed controller to get the encoder from
+     */
+    public SparkMaxEncoderWrapper(CANSparkMax sparkMax, String specificIdentifier) {
+        super();
+        
+        encoder = sparkMax.getEncoder();
+
+        this.specificIdentifier = "-" + specificIdentifier;
     }
 
     /**
@@ -194,5 +209,9 @@ public class SparkMaxEncoderWrapper extends IOLayer {
      */
     public double getOffset() {
         return offset;
+    }
+
+    public String getBaseName() {
+        return "SparkMaxEncoder" + this.specificIdentifier.replaceAll("/", "_");
     }
 }

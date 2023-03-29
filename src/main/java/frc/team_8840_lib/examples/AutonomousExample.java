@@ -49,7 +49,7 @@ public class AutonomousExample extends EventListener {
                 new int[]{ 1, 3, 5, 7 }, //Drive IDs
                 new int[]{ 2, 4, 6, 8 }, //Turn/Steering IDs
                 new int[]{ 9, 10, 11, 12 },  //Encoder IDs
-                new Pigeon(Pigeon.Type.TWO, 5, false)
+                new Pigeon(Pigeon.Type.TWO, 13, false)
         );
 
         Robot.getInstance().subscribeFixedPhase(new TimerTask() {
