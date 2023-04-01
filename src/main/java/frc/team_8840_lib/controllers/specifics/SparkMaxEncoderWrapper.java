@@ -43,6 +43,12 @@ public class SparkMaxEncoderWrapper extends IOLayer {
         super();
         
         encoder = sparkMax.getEncoder();
+
+        try {
+            this.specificIdentifier = "-" + sparkMax.getDeviceId();
+        } catch (Exception e) { //If closed, just don't add the identifier
+            this.specificIdentifier = "";
+        }
     }
 
     /**

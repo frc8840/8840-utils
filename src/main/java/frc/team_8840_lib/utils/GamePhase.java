@@ -23,6 +23,20 @@ public enum GamePhase {
         }
     }
 
+    public static GamePhase getFromName(String name) {
+        if (name.equalsIgnoreCase("auto") || name.equalsIgnoreCase("autonomous")) {
+            return GamePhase.Autonomous;
+        } else if (name.equalsIgnoreCase("teleop") || name.equalsIgnoreCase("teleoperated")) {
+            return GamePhase.Teleop;
+        } else if (name.equalsIgnoreCase("test")) {
+            return GamePhase.Test;
+        } else if (name.equalsIgnoreCase("disabled")) {
+            return GamePhase.Disabled;
+        } else {
+            throw new IllegalArgumentException("Invalid game phase name: " + name);
+        }
+    }
+
     public static boolean isEnabled() {
         return getCurrentPhase() != Disabled;
     }

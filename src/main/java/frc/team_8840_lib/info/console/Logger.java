@@ -82,6 +82,10 @@ public class Logger implements Loggable {
         return timePrefixFormat.replace("%%timeStamp%%", time);
     }
 
+    public static void Log(String group, String message) {
+        Log("[" + group + "] " + message);
+    }
+
     public static void Log(String message, TimeStamp timeStamp, boolean newLine) {
         p(formatTimePrefix(getTimeLogString(timeStamp)) + message, newLine);
     }

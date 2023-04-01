@@ -4,8 +4,11 @@
 
 package frc.team_8840_lib;
 
+import java.nio.file.Path;
+
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.examples.*;
+import frc.team_8840_lib.till.Till;
 
 public final class Main {
     private Main() {}
@@ -29,7 +32,11 @@ public final class Main {
         frc.team_8840_lib.listeners.Robot.assignListener(new Robot()); // frc.robot.Robot is a class that extends EventListener (NOT frc.robot.listeners.Robot)
         </code>
         * */
-        frc.team_8840_lib.listeners.Robot.assignListener(new AutonomousExample());
+        String home = System.getProperty("user.home");
+        frc.team_8840_lib.listeners.Robot.assignListener(
+            new AutonomousExample()
+            //new Till(Path.of(home, "Downloads", "generatedCode.till"))
+        );
 
         /**
          * Also assign a log writer such as FileWriter.

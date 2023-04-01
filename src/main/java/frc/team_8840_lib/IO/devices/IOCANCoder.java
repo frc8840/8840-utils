@@ -46,11 +46,15 @@ public class IOCANCoder extends IOLayer {
      */
     @IOMethod(name = "absolute position", method_type = IOMethodType.READ, value_type = IOValue.DOUBLE)
     public double getAbsolutePosition() {
+        //Check if the robot is real, and if the encoder is null. If it is, log a warning.
         if (Robot.isReal() && encoder == null) {
             Logger.Log("[" + getBaseName() + "] WARNING: CANCoder is null, and you're getting the absolute position.");
         }
+        //If the encoder is null, or the encoder port is less than 0 (used mainly for testing), return the cache.
+        //If the robot is real, return 0 if it satisfies the above conditions.
         if (encoder == null || this.encoderPort < 0) return isReal() ? 0 : this.cache;
         
+        //Return the absolute position of the encoder, or the cache if the robot is not real.
         return isReal() ? encoder.getAbsolutePosition() : this.cache;
     }
     
