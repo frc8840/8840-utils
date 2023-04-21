@@ -14,4 +14,8 @@ public abstract class LogWriter {
     public abstract void saveInfo(String encodedInfo);
 
     public abstract void close();
+
+    public String[] getArgs() {
+        return args;
+    }
 }

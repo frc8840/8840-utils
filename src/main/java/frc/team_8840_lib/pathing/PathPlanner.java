@@ -2,6 +2,7 @@ package frc.team_8840_lib.pathing;
 
 import java.util.HashMap;
 
+import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.pathing.PathConjugate.ConjugateType;
 
@@ -38,7 +39,11 @@ public class PathPlanner {
 
     public static PathPlanner getSelectedAuto() {
         if (selectedAuto == null) {
-            return new PathPlanner();
+            return new PathPlanner(
+                PathConjugate.runOnce(() -> {
+                    Logger.Log("PathPlanner", "No autonomous selected!");
+                })
+            );
         }
 
         return autos.get(selectedAuto);
@@ -56,6 +61,23 @@ public class PathPlanner {
 
     public PathPlanner(PathConjugate... conjugates) {
         this.conjugates = conjugates;
+    }
+
+    public PathPlanner(PathConjugate[]... conjugates) {
+        int length = 0;
+        for (PathConjugate[] conjugate : conjugates) {
+            length += conjugate.length;
+        }
+
+        this.conjugates = new PathConjugate[length];
+
+        int index = 0;
+        for (PathConjugate[] conjugate : conjugates) {
+            for (PathConjugate conjugate2 : conjugate) {
+                this.conjugates[index] = conjugate2;
+                index++;
+            }
+        }
     }
 
     public void start() {

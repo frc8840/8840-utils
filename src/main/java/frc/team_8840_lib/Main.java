@@ -4,11 +4,9 @@
 
 package frc.team_8840_lib;
 
-import java.nio.file.Path;
-
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.examples.*;
-import frc.team_8840_lib.till.Till;
+import frc.team_8840_lib.till.*;
 
 public final class Main {
     private Main() {}

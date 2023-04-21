@@ -115,22 +115,6 @@ public class Route implements HttpHandler {
             return this;
         }
 
-        //This is used to decide whether to not use all settings for the response. This is primarily used for the WebSocket server.
-        private boolean overrideResolutionAndUseBody = false;
-
-        public Resolution wsHandshake(String path, String host, String key) {
-            text = "GET " + path + " HTTP/1.1\r\n" +
-                    "Host: " + host + "\r\n" +
-                    "Upgrade: websocket\r\n" +
-                    "Connection: Upgrade\r\n" +
-                    "Sec-WebSocket-Key: " + key + "\r\n" +
-                    "Sec-WebSocket-Version: 13\r\n" +
-                    "Sec-WebSocket-Protocol: binary\r\n" +
-                    "\r\n";
-            overrideResolutionAndUseBody = true;
-            return this;
-        }
-
         public Resolution wsUpgradeConnection() {
             return null;
         }

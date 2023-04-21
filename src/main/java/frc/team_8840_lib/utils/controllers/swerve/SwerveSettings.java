@@ -60,8 +60,8 @@ public class SwerveSettings {
     //Current limit follows (continuousCurrent, peakCurrent, currentDuration)
     public CurrentLimit driveCurrentLimit = new CurrentLimit(35, 60, 0.1);
     public CurrentLimit turnCurrentLimit = new CurrentLimit(25, 40, 0.1);
-    //For NEOs....TODO: secondary is under for drive... hmm maybe I should change that
-    public CurrentLimit secondaryDriveCurrentLimit = new CurrentLimit(25, 40, 0.1);
+    //For NEOs
+    public CurrentLimit secondaryDriveCurrentLimit = new CurrentLimit(35, 40, 0.1);
     public CurrentLimit secondaryTurnCurrentLimit = new CurrentLimit(25, 40, 0.1);
 
     public double voltageCompensation = 12;

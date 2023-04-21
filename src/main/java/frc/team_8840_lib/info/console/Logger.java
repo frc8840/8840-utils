@@ -27,10 +27,10 @@ public class Logger implements Loggable {
             "Support your alliance",
             "Be very cool",
             "Idk what to say. Good luck I guess",
-            "Don't break the robot. Please",
-            "This is a game. This is a simulation. Wake up wake up wake up wake up wake up wak k",
-            "What do you call a robot pirate? Arrgghhh2-D2.",
+            "Don't break the robot",
     };
+
+    private static HashMap<String, ArrayList<String>> threads = new HashMap<>();
 
     public static void logCompetitionStart() {
         Log("-- Competition started! --", TimeStamp.All);
@@ -50,6 +50,14 @@ public class Logger implements Loggable {
 
     public static void logCompetitionEnd() {
         System.out.println("Competition ended!");
+    }
+
+    private static void addToThread(String threadName, String message) {
+        if (!Logger.threads.containsKey(threadName)) {
+            Logger.threads.put(threadName, new ArrayList<>());
+        }
+
+        Logger.threads.get(threadName).add(message);
     }
 
     private static String getTimeLogString(TimeStamp timeStamp) {
@@ -83,6 +91,7 @@ public class Logger implements Loggable {
     }
 
     public static void Log(String group, String message) {
+        addToThread(group, message);
         Log("[" + group + "] " + message);
     }
 
@@ -242,9 +251,6 @@ public class Logger implements Loggable {
         public static final byte BYTE_ARRAY_CORRESPONDENCE = 5;
     }
 
-    private static final byte START = 1;
-    private static final byte END = 2;
-
     private static int cycle = 0;
 
     private static HashMap<String, Integer> nameAssignedToMap = new HashMap<>();
@@ -345,171 +351,6 @@ public class Logger implements Loggable {
         }
     }
 
-    private static void loadAndSaveAllAutoLogsThroughBytes() {
-        writer.saveInfo("AutoLog Cycle " + cycle++ + (cycle < 3 ? " (skipped due to early cycle)" : ""));
-
-        if (cycle < 3 || !readyToSave) return;
-        //CHange to not run this until the robot is fully initialized.
-        //We skip the first 3 since the robot is not fully initialized yet + it usually causes annoying errors in console.
-        //Should be fine after the first one.
-
-        try {
-            for (Loggable klass : loggingClasses) {
-                for (Method method : klass.getClass().getMethods()) {
-                    AutoLog autoLogInfo = method.getAnnotation(AutoLog.class);
-
-                    if (autoLogInfo == null) continue;
-                    
-                    String name = autoLogInfo.name();
-                    LogType logType = autoLogInfo.logtype();
-
-                    if (autoLogInfo != null) {
-                        byte[] result = new byte[1];
-
-                        try {
-                            switch (logType) {
-                                case DOUBLE:
-                                    byte[] doubleStart = new byte[] { 
-                                        LogType.DOUBLE_CORRESPONDENCE
-                                    };
-
-                                    byte[] doubleConversion = ByteConversions.doubleToByteArray((double) method.invoke(klass));
-
-                                    result = new byte[doubleStart.length + doubleConversion.length];
-
-                                    //Join start and doubleConversion in result
-                                    System.arraycopy(doubleStart, 0, result, 0, doubleStart.length);
-                                    System.arraycopy(doubleConversion, 0, result, doubleStart.length, doubleConversion.length);
-                                    
-                                    break;
-                                case DOUBLE_ARRAY:
-                                    byte[] doubleArrayStart = new byte[] { 
-                                        LogType.DOUBLE_ARRAY_CORRESPONDENCE
-                                    };
-
-                                    double[] preprocessResult = (double[]) method.invoke(klass);
-
-                                    byte[][] doubleArrayConversion = new byte[preprocessResult.length][];
-
-                                    for (int i = 0; i < doubleArrayConversion.length; i++) {
-                                        doubleArrayConversion[i] = ByteConversions.doubleToByteArray(preprocessResult[i]);
-                                    }
-
-                                    int count = 0;
-
-                                    for (byte[] _double : doubleArrayConversion) count += _double.length;
-
-                                    result = new byte[count + doubleArrayStart.length];
-
-                                    //Join start and doubleArrayConversion in result
-                                    System.arraycopy(doubleArrayStart, 0, result, 0, doubleArrayStart.length);
-
-                                    int index = doubleArrayStart.length;
-
-                                    for (byte[] _double : doubleArrayConversion) {
-                                        System.arraycopy(_double, 0, result, index, _double.length);
-
-                                        index += _double.length;
-                                    }
-
-                                    break;
-                                case STRING:
-                                    byte[] stringStart = new byte[] { 
-                                        LogType.STRING_CORRESPONDENCE
-                                    };
-
-                                    String str = (String) method.invoke(klass);
-
-                                    byte[] stringConversion = ByteConversions.stringToByteArray(str);
-
-                                    result = new byte[stringStart.length + stringConversion.length];
-
-                                    //Join start and stringConversion in result
-                                    System.arraycopy(stringStart, 0, result, 0, stringStart.length);
-                                    System.arraycopy(stringConversion, 0, result, stringStart.length, stringConversion.length);
-
-                                    break;
-                                case STRING_ARRAY:
-                                    byte[] stringArrayStart = new byte[] { 
-                                        LogType.STRING_ARRAY_CORRESPONDENCE
-                                    };
-                                    
-                                    String[] strs = (String[]) method.invoke(klass);
-
-                                    if (strs.length == 0) {
-                                        result = stringArrayStart;
-
-                                        break;
-                                    }
-
-                                    byte[][] stringArrayConversion = new byte[strs.length][];
-
-                                    for (int i = 0; i < stringArrayConversion.length; i++) {
-                                        stringArrayConversion[i] = ByteConversions.stringToByteArray(strs[i]);
-                                    }
-
-                                    int count2 = 0;
-
-                                    for (byte[] _string : stringArrayConversion) count2 += _string.length;
-
-                                    result = new byte[count2 + stringArrayStart.length];
-
-                                    //Join start and stringArrayConversion in result
-                                    System.arraycopy(stringArrayStart, 0, result, 0, stringArrayStart.length);
-
-                                    int index2 = stringArrayStart.length;
-
-                                    for (byte[] _string : stringArrayConversion) {
-                                        System.arraycopy(_string, 0, result, index2, _string.length);
-
-                                        index2 += _string.length;
-                                    }
-                                    
-                                    break;
-                                case BYTE_ARRAY:
-                                    byte[] byteArrayStart = new byte[] { 
-                                        LogType.BYTE_ARRAY_CORRESPONDENCE
-                                    };
-
-                                    byte[] preResult = (byte[]) method.invoke(klass);
-
-                                    result = new byte[preResult.length + byteArrayStart.length];
-
-                                    //Join start and preResult in result
-                                    System.arraycopy(byteArrayStart, 0, result, 0, byteArrayStart.length);
-                                    System.arraycopy(preResult, 0, result, byteArrayStart.length, preResult.length);
-                                    
-                                    break;
-                                default:
-                                    result = new byte[] { (byte) 0 };
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            throw new IllegalArgumentException("[Logger] There was an error parsing the log in " + klass.getClass().getName() + ". Are the types matched up correctly?");
-                        }
-
-                        String convertedResult = ((char) START) + (char) ((byte) 0) + (char) ((byte) 0) + (char) ((byte) 0) + name + ((char) (byte) 0) + ((char) (byte) 0) + ((char) (byte) 0);
-
-                        //Join result and end in convertedResult
-                        convertedResult += new String(result);
-
-                        convertedResult += (char) ((byte) 0);
-                        convertedResult += (char) ((byte) 0);
-                        convertedResult += (char) ((byte) 0);
-                        convertedResult += END;
-
-                        writer.saveInfo(convertedResult);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            if (cycle > 1) {
-                e.printStackTrace();
-                throw new IllegalArgumentException("[Logger] There was an error parsing the log in " + loggingClasses.get(0).getClass().getName() + ". Are the types matched up correctly?");
-            }
-        }
-    }
-
     private static boolean lockLogWriterToOnlyCode = true;
 
     public static boolean logWriterIsLockedToCode() {
@@ -573,6 +414,6 @@ public class Logger implements Loggable {
 
     @AutoLog(name = "working", logtype = LogType.STRING)
     public String getWorking() {
-        return "yep!";
+        return "y";
     }
 }

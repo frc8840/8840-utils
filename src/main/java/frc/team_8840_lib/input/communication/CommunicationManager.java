@@ -57,6 +57,8 @@ public class CommunicationManager {
 
     public static final String SpeedControllerKey = "SpeedController";
 
+    public static int port = 5805;
+
     public static CommunicationManager getInstance() {
         return instance;
     }
@@ -93,9 +95,14 @@ public class CommunicationManager {
             /**
              * According to rule R704 and Table 9-5 Open FMS Ports, ports 5800-5810 are open to UDP/TCP traffic.
              * This means that we are allowed to host a server on any of the ports in this range, so we choose 5805.
-             * TODO: allow the user to change the port number in the preferences.
              * */
-            server = new HTTPServer(5805);
+            if (port < 5800 || port > 5810) {
+                Logger.Log("API", "Port " + port + " is not in the range of 5800-5810, which is the range of ports allowed by the FMS. Please change the port to a value in this range.");
+                Logger.Log("API", "Changing port automatically to 5805.");
+                port = 5805;
+            }
+
+            server = new HTTPServer(port);
 
             server.route(new Route("/", new Constructor() {
                 @Override
@@ -518,9 +525,6 @@ public class CommunicationManager {
                                 pointParent.put("x", point.getX());
                                 pointParent.put("y", point.getY());
                                 pointParent.put("d", point.getAngle());
-                                //we don't need these two (for now), TODO: check if we actually need them.
-                                // pointParent.put("v", point.getVelocity());
-                                // pointParent.put("t", point.getTime());
 
                                 path.put(pointParent);
                             }
@@ -661,6 +665,11 @@ public class CommunicationManager {
                     return res.json(this.error("Invalid JSON format.")).status(400);
                 }
             }));
+
+            HashMap<String, Constructor> customRoutes = new HashMap<>();
+            for (String route : customRoutes.keySet()) {
+                server.route(new Route(route, customRoutes.get(route)));
+            }
 
             server.listen();
 

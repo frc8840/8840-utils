@@ -5,7 +5,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 //From https://github.com/Team364/BaseFalconSwerve/blob/main/src/main/java/frc/lib/util/CTREModuleState.java
 //All credit goes to them, but this has been modified a bit to be a tiny bit more efficient
-//TODO: Change this to work better/make more efficient
 public class CTREModuleState {
 
      /**

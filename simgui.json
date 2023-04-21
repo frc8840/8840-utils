@@ -83,14 +83,16 @@
     "SmartDashboard": {
       "open": true
     },
+    "retained": {
+      "8840-lib": {
+        "open": true
+      }
+    },
     "transitory": {
       "8840-lib": {
         "IO": {
           "CANCoder": {
             "0": {
-              ".info": {
-                "open": true
-              },
               "absolute position": {
                 "open": true
               },
@@ -100,7 +102,10 @@
               }
             },
             "1": {
-              "open": true
+              "open": true,
+              "set cached position": {
+                "open": true
+              }
             },
             "2": {
               "open": true
@@ -185,6 +190,24 @@
               "open": true
             }
           },
+          "SparkMaxEncoder-D1-3": {
+            "open": true
+          },
+          "SparkMaxEncoder-D2-5": {
+            "open": true
+          },
+          "SparkMaxEncoder-T1-4": {
+            "open": true
+          },
+          "SparkMaxEncoder-T3-8": {
+            "0": {
+              "Position": {
+                "open": true
+              },
+              "open": true
+            },
+            "open": true
+          },
           "Swerve Module 0": {
             "0": {
               "open": true
@@ -202,8 +225,7 @@
               "0": {
                 "open": true
               }
-            },
-            "open": true
+            }
           },
           "Swerve Module 1": {
             ".info": {
