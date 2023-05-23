@@ -28,16 +28,23 @@ sleep 1
 echo "Installing..."
 sleep 2
 cd ..
-echo "Editing build.gradle..."
-replacing_line="simulationRelease wpi.sim.enableRelease()"
-replaced_line="simulationRelease wpi.sim.enableRelease()\n  implementation fileTree(include: ['*.jar'], dir: 'libs'])"
-# actually no clue if this works on windows
-if [ "$(uname)" == "Darwin" ]; then
-    sed -i '.bak' 's|'"$replacing_line"'|'"$replaced_line"'|g' build.gradle
-else
-    sed -i 's|'"$replacing_line"'|'"$replaced_line"'|g' build.gradle
+echo "Do you want to edit ./build.gradle? This is recommended if this is the first time you are installing 8840-utils. (y/n, default: y)"
+echo "(THIS IS ONLY ONE TIME. DO NOT RUN THIS IF YOU'VE ALREADY RUN THIS SCRIPT BEFORE.)"
+read edit_build_gradle
+# if edit build gradle is y, Y, or empty, edit build.gradle
+if [ -z "$edit_build_gradle" ] || [ "$edit_build_gradle" == "y" ] || [ "$edit_build_gradle" == "Y" ]; then
+    echo "Editing build.gradle..."
+    replacing_line="simulationRelease wpi.sim.enableRelease()"
+    replaced_line="simulationRelease wpi.sim.enableRelease()\n  implementation fileTree(include: ['*.jar'], dir: 'libs')"
+    # actually no clue if this works on windows
+    if [ "$(uname)" == "Darwin" ]; then
+        sed -i '.bak' 's|'"$replacing_line"'|'"$replaced_line"'|g' build.gradle
+    else
+        sed -i 's|'"$replacing_line"'|'"$replaced_line"'|g' build.gradle
+    fi
+    echo "Finished editing build.gradle."
 fi
-echo "Finished editing build.gradle. Do you want to run ./gradlew build? (y/n, default: y)"
+echo "Do you want to run ./gradlew build? (y/n, default: y)"
 read run_build
 # if run build is y, yes, Y, or empty, run build
 if [ -z "$run_build" ] || [ "$run_build" == "y" ] || [ "$run_build" == "Y" ]; then
@@ -45,9 +52,16 @@ if [ -z "$run_build" ] || [ "$run_build" == "y" ] || [ "$run_build" == "Y" ]; th
     ./gradlew build
 fi
 echo "Finished installing 8840-utils.jar $latest_version!"
+sleep 1
 echo "-----------------------------------"
+sleep 0.5
 echo "8840-utils is made by Team 8840. You can check them out here: https://team8840.org"
+sleep 0.5
 echo "Documentation: https://8840-utils-docs.readthedocs.io/en/latest/"
+sleep 0.5
 echo "Javadocs: https://frc8840.github.io/8840-utils/build/docs/javadoc/index.html"
+sleep 0.5
 echo "Source Code: https://github.com/frc8840/8840-utils"
+sleep 0.5
 echo "-----------------------------------"
+echo ""
