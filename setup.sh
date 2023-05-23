@@ -38,7 +38,9 @@ if [ -z "$edit_build_gradle" ] || [ "$edit_build_gradle" == "y" ] || [ "$edit_bu
     replaced_line="simulationRelease wpi.sim.enableRelease()\n  implementation fileTree(include: ['*.jar'], dir: 'libs')"
     # actually no clue if this works on windows
     if [ "$(uname)" == "Darwin" ]; then
+        # mac creates a backup file, so we'll delete it. good job mac, but we don't need it for this.
         sed -i '.bak' 's|'"$replacing_line"'|'"$replaced_line"'|g' build.gradle
+        rm "build.gradle.bak"
     else
         sed -i 's|'"$replacing_line"'|'"$replaced_line"'|g' build.gradle
     fi
