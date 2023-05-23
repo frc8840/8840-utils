@@ -23,6 +23,10 @@ public class FileWriter extends LogWriter {
     //And "dat" since it's data idk
     private static final String extension = "baydat";
 
+    public static String getExtension() {
+        return extension;
+    }
+
     private String filePath;
 
     private boolean initializedFile = false;

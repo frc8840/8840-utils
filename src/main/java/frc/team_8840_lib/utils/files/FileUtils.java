@@ -65,8 +65,12 @@ public class FileUtils {
             }
         }
 
-        //Read string from file
-        try {
+        return read(file);
+    }
+
+    public static String read(File file) {
+         //Read string from file
+         try {
             java.io.FileReader fr = new java.io.FileReader(file);
             StringBuilder sb = new StringBuilder();
             int i;

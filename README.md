@@ -1,9 +1,10 @@
 # 8840 Utils
 
+[![Documentation Status](https://readthedocs.org/projects/8840-utils-docs/badge/?version=latest)](https://8840-utils-docs.readthedocs.io/en/latest/?badge=latest)
+
 **[Team 8840](https://team8840.org) - [Jaiden Grimminck](https://github.com/jaidenagrimminck)**
   
-
-**JAVA DOCS:**
+**Java Reference:**
 [https://frc8840.github.io/8840-utils/build/docs/javadoc/index.html](https://frc8840.github.io/8840-utils/build/docs/javadoc/index.html)
 
 ## What is this?

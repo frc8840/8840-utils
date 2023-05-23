@@ -59,16 +59,36 @@ public class CommunicationManager {
 
     public static int port = 5805;
 
+    /**
+     * Get the instance of the CommunicationManager.
+     * This is the same as {@link #i()}.
+     * @return The instance of the CommunicationManager.
+     */
     public static CommunicationManager getInstance() {
         return instance;
     }
 
+    /**
+     * Get the instance of the CommunicationManager. Shorter name for convenience.
+     * @return The instance of the CommunicationManager.
+     */
+    public static CommunicationManager i() {
+        return instance;
+    }
+
+    /**
+     * Start the communication manager. This method is used internally and should not be called.
+     */
     public static void init() {
         instance = new CommunicationManager();
 
         NetworkTableInstance.getDefault().flush(); //idk why this is here but yeah
     }
 
+    /**
+     * Returns the base path of the network table for 8840-utils
+     * @return The base path of the network table for 8840-utils.
+     */
     public static String base() {
         return "8840-lib";
     }
@@ -693,18 +713,35 @@ public class CommunicationManager {
 
     private String currentAutoPath = "";
 
+    /**
+     * This method is the legacy version of waitForAutonomousPath. It is only used for backwards compatibility.
+     * @param callback The callback to be called when a new autonomous path is received.
+     * @return The CommunicationManager instance.
+     */
+    @Deprecated(since = "2023.2.1")
     public CommunicationManager legacyWaitForAutonomousPath(PathCallback callback) {
         legacyPathCallback = callback;
         Logger.Log("[PATHING] Registered new legacy autonomous path callback.");
         return this;
     }
 
+    /**
+     * This method is the new version of waitForAutonomousPath. It is used for the new autonomous pathing system.
+     * @param callback The callback to be called when a new autonomous path is received.
+     * @return The CommunicationManager instance.
+     */
     public CommunicationManager waitForAutonomousPath(Callback callback) {
         pathCallback = callback;
         Logger.Log("[PATHING] Registered new autonomous path callback.");
         return this;
     }
 
+    /**
+     * This method is used to read a json file and parse it into a TimePoint array.
+     * @param json The json object to read.
+     * @param toLastMovementPoint Whether or not to only parse up to the last movement point, or the full timeline.
+     * @return The parsed TimePoint array.
+     */
     public TimePoint[] readAndParsePath(JSONObject json, boolean toLastMovementPoint) {
         JSONArray timeline = json.getJSONArray("generatedTimeline");
 
@@ -746,6 +783,12 @@ public class CommunicationManager {
         // return points.length;
     }
 
+    /**
+     * Update the status of a service.
+     * @param service The service to update.
+     * @param status The new status of the service.
+     * @return The CommunicationManager instance.
+     */
     public CommunicationManager updateStatus(String service, String status) {
         updateInfo("Status", service, status);
         return this;

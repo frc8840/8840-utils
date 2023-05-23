@@ -13,6 +13,12 @@ import frc.team_8840_lib.info.console.AutoLog;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.info.console.Logger.LogType;
 import frc.team_8840_lib.input.communication.CommunicationManager;
+import frc.team_8840_lib.replay.Replayable;
+import frc.team_8840_lib.utils.IO.IOAccess;
+import frc.team_8840_lib.utils.IO.IOMethod;
+import frc.team_8840_lib.utils.IO.IOMethodType;
+import frc.team_8840_lib.utils.IO.IOPermission;
+import frc.team_8840_lib.utils.IO.IOValue;
 import frc.team_8840_lib.utils.controllers.Pigeon;
 import frc.team_8840_lib.utils.controllers.swerve.CTREConfig;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
@@ -30,7 +36,8 @@ import frc.team_8840_lib.utils.math.MathUtils;
  * 
  * @author Jaiden Grimminck
  * */
-public class SwerveGroup implements Loggable {
+@IOAccess(IOPermission.READ_WRITE)
+public class SwerveGroup extends Replayable {
     private String name;
 
     public String getName() { return name; }
@@ -102,6 +109,8 @@ public class SwerveGroup implements Loggable {
      * @param pigeon Gyroscope (Pigeon 2.0 or IMU, use Pigeon class)
      * */
     public SwerveGroup(String name, SwerveSettings settings, int[] driveIDs, int[] steerIDs, int[] encoderIDs, Pigeon pigeon) {
+        super();
+        
         this.name = name;
         
         if (driveIDs.length != steerIDs.length && driveIDs.length != encoderIDs.length) {
@@ -126,15 +135,6 @@ public class SwerveGroup implements Loggable {
         //Set the gyro
         this.gyro = pigeon;
         this.gyro.config(); //Config for pigeon has to be called after the pigeon is created unlike others which are called in the constructor
-
-        //Pose odometry usually crashes the program (idk why), so we're commenting it out.
-        // pose_odometry = new SwerveDrivePoseEstimator(
-        //     getAngle(), getPose(), 
-        //     settings.getKinematics(), 
-        //     VecBuilder.fill(0.1, 0.1, 0.1),
-        //     VecBuilder.fill(0.05),
-        //     VecBuilder.fill(0.1, 0.1, 0.1)
-        // );
 
         //Create the modules
         topLeft = new SwerveModule(
@@ -696,9 +696,10 @@ public class SwerveGroup implements Loggable {
 
     /**
      * Logs the speeds of the modules
+     * Linked with {@link #replaySpeeds(double[])}
      * @return The speeds of the modules
      */
-    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Swerve Drive Module Speeds")
+    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Swerve Drive Module Speeds", replaylink = "Replay Speeds")
     public double[] logSpeeds() {
         double[] speeds = new double[4];
         loop((module, i) -> {
@@ -708,11 +709,20 @@ public class SwerveGroup implements Loggable {
         return speeds;
     }
 
+    @IOMethod(name = "Replay Speeds", value_type = IOValue.DOUBLE_ARRAY, method_type = IOMethodType.WRITE, toNT = false)
+    public void replaySpeeds(double[] speeds) {
+        SwerveModuleState[] states = getModuleStates();
+        loop((module, i) -> {
+            states[i].speedMetersPerSecond = speeds[i];
+        });
+        setModuleStates(states);
+    }
+
     /**
      * Logs the angles of the modules
      * @return The angles of the modules
      */
-    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Swerve Drive Module Angles")
+    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Swerve Drive Module Angles", replaylink = "Replay Angles")
     public double[] logAngles() {
         double[] angles = new double[4];
         loop((module, i) -> {
@@ -720,6 +730,14 @@ public class SwerveGroup implements Loggable {
         });
 
         return angles;
+    }
+
+    @IOMethod(name = "Replay Angles", value_type = IOValue.DOUBLE_ARRAY, method_type = IOMethodType.WRITE, toNT = false)
+    public void replayAngles(double[] angles) {
+        SwerveModuleState[] states = getModuleStates();
+        loop((module, i) -> {
+            states[i].angle = Rotation2d.fromDegrees(angles[i]);
+        });
     }
 
     /**
@@ -748,5 +766,20 @@ public class SwerveGroup implements Loggable {
         });
 
         return angles;
+    }
+
+    @Override
+    public String getBaseName() {
+        return this.name;
+    }
+
+    @Override
+    public void replayInit() {
+        
+    }
+
+    @Override
+    public void exitReplay() {
+        
     }
 }

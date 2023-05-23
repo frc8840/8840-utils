@@ -8,4 +8,5 @@ public @interface IOMethod {
     public String name();
     public IOValue value_type();
     public IOMethodType method_type();
+    public boolean toNT() default true;
 }

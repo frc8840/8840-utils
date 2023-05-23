@@ -9,6 +9,7 @@ import frc.team_8840_lib.IO.IOManager;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.info.time.TimeKeeper;
 import frc.team_8840_lib.input.communication.CommunicationManager;
+import frc.team_8840_lib.libraries.LibraryManager;
 import frc.team_8840_lib.utils.GamePhase;
 
 /**
@@ -36,6 +37,12 @@ public class FrameworkUtil {
      * This is supposed to be called at the start.
      */
     public void onStart() {
+        if (LibraryManager.hasDownloadedNewLibraries()) {
+            Logger.Log("New libraries have been downloaded. Please restart the code.");
+            System.exit(0);
+            return;
+        }
+
         controlWord = new DSControlWord();
 
         Logger.addClassToBeAutoLogged(new Logger());

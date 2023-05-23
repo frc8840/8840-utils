@@ -14,8 +14,10 @@ frc.team_8840_lib.input.communication.server
 frc.team_8840_lib.input.controls
 frc.team_8840_lib.IO
 frc.team_8840_lib.IO.devices
+frc.team_8840_lib.libraries
 frc.team_8840_lib.listeners
 frc.team_8840_lib.pathing
+frc.team_8840_lib.replay
 frc.team_8840_lib.till
 frc.team_8840_lib.utils
 frc.team_8840_lib.utils.buffer
@@ -29,6 +31,7 @@ frc.team_8840_lib.utils.http
 frc.team_8840_lib.utils.http.html
 frc.team_8840_lib.utils.interfaces
 frc.team_8840_lib.utils.IO
+frc.team_8840_lib.utils.library
 frc.team_8840_lib.utils.logging
 frc.team_8840_lib.utils.math
 frc.team_8840_lib.utils.math.operators

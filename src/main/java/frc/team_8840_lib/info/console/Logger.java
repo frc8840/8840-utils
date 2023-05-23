@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.team_8840_lib.info.time.TimeKeeper;
 import frc.team_8840_lib.listeners.Preferences;
 import frc.team_8840_lib.utils.GamePhase;
-import frc.team_8840_lib.utils.buffer.ByteConversions;
 import frc.team_8840_lib.utils.logging.LogWriter;
 import frc.team_8840_lib.utils.logging.Loggable;
 import frc.team_8840_lib.utils.time.TimeStamp;
@@ -33,18 +32,21 @@ public class Logger implements Loggable {
     private static HashMap<String, ArrayList<String>> threads = new HashMap<>();
 
     public static void logCompetitionStart() {
-        Log("-- Competition started! --", TimeStamp.All);
+        Log("\n-- Competition started! --", TimeStamp.All);
         String competitionName = DriverStation.getEventName();
         DriverStation.Alliance alliance = DriverStation.getAlliance();
         int matchNumber = DriverStation.getMatchNumber();
         DriverStation.MatchType matchType = DriverStation.getMatchType();
 
         Log(new String[] {
-            "Welcome to the " + competitionName + "!",
+            "Welcome to " + competitionName + "!",
             "Your Alliance: " + alliance,
             "Match Number: " + matchNumber,
             "Match Type: " + matchType,
-            funStartingMessages[(int) Math.floor(Math.random() * funStartingMessages.length)] + ", " + alliance + "! Go team! 8840-utils made by FRC Team 8840 Bay Robotics (https://team8840.org)."
+            funStartingMessages[(int) Math.floor(Math.random() * funStartingMessages.length)] + ", " + alliance + "! Go team! 8840-utils made by FRC Team 8840 Bay Robotics (https://team8840.org).",
+            "",
+            "--------------------",
+            ""
         }, TimeStamp.None);
     }
 
@@ -87,7 +89,16 @@ public class Logger implements Loggable {
     }
 
     private static String formatTimePrefix(String time) {
+        if (time == "") return "";
+
         return timePrefixFormat.replace("%%timeStamp%%", time);
+    }
+
+    public static void Error(String group, Exception e) {
+        e.printStackTrace();
+        if (writer != null) {
+            saveAndUpdate("ERROR: " + e.getMessage());
+        }
     }
 
     public static void Log(String group, String message) {
@@ -223,6 +234,7 @@ public class Logger implements Loggable {
     public enum LogType {
         STRING,
         DOUBLE,
+        BOOLEAN,
         STRING_ARRAY,
         DOUBLE_ARRAY,
         BYTE_ARRAY;
@@ -239,6 +251,8 @@ public class Logger implements Loggable {
                     return "D";
                 case BYTE_ARRAY:
                     return "B";
+                case BOOLEAN:
+                    return "b";
                 default:
                     return "s";
             }
@@ -280,13 +294,13 @@ public class Logger implements Loggable {
                     
                     if (name.contains("/")) {
                         //replace all slashes with underscores, just in case.
-                        name = name.replaceAll("/", "_");
+                        name = name.replaceAll("/", "|");
                     }
 
                     if (autoLogInfo != null) {
                         if (nameAssignedToMap.get(name) == null) {
                             nameAssignedToMap.put(name, nameAssignedTo++);
-                            writer.saveInfo("a" + name + logType.smallString() + "/" + nameAssignedToMap.get(name));
+                            writer.saveInfo("a" + klass.getBaseName() + "|" + name + logType.smallString() + "/" + nameAssignedToMap.get(name));
                         }
 
                         int assignedTo = nameAssignedToMap.get(name);
@@ -299,6 +313,9 @@ public class Logger implements Loggable {
                                     break;
                                 case DOUBLE:
                                     assignable = "" + (Double) method.invoke(klass);
+                                    break;
+                                case BOOLEAN:
+                                    assignable = "" + (Boolean) method.invoke(klass);
                                     break;
                                 case STRING_ARRAY:
                                     //save as string, separated by commas
@@ -415,5 +432,9 @@ public class Logger implements Loggable {
     @AutoLog(name = "working", logtype = LogType.STRING)
     public String getWorking() {
         return "y";
+    }
+
+    public String getBaseName() {
+        return "Logger";
     }
 }

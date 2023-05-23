@@ -28,12 +28,12 @@ public final class Main {
         frc.team_8840_lib.listeners.Robot.assignListener(new TankDrive()); // TankDrive is an example class that extends EventListener
         frc.team_8840_lib.listeners.Robot.assignListener(new 8840_Robot()); // 8840_Robot is a custom class (does not exist here) that extends EventListener
         frc.team_8840_lib.listeners.Robot.assignListener(new Robot()); // frc.robot.Robot is a class that extends EventListener (NOT frc.robot.listeners.Robot)
+        
+        new Till(Path.of(System.getProperty("user.home"), "Downloads", "generatedCode.till")); //An example of running a Till file
         </code>
         * */
-        String home = System.getProperty("user.home");
         frc.team_8840_lib.listeners.Robot.assignListener(
             new AutonomousExample()
-            //new Till(Path.of(home, "Downloads", "generatedCode.till"))
         );
 
         /**

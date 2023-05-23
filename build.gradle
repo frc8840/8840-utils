@@ -73,6 +73,8 @@ dependencies {
     implementation group: 'org.json', name: 'json', version: '20220924'
 
     testImplementation 'junit:junit:4.13.2'
+
+    implementation 'org.reflections:reflections:0.10.2'
 }
 
 test {

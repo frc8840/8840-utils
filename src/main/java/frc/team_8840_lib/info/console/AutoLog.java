@@ -10,5 +10,7 @@ public @interface AutoLog {
     public LogType logtype();
 
     public String name();
+
+    public String replaylink() default "";
 }
 

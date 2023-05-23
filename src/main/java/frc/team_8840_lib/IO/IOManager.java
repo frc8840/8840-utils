@@ -10,6 +10,7 @@ import frc.team_8840_lib.info.console.AutoLog;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.info.console.Logger.LogType;
 import frc.team_8840_lib.input.communication.CommunicationManager;
+import frc.team_8840_lib.replay.Replayable;
 import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
@@ -109,6 +110,8 @@ public class IOManager implements Loggable {
                     continue;
                 }
 
+                if (!iomethod.toNT()) continue;
+
                 String key = layer.getBaseName() + "/" + layerCount.get(layer.getBaseName()) + "/" + iomethod.name();
 
                 /*
@@ -162,12 +165,15 @@ public class IOManager implements Loggable {
             }
 
             //Quickly check perms to make sure it has all of the methods.
-            if (!(hasRead && hasWrite) && perms == IOPermission.READ_WRITE) {
-                throw new IllegalArgumentException("[IOManager] Missing either read or write methods on IO layer " + layer.getBaseName() + " (class name: " + layer.getClass().getName() + ")" + " when marked as having both. Either change the IOPermissions or add in a read or write method.");
-            }
+            //Unless it's a replayable, since it's a bit different.
+            if (!(layer instanceof Replayable)) {
+                if (!(hasRead && hasWrite) && perms == IOPermission.READ_WRITE) {
+                    throw new IllegalArgumentException("[IOManager] Missing either read or write methods on IO layer " + layer.getBaseName() + " (class name: " + layer.getClass().getName() + ")" + " when marked as having both. Either change the IOPermissions or add in a read or write method.");
+                }
 
-            if (!hasRead && perms == IOPermission.READ) {
-                throw new IllegalArgumentException("[IOManager] Missing read method(s) on IO layer " + layer.getBaseName() + " (class name: " + layer.getClass().getName() + ")" + " when marked as having at least one. Either change the IOPermissions or add in a read method.");
+                if (!hasRead && perms == IOPermission.READ) {
+                    throw new IllegalArgumentException("[IOManager] Missing read method(s) on IO layer " + layer.getBaseName() + " (class name: " + layer.getClass().getName() + ")" + " when marked as having at least one. Either change the IOPermissions or add in a read method.");
+                }
             }
         }
 
@@ -386,5 +392,9 @@ public class IOManager implements Loggable {
             this.type = type;
             this.layer = layer;
         }
+    }
+
+    public String getBaseName() {
+        return "IOManager";
     }
 }
