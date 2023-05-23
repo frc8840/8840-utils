@@ -13,7 +13,7 @@ if [ -d "libs" ]; then
         echo "Deleted libs folder, making a new one."
         mkdir libs
     fi
-else; then
+else
     mkdir libs
     echo "Made library folder 'libs'."
 fi
@@ -34,7 +34,7 @@ replaced_line="simulationRelease wpi.sim.enableRelease()\n  implementation fileT
 # actually no clue if this works on windows
 if [ "$(uname)" == "Darwin" ]; then
     sed -i '.bak' 's|'"$replacing_line"'|'"$replaced_line"'|g' build.gradle
-else; then
+else
     sed -i 's|'"$replacing_line"'|'"$replaced_line"'|g' build.gradle
 fi
 echo "Finished editing build.gradle. Do you want to run ./gradlew build? (y/n, default: y)"
