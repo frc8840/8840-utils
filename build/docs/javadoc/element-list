@@ -10,6 +10,8 @@ frc.team_8840_lib.input.communication.dashboard
 frc.team_8840_lib.input.communication.dashboard.components
 frc.team_8840_lib.input.communication.dashboard.components.canvas
 frc.team_8840_lib.input.communication.dashboard.modules
+frc.team_8840_lib.input.communication.dashboard.pages
+frc.team_8840_lib.input.communication.dashboard.pages.api
 frc.team_8840_lib.input.communication.server
 frc.team_8840_lib.input.controls
 frc.team_8840_lib.IO

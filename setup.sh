@@ -35,7 +35,7 @@ read edit_build_gradle
 if [ -z "$edit_build_gradle" ] || [ "$edit_build_gradle" == "y" ] || [ "$edit_build_gradle" == "Y" ]; then
     echo "Editing build.gradle..."
     replacing_line="simulationRelease wpi.sim.enableRelease()"
-    replaced_line="simulationRelease wpi.sim.enableRelease()\n  implementation fileTree(include: ['*.jar'], dir: 'libs')"
+    replaced_line="simulationRelease wpi.sim.enableRelease()\n\timplementation fileTree(include: ['*.jar'], dir: 'libs')"
     # actually no clue if this works on windows
     if [ "$(uname)" == "Darwin" ]; then
         # mac creates a backup file, so we'll delete it. good job mac, but we don't need it for this.

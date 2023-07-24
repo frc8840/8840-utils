@@ -6,7 +6,6 @@ package frc.team_8840_lib;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.examples.*;
-import frc.team_8840_lib.till.*;
 
 public final class Main {
     private Main() {}
@@ -16,6 +15,9 @@ public final class Main {
      * This function assigns a listener to the robot, then starts the robot.
      */
     public static void main(String... args) {
+        /* Load all libraries. */
+        Libraries.main();
+
         /*
         Assign a listener to the robot.
         You can do any type of EventListener here, but only one can be assigned at a time.

@@ -22,6 +22,7 @@ import frc.team_8840_lib.controllers.ControllerGroup;
 import frc.team_8840_lib.controllers.SwerveGroup;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.input.communication.dashboard.ModuleBuilder;
+import frc.team_8840_lib.input.communication.dashboard.pages.PageHandler;
 import frc.team_8840_lib.input.communication.server.HTTPServer;
 import frc.team_8840_lib.listeners.Preferences;
 import frc.team_8840_lib.listeners.Robot;
@@ -122,9 +123,13 @@ public class CommunicationManager {
                 port = 5805;
             }
 
+            PageHandler.addPages();
+
             server = new HTTPServer(port);
 
-            server.route(new Route("/", new Constructor() {
+            server.route(new Route("/", PageHandler.get()));
+
+            server.route(new Route("/confirmation", new Constructor() {
                 @Override
                 public Route.Resolution finish(HttpExchange req, Route.Resolution res) {
                     return res.send(Element.CreatePage(Element.CreateHead(
@@ -1049,14 +1054,31 @@ public class CommunicationManager {
         return this;
     }
     
+    /**
+     * Returns the NetworkTableEntry for a given tab and key.
+     * @param tab The tab to get the entry from.
+     * @param key The key to get the entry from.
+     * @return The NetworkTableEntry for the given tab and key.
+     */
     public NetworkTableEntry get(String tab, String key) {
         return table.getEntry(f(tab, key));
     }
 
+    /**
+     * Closes all network communications.
+     */
     public void closeComms() {
         for (String key : entries.keySet()) {
             entries.get(key).close();
         }
+    }
+
+    /**
+     * Sets the API server notifications to be enabled or disabled.
+     * @param enabled
+     */
+    public static void setServerNotifications(boolean enabled) {
+        Route.setServerNotifications(enabled);
     }
 
     //Just quicker to type than (tab + "." + key)

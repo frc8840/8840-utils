@@ -9,9 +9,13 @@ import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.reflections.Reflections;
 
+import frc.team_8840_lib.Info;
 import frc.team_8840_lib.info.console.Logger;
+import frc.team_8840_lib.utils.library.AutonomousLibraryInfo;
+import frc.team_8840_lib.utils.library.IOLibraryInfo;
+import frc.team_8840_lib.utils.library.LoggerLibraryInfo;
+import frc.team_8840_lib.utils.library.SwerveLibraryInfo;
 
 public class LibraryManager {
     private static ArrayList<LibraryInfo> loadedLibraries;
@@ -36,43 +40,34 @@ public class LibraryManager {
     }
 
     public static void start() {
-        /*
-         * We need to load every class that's a extension of LibraryInfo into memory. 
-         * This is so that we can register the libraries.
-         * 
-         * There exists libraries that are aren't part of this project, but they'll all extend LibraryInfo.
-         */
-
-        //First, let's load Info.java
-        try {
-            Class.forName("frc.team_8840_lib.info.Info");
-        } catch (Exception e) {
-            Logger.Log("LibraryManager", "Could not load Info.java!");
-            return;
-        }
-
-        //Next, let's get all the classes in the utils.library package
-        Reflections reflections = new Reflections("frc.team_8840_lib.libraries");
-
-        //reflections.
+        registerLibrary(new Info());
+        registerLibrary(new AutonomousLibraryInfo());
+        registerLibrary(new IOLibraryInfo());
+        registerLibrary(new LoggerLibraryInfo());
+        registerLibrary(new SwerveLibraryInfo());
     }
 
     public static void registerLibrary(LibraryInfo info) {
         if (loadedLibraries == null)
             loadedLibraries = new ArrayList<>();
 
-        System.out.println("Registering library " + info.name + " by " + info.author + ", version: " + info.version + ".");
+        System.out.println("--------------------");
+
+        System.out.println("Registering library " + info.name() + " by " + info.author() + ", version: " + info.version() + ".");
 
         loadedLibraries.add(info);
-        Logger.Log("Loaded library " + info.name + " by " + info.author + ", version: " + info.version + ".");
-        if (info.experimental) {
-            Logger.Log("Library " + info.name + " is experimental. Use at your own risk!");
+        System.out.println("Loaded library " + info.name() + " by " + info.author() + ", version: " + info.version() + ".");
+        if (info.experimental()) {
+            System.out.println("Library " + info.name() + " is experimental. Use at your own risk!");
         }
+
+        System.out.println("--------------------");
+        System.out.println();
     }
 
     public static LibraryInfo getLibraryInfoByRepo(String repo) {
         for (LibraryInfo info : loadedLibraries) {
-            if (info.repo.equals(repo))
+            if (info.repo().equals(repo))
                 return info;
         }
 
@@ -81,11 +76,15 @@ public class LibraryManager {
 
     public static LibraryInfo getLibraryInfoByName(String name) {
         for (LibraryInfo info : loadedLibraries) {
-            if (info.name.equals(name))
+            if (info.name().equals(name))
                 return info;
         }
 
         return null;
+    }
+
+    public static ArrayList<LibraryInfo> getLoadedLibraries() {
+        return loadedLibraries;
     }
 
     public static String[] getLanguageOfGitHubRepo(String author, String repository) {
@@ -107,6 +106,7 @@ public class LibraryManager {
             }
         } catch (Exception e) {
             Logger.Log("LibraryManager", "Error getting language of GitHub repository " + author + "/" + repository + ": " + e.getMessage());
+            return new String[0];
         }
 
         JSONObject languages;

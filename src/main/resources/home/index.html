@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>8840-utils Dashboard :: Home</title>
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+    <body>
+        <div class="header">
+            <h1>8840-utils</h1>
+        </div>
+
+        <div class="content">
+            <div class="quick-info quick-info-hidden">
+                <h3>Summary</h3>
+                <p>Using 8840-utils version <span style="font-weight: bold;" id="8840-utils-version"></span>.</p>
+                <p>Currently running <span id="in-simulation" style="font-weight: bold;">in simulation/on the robot</span>.</p>
+                <p>Robot IP Address is currently <span id="ip-address" style="font-weight: bold;">?</span></p>
+                <p>Robot currently has <span style="font-weight: bold;" id="gb-free"></span> GB avaliable of <span id="gb-total" style="font-weight: bold;"></span> GB.</p>
+            </div>
+            <div class="quick-info quick-info-hidden">
+                <p>Libraries Loaded: <span style="font-weight: bold;" id="libraries-loaded">0</span></p>
+                <button onclick="redirectToLibs()" class="libraries-button">See Libraries <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="color: white;"><title>arrow-right</title><path color="white" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" /></svg></button>
+                <p></p>
+            </div>
+            <div class="quick-info quick-info-hidden">
+                <h3>Files</h3>
+                <button onclick="redirectToFiles()" class="libraries-button">See File Explorer <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="color: white;"><title>arrow-right</title><path color="white" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" /></svg></button>
+                <p></p>
+            </div>
+        </div>
+
+        <script>
+            function redirectToLibs() {
+                window.location.href = "/libraries";
+            }
+
+            const inSimulation = document.getElementById("in-simulation");
+
+            async function fillOutSummary() {
+                const response = await fetch("/api/info");
+                const data = await response.json();
+
+                if (data.inSimulation == "true") {
+                    inSimulation.innerText = `in simulation (running on ${data.os})`;
+                } else {
+                    inSimulation.innerText = "on the robot";
+                }
+
+                document.getElementById("8840-utils-version").textContent = data.version;
+
+                document.getElementById("ip-address").textContent = data.ip;
+
+                document.getElementById("gb-free").textContent = Math.floor(data.storage.free_gb * 100) / 100;
+                document.getElementById("gb-total").textContent = Math.floor(data.storage.total_gb * 100) / 100;
+            }
+
+            async function getLibraries() {
+                const request = await fetch("/api/libraries");
+                const data = await request.json();
+
+                const libraries = document.getElementById("libraries-loaded");
+
+                libraries.textContent = data.count;
+            }
+
+            const quickInfo = document.getElementsByClassName("quick-info");
+            
+            setTimeout(() => {
+                fillOutSummary();
+                getLibraries();
+
+                let i = 0;
+                for (let qi of quickInfo) {
+                    setTimeout(() => {
+                        qi.classList.remove("quick-info-hidden");
+                    }, (i * 500))
+                    i++;
+                }
+            }, 100);
+        </script>
+    </body>
+</html>

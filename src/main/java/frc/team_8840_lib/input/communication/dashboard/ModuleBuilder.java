@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.input.communication.dashboard.components.DashboardComponent;
 import frc.team_8840_lib.utils.http.Constructor;
 import frc.team_8840_lib.utils.http.Route;

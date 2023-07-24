@@ -23,6 +23,9 @@ public class Robot extends RobotBase {
         WINDOWS, MAC, LINUX, UNKNOWN;
     }
 
+    /**
+     * @return The operating system the code is running on
+     */
     public static OS os() {
         String os = System.getProperty("os.name").toLowerCase();
         
@@ -30,6 +33,20 @@ public class Robot extends RobotBase {
         else if (os.contains("mac")) return OS.MAC;
         else if (os.contains("nix") || os.contains("nux") || os.contains("aix")) return OS.LINUX;
         else return OS.UNKNOWN;
+    }
+
+    /**
+     * Returns true if the code has been built into a JAR file
+     * @return True if the code has been built into a JAR file
+     */
+    public static boolean isJAR() {
+        //we'll try and get home/index.html in the resource folder through the class loader
+        //if it's null, we're in a JAR file
+        try {
+            return Robot.class.getClassLoader().getResource("home/index.html") != null;
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     private static Robot instance;

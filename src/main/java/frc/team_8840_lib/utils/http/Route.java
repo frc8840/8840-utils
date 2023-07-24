@@ -15,6 +15,12 @@ public class Route implements HttpHandler {
     private String path;
     private Constructor callback;
 
+    private static boolean notifyRequests = false;
+    
+    public static void setServerNotifications(boolean notify) {
+    	notifyRequests = notify;
+    }
+
     public Route(String path, Constructor callback) {
         this.path = path;
         this.callback = callback;
@@ -35,16 +41,26 @@ public class Route implements HttpHandler {
         }
 
         Resolution res = this.callback.finish(exchange, new Resolution());
+        
         String body = res.getBody();
         int status = res.getStatus();
 
-        System.out.println(exchange.getRequestMethod().toUpperCase() + " Request \"" + this.getPath() + "\" " + status);
+        if (Route.notifyRequests) System.out.println(exchange.getRequestMethod().toUpperCase() + " Request \"" + exchange.getRequestURI().toString() + "\" " + status + " " + res.getHeaders());
 
-        exchange.sendResponseHeaders(status, body.length());
+        //Add headers from getHeaders() to the response
+        for (String header : res.getHeaders().keySet()) {
+            exchange.getResponseHeaders().add(header, res.getHeaders().get(header));
+        }
+
+        int responseLength = body.getBytes().length;
+
+        exchange.sendResponseHeaders(status, responseLength);
         OutputStream os = exchange.getResponseBody();
         os.write(body.getBytes());
         os.flush();
         os.close();
+
+        exchange.close();
     }
 
     public static enum ContentType {
@@ -102,6 +118,12 @@ public class Route implements HttpHandler {
             this.contentType = ContentType.TEXT;
             setHeader("Content-Type", "text/plain");
             status(200);
+            return this;
+        }
+
+        public Resolution setContent(String content) {
+            this.contentType = ContentType.TEXT;
+            this.text = content;
             return this;
         }
 
