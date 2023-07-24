@@ -15,7 +15,7 @@ public final class Main {
      * This function assigns a listener to the robot, then starts the robot.
      */
     public static void main(String... args) {
-        /* Load all libraries. */
+        /* Load all libraries. TODO: Temporary, alternate will be made soon. */
         Libraries.main();
 
         /*
