@@ -7,6 +7,8 @@
 **Java Reference:**
 [https://frc8840.github.io/8840-utils/build/docs/javadoc/index.html](https://frc8840.github.io/8840-utils/build/docs/javadoc/index.html)
 
+**Read the Docs:**: [https://readthedocs.org/projects/8840-utils-docs/](https://readthedocs.org/projects/8840-utils-docs/)
+
 ## What is this?
 
 This is a collection of useful utilities used by our team to make the programming process easier and/or cleaner.  
@@ -143,35 +145,14 @@ class SomeImportantLoggingThing implements Loggable {
     }
 
     //This method will be called by the logger, and any other method with the AutoLog annotation. Specify the type of return value, and the name of the value.
-    //You can also use the byte[] notation to log any type of data.
     //This is useful for logging streams of data.
-    @AutoLog(logtype = LogType.DOUBLE, name = "multiplier")
-    public byte[] logMultiplier() {
-        //ByteConversions is a class that exists in the library.
-        //It has methods to convert different types of data to byte arrays.
-
-        //We declare two byte arrays containing the encoded values.
-        byte[] encodedMutliplier = ByteConversions.doubleToByteArray(this.multiplier);
-
-        byte[] encodedSomeValue = ByteConversions.intToByteArray(this.someValue);
-
-        //Create a combined array, with a length of the two arrays combined.
-        byte[] combined = new byte[encodedMutliplier.length + 1 + encodedSomeValue.length];
-
-        //Set the middle value to 0x00, which is the delimiter. This is useful for reading the data.
-        combined[encodedMutliplier.length] = 0x00;
-
-        //Copy the arrays into one array
-        System.arraycopy(encodedMutliplier, 0, combined, 0, encodedMutliplier.length);
-
-        System.arraycopy(encodedSomeValue, 0, combined, encodedMutliplier.length, encodedSomeValue.length);
+    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "multiplier")
+    public double logMultiplier() {
+        double multiplier = this.multiplier;
+        double value = this.someValue;
 
         //Return the combined array.
-        return combined;
-
-        //Unfortunately, we only support reading byte arrays that are default to the library in 8840-app
-        //We will be adding support for custom byte arrays in the future, but for now, we recommend using the default types unless you want to write your own parser.
-        //I don't think you should be using this library if you can write your own parser though. You probably have enough knolwedge to write your own library.
+        return new double[] {multiplier, value};
     }
 }
 ```
@@ -213,6 +194,4 @@ Credit is also due to any other libraries that this project uses.
 
 ## Contact
 
-If you have any questions, comments, concerns, or anything else, feel free to contact us [here!](https://www.team8840.org/contact)
-
-# Thanks for reading!
+If you have any questions, comments, concerns, or anything else, feel free to contact us [here!](https://www.team8840.org/contact) or by messaging us on [Instagram](https://www.instagram.com/bay_robotics/).
