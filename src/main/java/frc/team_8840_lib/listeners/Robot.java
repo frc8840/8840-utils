@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Watchdog;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.utils.GamePhase;
+import frc.team_8840_lib.utils.async.Promise;
 import frc.team_8840_lib.utils.interfaces.Callback;
 import frc.team_8840_lib.utils.time.TimeStamp;
 
@@ -171,40 +172,38 @@ public class Robot extends RobotBase {
 
     private boolean conditionsFullfilled = true;
     
-    @SafeVarargs
-    public final Robot waitForFullfillConditions(final int timeoutMS, Supplier<Boolean> ...conditions) {
+    public final Robot waitForFullfillConditions(final int timeoutMS, Promise promise) {
         conditionsFullfilled = false;
 
-        TimerTask task = new TimerTask() {
+        promise.finish();
+
+        TimerTask generalTimeout = new TimerTask() {
             @Override
             public void run() {
-                int total = conditions.length;
-                int fullfilled = 0;
+                if (conditionsFullfilled) return;
 
-                for (Supplier<Boolean> condition : conditions) {
-                    if (condition.get()) fullfilled++;
-                }
-
-                if (fullfilled == total) conditionsFullfilled = true;
-
-                if (conditionsFullfilled) {
-                    this.cancel();
-                }
-            }
-        };
-
-        TimerTask overrideFullfill = new TimerTask() {
-            @Override
-            public void run() {
+                Logger.Log("Robot", "Timeout condition filled.");
                 conditionsFullfilled = true;
             }
         };
 
-        Timer timer = new Timer();
-        timer.schedule(task, 10);
+        new Promise((res, rej) -> {
+            Promise.WaitThen(() -> {
+                return promise.resolved();
+            }, res, rej, 10);
+        }).then((res, rej) -> {
+            Logger.Log("Robot", "Promise condition filled.");
 
-        Timer overrideTimer = new Timer();
-        overrideTimer.schedule(overrideFullfill, timeoutMS);
+            conditionsFullfilled = true;
+
+            res.run();
+        }).catch_err((e) -> {
+            Logger.Log("Error while waiting for conditions to be fullfilled: " + e.getMessage());
+            e.printStackTrace();
+        });
+
+        Timer timer = new Timer();
+        timer.schedule(generalTimeout, timeoutMS);
 
         return this;
     }
@@ -225,13 +224,15 @@ public class Robot extends RobotBase {
      * Usually, you SHOULD have a delay until the robot is ready to start, especially if you are using a camera or at the start of a match.
      * Else, you're risking the robot not being ready to start, and thus losing points.
      * @param quickStart Whether to quick start or not. TRUE = quick start, FALSE = normal start. It is already set to FALSE by default.
-     * @see #waitForFullfillConditions(int, Supplier[])
+     * @see #waitForFullfillConditions(int, Promise)
      * @see #onFinishFullfillment(Callback)
      */
     public void quickStart(boolean quickStart) {
         doQuickStart = quickStart;
         if (doQuickStart) Logger.Log("[Robot] DOING QUICK START. NOTE: THIS IS NOT RECOMMENDED FOR NORMAL USE.");
     }
+
+    int randomInt = 0;
 
     @Override
     public void startCompetition() {
@@ -250,40 +251,67 @@ public class Robot extends RobotBase {
         boolean noRun = false;
 
         if (!hasListener()) {
-            Logger.Log("[Robot] Warning: No event listener assigned. Please assign a listener before starting the competition.");
+            Logger.Log("Robot", "Warning: No event listener assigned. Please assign a listener before starting the competition.");
 
             Logger.Log("[Robot] Automatically stopping program due to no event listener.", TimeStamp.None);
 
             exit = true;
             noRun = true;
+
+            duringCompetition(noRun);
+            return;
         } else {
             listener.robotInit();
 
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             if (!conditionsFullfilled) {
-                Logger.Log("[Robot] Conditions not fullfilled for startup, waiting until conditions are fullfilled...");
-                Timer waitTimer = new Timer();
-                waitTimer.schedule(new TimerTask() {
+                Logger.Log("Robot", "Conditions not fullfilled for startup, waiting until conditions are fullfilled...");
+
+                Thread startupThread = new Thread() {
                     @Override
                     public void run() {
-                        if (conditionsFullfilled) {
-                            Logger.Log("[Robot] Conditions fullfilled, continuing startup!");
-                            this.cancel();
+                        new Promise((res, rej) -> {
+                            Promise.WaitThen(() -> {
+                                return conditionsFullfilled;
+                            }, res, rej, 100);
+                        }).then((res, rej) -> {
+                            Logger.Log("Robot", "Conditions fullfilled, continuing startup!");
 
                             if (finishFullfillmentCallback != null) finishFullfillmentCallback.run();
-                        }
+
+                            duringCompetition(false);
+
+                            res.run();
+                        }).catch_err((e) -> {
+                            e.printStackTrace();
+
+                            Logger.Log("Robot", "There was an error during startup. Please check the stack trace for more information.");
+
+                            duringCompetition(true);
+                        });
                     }
-                }, 10);
+                };
+
+                startupThread.start();
 
                 while (!conditionsFullfilled) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    //most stupid fix but it works. basically just stalls the thread until the conditions are fullfilled and the main thread starts.
+                    //this took me an hour to figure out. i hate this.
+                    randomInt++;
                 }
+            } else {
+                duringCompetition(noRun);
+                return;
             }
         }
+    }
 
+    public void duringCompetition(boolean noRun) {
         Logger.Log("[Robot] Robot program startup completed in " + (System.currentTimeMillis() - startTime) + "ms.");
 
         lastPhase = GamePhase.Disabled;

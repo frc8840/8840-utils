@@ -13,6 +13,7 @@ import frc.team_8840_lib.pathing.PathConjugate;
 import frc.team_8840_lib.pathing.PathPlanner;
 import frc.team_8840_lib.pathing.PathConjugate.ConjugateType;
 import frc.team_8840_lib.utils.GamePhase;
+import frc.team_8840_lib.utils.async.Promise;
 import frc.team_8840_lib.utils.controllers.Pigeon;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveType;
@@ -116,7 +117,11 @@ public class AutonomousExample extends EventListener {
 
         //Wait till the swerve drive is ready to be used
         Robot.getRealInstance()
-            .waitForFullfillConditions(1000, () -> swerveDrive.ready())
+            .waitForFullfillConditions(1000, new Promise((res, rej) -> {
+                Promise.WaitThen(() -> {
+                    return swerveDrive.ready();
+                }, res, rej, 10);
+            }))
             .onFinishFullfillment(() -> {
                 swerveDrive.resetOdometry(new Pose2d(7, 4, new Rotation2d(0)));
             });

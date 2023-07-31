@@ -22,6 +22,7 @@ frc.team_8840_lib.pathing
 frc.team_8840_lib.replay
 frc.team_8840_lib.till
 frc.team_8840_lib.utils
+frc.team_8840_lib.utils.async
 frc.team_8840_lib.utils.buffer
 frc.team_8840_lib.utils.controllers
 frc.team_8840_lib.utils.controllers.swerve

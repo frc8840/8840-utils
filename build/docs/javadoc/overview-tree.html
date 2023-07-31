@@ -75,6 +75,7 @@ loadScripts(document, 'script');</script>
 <li><a href="frc/team_8840_lib/replay/package-tree.html">frc.team_8840_lib.replay</a>, </li>
 <li><a href="frc/team_8840_lib/till/package-tree.html">frc.team_8840_lib.till</a>, </li>
 <li><a href="frc/team_8840_lib/utils/package-tree.html">frc.team_8840_lib.utils</a>, </li>
+<li><a href="frc/team_8840_lib/utils/async/package-tree.html">frc.team_8840_lib.utils.async</a>, </li>
 <li><a href="frc/team_8840_lib/utils/buffer/package-tree.html">frc.team_8840_lib.utils.buffer</a>, </li>
 <li><a href="frc/team_8840_lib/utils/controllers/package-tree.html">frc.team_8840_lib.utils.controllers</a>, </li>
 <li><a href="frc/team_8840_lib/utils/controllers/swerve/package-tree.html">frc.team_8840_lib.utils.controllers.swerve</a>, </li>
@@ -142,7 +143,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">frc.team_8840_lib.examples.<a href="frc/team_8840_lib/examples/AutonomousExample.html" class="type-name-link" title="class in frc.team_8840_lib.examples">AutonomousExample</a></li>
 <li class="circle">frc.team_8840_lib.examples.<a href="frc/team_8840_lib/examples/MotorExample.html" class="type-name-link" title="class in frc.team_8840_lib.examples">MotorExample</a></li>
 <li class="circle">frc.team_8840_lib.examples.<a href="frc/team_8840_lib/examples/PulsingMotor.html" class="type-name-link" title="class in frc.team_8840_lib.examples">PulsingMotor</a></li>
-<li class="circle">frc.team_8840_lib.examples.<a href="frc/team_8840_lib/examples/SwerveDrive.html" class="type-name-link" title="class in frc.team_8840_lib.examples">SwerveDrive</a></li>
+<li class="circle">frc.team_8840_lib.examples.<a href="frc/team_8840_lib/examples/SwerveDriveExample.html" class="type-name-link" title="class in frc.team_8840_lib.examples">SwerveDriveExample</a></li>
 <li class="circle">frc.team_8840_lib.examples.<a href="frc/team_8840_lib/examples/TankDrive.html" class="type-name-link" title="class in frc.team_8840_lib.examples">TankDrive</a></li>
 <li class="circle">frc.team_8840_lib.till.<a href="frc/team_8840_lib/till/Till.html" class="type-name-link" title="class in frc.team_8840_lib.till">Till</a></li>
 </ul>
@@ -166,11 +167,12 @@ loadScripts(document, 'script');</script>
 <li class="circle">frc.team_8840_lib.utils.controllers.<a href="frc/team_8840_lib/utils/controllers/Pigeon.html" class="type-name-link" title="class in frc.team_8840_lib.utils.controllers">Pigeon</a></li>
 <li class="circle">frc.team_8840_lib.replay.<a href="frc/team_8840_lib/replay/Replayable.html" class="type-name-link" title="class in frc.team_8840_lib.replay">Replayable</a> (implements frc.team_8840_lib.utils.logging.<a href="frc/team_8840_lib/utils/logging/Loggable.html" title="interface in frc.team_8840_lib.utils.logging">Loggable</a>)
 <ul>
+<li class="circle">frc.team_8840_lib.controllers.<a href="frc/team_8840_lib/controllers/SwerveDrive.html" class="type-name-link" title="class in frc.team_8840_lib.controllers">SwerveDrive</a></li>
 <li class="circle">frc.team_8840_lib.controllers.<a href="frc/team_8840_lib/controllers/SwerveGroup.html" class="type-name-link" title="class in frc.team_8840_lib.controllers">SwerveGroup</a></li>
 </ul>
 </li>
 <li class="circle">frc.team_8840_lib.controllers.specifics.<a href="frc/team_8840_lib/controllers/specifics/SparkMaxEncoderWrapper.html" class="type-name-link" title="class in frc.team_8840_lib.controllers.specifics">SparkMaxEncoderWrapper</a></li>
-<li class="circle">frc.team_8840_lib.controllers.<a href="frc/team_8840_lib/controllers/SwerveModule.html" class="type-name-link" title="class in frc.team_8840_lib.controllers">SwerveModule</a></li>
+<li class="circle">frc.team_8840_lib.controllers.<a href="frc/team_8840_lib/controllers/SwerveModuleOld.html" class="type-name-link" title="class in frc.team_8840_lib.controllers">SwerveModuleOld</a></li>
 </ul>
 </li>
 <li class="circle">frc.team_8840_lib.IO.<a href="frc/team_8840_lib/IO/IOManager.html" class="type-name-link" title="class in frc.team_8840_lib.IO">IOManager</a> (implements frc.team_8840_lib.utils.logging.<a href="frc/team_8840_lib/utils/logging/Loggable.html" title="interface in frc.team_8840_lib.utils.logging">Loggable</a>)</li>
@@ -200,6 +202,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">frc.team_8840_lib.utils.math.<a href="frc/team_8840_lib/utils/math/MathUtils.html" class="type-name-link" title="class in frc.team_8840_lib.utils.math">MathUtils</a></li>
 <li class="circle">frc.team_8840_lib.utils.math.<a href="frc/team_8840_lib/utils/math/Matrix.html" class="type-name-link" title="class in frc.team_8840_lib.utils.math">Matrix</a></li>
 <li class="circle">frc.team_8840_lib.input.communication.dashboard.<a href="frc/team_8840_lib/input/communication/dashboard/ModuleBuilder.html" class="type-name-link" title="class in frc.team_8840_lib.input.communication.dashboard">ModuleBuilder</a></li>
+<li class="circle">frc.team_8840_lib.utils.controllers.swerve.<a href="frc/team_8840_lib/utils/controllers/swerve/ModuleConfig.html" class="type-name-link" title="class in frc.team_8840_lib.utils.controllers.swerve">ModuleConfig</a></li>
 <li class="circle">frc.team_8840_lib.utils.controllers.<a href="frc/team_8840_lib/utils/controllers/MotorInfo.html" class="type-name-link" title="class in frc.team_8840_lib.utils.controllers">MotorInfo</a></li>
 <li class="circle">frc.team_8840_lib.utils.controllers.swerve.conversions.<a href="frc/team_8840_lib/utils/controllers/swerve/conversions/NeoConversions.html" class="type-name-link" title="class in frc.team_8840_lib.utils.controllers.swerve.conversions">NeoConversions</a></li>
 <li class="circle">frc.team_8840_lib.AI.<a href="frc/team_8840_lib/AI/NeuralNetwork.html" class="type-name-link" title="class in frc.team_8840_lib.AI">NeuralNetwork</a></li>
@@ -219,12 +222,22 @@ loadScripts(document, 'script');</script>
 <li class="circle">frc.team_8840_lib.pathing.<a href="frc/team_8840_lib/pathing/PathPlanner.AUTOS.ChargedUp.html" class="type-name-link" title="class in frc.team_8840_lib.pathing">PathPlanner.AUTOS.ChargedUp</a></li>
 <li class="circle">frc.team_8840_lib.utils.controllers.swerve.structs.<a href="frc/team_8840_lib/utils/controllers/swerve/structs/PIDStruct.html" class="type-name-link" title="class in frc.team_8840_lib.utils.controllers.swerve.structs">PIDStruct</a></li>
 <li class="circle">frc.team_8840_lib.listeners.<a href="frc/team_8840_lib/listeners/Preferences.html" class="type-name-link" title="class in frc.team_8840_lib.listeners">Preferences</a></li>
+<li class="circle">frc.team_8840_lib.utils.async.<a href="frc/team_8840_lib/utils/async/Promise.html" class="type-name-link" title="class in frc.team_8840_lib.utils.async">Promise</a></li>
 <li class="circle">frc.team_8840_lib.utils.math.<a href="frc/team_8840_lib/utils/math/Range.html" class="type-name-link" title="class in frc.team_8840_lib.utils.math">Range</a></li>
 <li class="circle">frc.team_8840_lib.utils.math.units.<a href="frc/team_8840_lib/utils/math/units/RectangleBounds.html" class="type-name-link" title="class in frc.team_8840_lib.utils.math.units">RectangleBounds</a></li>
 <li class="circle">frc.team_8840_lib.replay.<a href="frc/team_8840_lib/replay/ReplayLog.html" class="type-name-link" title="class in frc.team_8840_lib.replay">ReplayLog</a></li>
 <li class="circle">frc.team_8840_lib.replay.<a href="frc/team_8840_lib/replay/ReplayManager.html" class="type-name-link" title="class in frc.team_8840_lib.replay">ReplayManager</a></li>
 <li class="circle">edu.wpi.first.wpilibj.RobotBase (implements java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/AutoCloseable.html" title="class or interface in java.lang" class="external-link">AutoCloseable</a>)
 <ul>
+<li class="circle">edu.wpi.first.wpilibj.IterativeRobotBase
+<ul>
+<li class="circle">edu.wpi.first.wpilibj.TimedRobot
+<ul>
+<li class="circle">frc.team_8840_lib.examples.<a href="frc/team_8840_lib/examples/MotorMove.html" class="type-name-link" title="class in frc.team_8840_lib.examples">MotorMove</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="circle">frc.team_8840_lib.listeners.<a href="frc/team_8840_lib/listeners/Robot.html" class="type-name-link" title="class in frc.team_8840_lib.listeners">Robot</a></li>
 </ul>
 </li>
@@ -233,6 +246,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">frc.team_8840_lib.input.controls.<a href="frc/team_8840_lib/input/controls/SimulatedController.html" class="type-name-link" title="class in frc.team_8840_lib.input.controls">SimulatedController</a></li>
 <li class="circle">frc.team_8840_lib.input.communication.server.<a href="frc/team_8840_lib/input/communication/server/SocketServer.html" class="type-name-link" title="class in frc.team_8840_lib.input.communication.server">SocketServer</a></li>
 <li class="circle">frc.team_8840_lib.controllers.specifics.<a href="frc/team_8840_lib/controllers/specifics/SparkMaxPIDWrapper.html" class="type-name-link" title="class in frc.team_8840_lib.controllers.specifics">SparkMaxPIDWrapper</a></li>
+<li class="circle">frc.team_8840_lib.controllers.<a href="frc/team_8840_lib/controllers/SwerveModule.html" class="type-name-link" title="class in frc.team_8840_lib.controllers">SwerveModule</a></li>
 <li class="circle">frc.team_8840_lib.utils.controllers.swerve.<a href="frc/team_8840_lib/utils/controllers/swerve/SwerveOptimization.html" class="type-name-link" title="class in frc.team_8840_lib.utils.controllers.swerve">SwerveOptimization</a></li>
 <li class="circle">frc.team_8840_lib.utils.controllers.swerve.<a href="frc/team_8840_lib/utils/controllers/swerve/SwerveSettings.html" class="type-name-link" title="class in frc.team_8840_lib.utils.controllers.swerve">SwerveSettings</a></li>
 <li class="circle">frc.team_8840_lib.utils.controllers.swerve.<a href="frc/team_8840_lib/utils/controllers/swerve/SwerveSettings.SDS.html" class="type-name-link" title="class in frc.team_8840_lib.utils.controllers.swerve">SwerveSettings.SDS</a></li>
@@ -254,9 +268,12 @@ loadScripts(document, 'script');</script>
 <h2 title="Interface Hierarchy">Interface Hierarchy</h2>
 <ul>
 <li class="circle">frc.team_8840_lib.utils.interfaces.<a href="frc/team_8840_lib/utils/interfaces/Callback.html" class="type-name-link" title="interface in frc.team_8840_lib.utils.interfaces">Callback</a></li>
+<li class="circle">frc.team_8840_lib.utils.interfaces.<a href="frc/team_8840_lib/utils/interfaces/Condition.html" class="type-name-link" title="interface in frc.team_8840_lib.utils.interfaces">Condition</a></li>
+<li class="circle">frc.team_8840_lib.utils.interfaces.<a href="frc/team_8840_lib/utils/interfaces/ErrorCallback.html" class="type-name-link" title="interface in frc.team_8840_lib.utils.interfaces">ErrorCallback</a></li>
 <li class="circle">frc.team_8840_lib.utils.logging.<a href="frc/team_8840_lib/utils/logging/Loggable.html" class="type-name-link" title="interface in frc.team_8840_lib.utils.logging">Loggable</a></li>
 <li class="circle">frc.team_8840_lib.utils.interfaces.<a href="frc/team_8840_lib/utils/interfaces/MathMap.html" class="type-name-link" title="interface in frc.team_8840_lib.utils.interfaces">MathMap</a></li>
 <li class="circle">frc.team_8840_lib.utils.pathplanner.<a href="frc/team_8840_lib/utils/pathplanner/PathCallback.html" class="type-name-link" title="interface in frc.team_8840_lib.utils.pathplanner">PathCallback</a></li>
+<li class="circle">frc.team_8840_lib.utils.interfaces.<a href="frc/team_8840_lib/utils/interfaces/PromiseMethod.html" class="type-name-link" title="interface in frc.team_8840_lib.utils.interfaces">PromiseMethod</a></li>
 <li class="circle">frc.team_8840_lib.utils.interfaces.<a href="frc/team_8840_lib/utils/interfaces/SingleVariableEquation.html" class="type-name-link" title="interface in frc.team_8840_lib.utils.interfaces">SingleVariableEquation</a></li>
 <li class="circle">frc.team_8840_lib.utils.interfaces.<a href="frc/team_8840_lib/utils/interfaces/SwerveLoop.html" class="type-name-link" title="interface in frc.team_8840_lib.utils.interfaces">SwerveLoop</a></li>
 </ul>
@@ -295,6 +312,7 @@ loadScripts(document, 'script');</script>
 <li class="circle">frc.team_8840_lib.utils.controllers.<a href="frc/team_8840_lib/utils/controllers/SCType.html" class="type-name-link" title="enum class in frc.team_8840_lib.utils.controllers">SCType</a></li>
 <li class="circle">frc.team_8840_lib.utils.time.<a href="frc/team_8840_lib/utils/time/SubscriptionType.html" class="type-name-link" title="enum class in frc.team_8840_lib.utils.time">SubscriptionType</a></li>
 <li class="circle">frc.team_8840_lib.controllers.<a href="frc/team_8840_lib/controllers/SwerveGroup.ModuleIndex.html" class="type-name-link" title="enum class in frc.team_8840_lib.controllers">SwerveGroup.ModuleIndex</a></li>
+<li class="circle">frc.team_8840_lib.controllers.<a href="frc/team_8840_lib/controllers/SwerveModule.Position.html" class="type-name-link" title="enum class in frc.team_8840_lib.controllers">SwerveModule.Position</a></li>
 <li class="circle">frc.team_8840_lib.utils.controllers.swerve.<a href="frc/team_8840_lib/utils/controllers/swerve/SwerveType.html" class="type-name-link" title="enum class in frc.team_8840_lib.utils.controllers.swerve">SwerveType</a></li>
 <li class="circle">frc.team_8840_lib.utils.time.<a href="frc/team_8840_lib/utils/time/TimeStamp.html" class="type-name-link" title="enum class in frc.team_8840_lib.utils.time">TimeStamp</a></li>
 <li class="circle">frc.team_8840_lib.utils.math.units.<a href="frc/team_8840_lib/utils/math/units/Unit.Type.html" class="type-name-link" title="enum class in frc.team_8840_lib.utils.math.units">Unit.Type</a></li>

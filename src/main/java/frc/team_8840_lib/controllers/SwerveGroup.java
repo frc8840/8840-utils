@@ -23,7 +23,6 @@ import frc.team_8840_lib.utils.controllers.Pigeon;
 import frc.team_8840_lib.utils.controllers.swerve.CTREConfig;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
 import frc.team_8840_lib.utils.interfaces.SwerveLoop;
-import frc.team_8840_lib.utils.logging.Loggable;
 import frc.team_8840_lib.utils.math.MathUtils;
 
 /**
@@ -89,10 +88,10 @@ public class SwerveGroup extends Replayable {
     //The config for the swerve drive
     private CTREConfig config;
 
-    private SwerveModule topLeft;
-    private SwerveModule topRight;
-    private SwerveModule bottomLeft;
-    private SwerveModule bottomRight;
+    private SwerveModuleOld topLeft;
+    private SwerveModuleOld topRight;
+    private SwerveModuleOld bottomLeft;
+    private SwerveModuleOld bottomRight;
 
     private boolean fullyReady = false;
     public boolean ready() { return fullyReady; }
@@ -137,7 +136,7 @@ public class SwerveGroup extends Replayable {
         this.gyro.config(); //Config for pigeon has to be called after the pigeon is created unlike others which are called in the constructor
 
         //Create the modules
-        topLeft = new SwerveModule(
+        topLeft = new SwerveModuleOld(
             driveIDs[ModuleIndex.kTOP_LEFT.getIndex()], 
             steerIDs[ModuleIndex.kTOP_LEFT.getIndex()], 
             encoderIDs[ModuleIndex.kTOP_LEFT.getIndex()], 
@@ -145,7 +144,7 @@ public class SwerveGroup extends Replayable {
             config
         );
 
-        topRight = new SwerveModule(
+        topRight = new SwerveModuleOld(
             driveIDs[ModuleIndex.kTOP_RIGHT.getIndex()], 
             steerIDs[ModuleIndex.kTOP_RIGHT.getIndex()], 
             encoderIDs[ModuleIndex.kTOP_RIGHT.getIndex()], 
@@ -153,7 +152,7 @@ public class SwerveGroup extends Replayable {
             config
         );
 
-        bottomLeft = new SwerveModule(
+        bottomLeft = new SwerveModuleOld(
             driveIDs[ModuleIndex.kBOTTOM_LEFT.getIndex()], 
             steerIDs[ModuleIndex.kBOTTOM_LEFT.getIndex()], 
             encoderIDs[ModuleIndex.kBOTTOM_LEFT.getIndex()], 
@@ -161,7 +160,7 @@ public class SwerveGroup extends Replayable {
             config
         );
 
-        bottomRight = new SwerveModule(
+        bottomRight = new SwerveModuleOld(
             driveIDs[ModuleIndex.kBOTTOM_RIGHT.getIndex()], 
             steerIDs[ModuleIndex.kBOTTOM_RIGHT.getIndex()], 
             encoderIDs[ModuleIndex.kBOTTOM_RIGHT.getIndex()], 
@@ -240,39 +239,6 @@ public class SwerveGroup extends Replayable {
 
         //Add to logger
         Logger.addClassToBeAutoLogged(this);
-    }
-
-    /**
-     * Sets the speed of every module. Uses open loop.
-     * @param value Speeds for each module
-     * */
-    public void setSpeed(double value) {
-        topLeft.setSpeed(value);
-        topRight.setSpeed(value);
-        bottomLeft.setSpeed(value);
-        bottomRight.setSpeed(value);
-    }
-
-    /**
-     * Sets the state of every module using one state. Uses closed or open loop.
-     * @deprecated Use {@link #setModuleStates(SwerveModuleState[])} instead. This is deprecated since it's dangerous to use, and it's not used anywhere in the code. Only use this method for testing.
-     * @param state State for each module.
-     * */
-    @Deprecated
-    public void setState(SwerveModuleState state, boolean openLoop) {
-        topLeft.setDesiredState(state, openLoop);
-        topRight.setDesiredState(state, openLoop);
-        bottomLeft.setDesiredState(state, openLoop);
-        bottomRight.setDesiredState(state, openLoop);
-    }
-
-    /**
-     * Sets the state of every module using an array of states. Uses open loop.
-     * @deprecated Use {@link #setModuleStates(SwerveModuleState[])} instead. This is deprecated since it's dangerous to use, and it's not used anywhere in the code. Only use this method for testing.
-     * */
-    @Deprecated
-    public void setState(SwerveModuleState state) {
-        setState(state, true);
     }
 
     /**
@@ -470,7 +436,10 @@ public class SwerveGroup extends Replayable {
      * Sets all module speeds to 0
      */
     public void stop() {
-        setSpeed(0);
+        bottomLeft.setSpeed(0);
+        bottomRight.setSpeed(0);
+        topLeft.setSpeed(0);
+        topRight.setSpeed(0);
 
         lastChassisSpeeds = new ChassisSpeeds(0, 0, 0);
     }
@@ -524,7 +493,7 @@ public class SwerveGroup extends Replayable {
      * @param s_loop The lambda to use. Takes in the module and the index of the module.
      */
     public void loop(SwerveLoop s_loop) {
-        SwerveModule[] modules = getModules();
+        SwerveModuleOld[] modules = getModules();
         for (int i = 0; i < 4; i++) {
             s_loop.run(modules[i], i);
         }
@@ -536,7 +505,6 @@ public class SwerveGroup extends Replayable {
      * */
     public void resetOdometry(Pose2d pose) {
         odometry.resetPosition(getAngle(), getSwervePositions(), pose);
-        //pose_odometry.resetPosition(pose, getAngle());
     }
 
     /**
@@ -603,8 +571,8 @@ public class SwerveGroup extends Replayable {
      * Returns the modules of the swerve drive.
      * @return The modules of the swerve drive
      */
-    public SwerveModule[] getModules() {
-        return new SwerveModule[] {
+    public SwerveModuleOld[] getModules() {
+        return new SwerveModuleOld[] {
             topRight,
             bottomRight,
             topLeft,
@@ -657,7 +625,7 @@ public class SwerveGroup extends Replayable {
     }
     
     public SwerveModulePosition[] getSwervePositions() {
-        SwerveModule[] modules = getModules();
+        SwerveModuleOld[] modules = getModules();
         return new SwerveModulePosition[] {
             modules[0].getPosition(),
             modules[1].getPosition(),

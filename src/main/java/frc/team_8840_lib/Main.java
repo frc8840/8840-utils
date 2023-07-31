@@ -35,7 +35,7 @@ public final class Main {
         </code>
         * */
         frc.team_8840_lib.listeners.Robot.assignListener(
-            new AutonomousExample()
+            new SwerveDriveExample()
         );
 
         /**

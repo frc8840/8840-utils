@@ -96,22 +96,14 @@
               "absolute position": {
                 "open": true
               },
-              "open": true,
               "set cached position": {
                 "open": true
               }
             },
             "1": {
-              "open": true,
               "set cached position": {
                 "open": true
               }
-            },
-            "2": {
-              "open": true
-            },
-            "3": {
-              "open": true
             },
             "absolute position": {
               "0": {
@@ -196,6 +188,44 @@
           "SparkMaxEncoder-D2-5": {
             "open": true
           },
+          "SparkMaxEncoder-Swerve-BACK_LEFT-Drive": {
+            ".info": {
+              "open": true
+            },
+            "0": {
+              "Position": {
+                "open": true
+              },
+              "open": true
+            }
+          },
+          "SparkMaxEncoder-Swerve-BACK_LEFT-Turn": {
+            ".info": {
+              "open": true
+            },
+            "0": {
+              "Position": {
+                "open": true
+              },
+              "open": true
+            }
+          },
+          "SparkMaxEncoder-Swerve-BACK_RIGHT-Drive": {
+            ".info": {
+              "open": true
+            },
+            "0": {
+              "Position": {
+                "open": true
+              },
+              "open": true
+            }
+          },
+          "SparkMaxEncoder-Swerve-FRONT_LEFT-Turn": {
+            ".info": {
+              "open": true
+            }
+          },
           "SparkMaxEncoder-T1-4": {
             "open": true
           },
@@ -250,6 +280,12 @@
               "open": true
             },
             "Initialized": {
+              "open": true
+            },
+            "open": true
+          },
+          "SwerveDrive": {
+            ".info": {
               "open": true
             },
             "open": true

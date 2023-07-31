@@ -7,3 +7,5 @@
 [] Add in API endpoint to webpage rest server
 [] Add in HTML to webpage to allow for package requests
 [] Fix CSS on webpage
+[] Generally fix swerve
+[] Move late start -> promise

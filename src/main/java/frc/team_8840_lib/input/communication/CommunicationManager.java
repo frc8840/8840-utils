@@ -660,7 +660,7 @@ public class CommunicationManager {
                             return res.json(this.error("Invalid JSON format.")).status(400);
                         }
 
-                        FileUtils.write(Path.of(home, path), data);
+                        FileUtils.write(Path.of(home, path), data, false);
 
                         Logger.Log("[FileSystem] Successfully wrote file to " + path + ".");
                         

@@ -13,6 +13,7 @@ import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.listeners.EventListener;
 import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.GamePhase;
+import frc.team_8840_lib.utils.async.Promise;
 import frc.team_8840_lib.utils.http.Constructor;
 import frc.team_8840_lib.utils.http.Route;
 import frc.team_8840_lib.utils.math.IntRange;
@@ -241,9 +242,11 @@ public class Till extends EventListener {
             }
         }, GamePhase.Disabled);
 
-        Robot.getRealInstance().waitForFullfillConditions(3000, () -> {
-            return runnable();
-        }).onFinishFullfillment(() -> {
+        Robot.getRealInstance().waitForFullfillConditions(3000, new Promise((res, rej) -> {
+            Promise.WaitThen(() -> {
+                return runnable();
+            }, res, rej, 10);
+        }).finish()).onFinishFullfillment(() -> {
             if (runnable()) {
                 handleGamePhase(MethodType.INIT, null);
             } else {

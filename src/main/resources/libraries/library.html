@@ -5,11 +5,24 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>8840-utils Dashboard :: Libraries</title>
         <link rel="stylesheet" href="/static/style.css">
+        <link rel="stylesheet" href="/static/library.css">
     </head>
     <body>
         <div class="header">
             <h1>8840-utils</h1>
         </div>
+        <div class="overlay">
+            <div class="import-popup">
+                <h3>Import Library</h3>
+                <select id="import-via">
+                    <option value="util-lib-github">Import 8840-utils Library via GitHub</option>
+                </select><br>
+                <label>Author/Repo (EX: frc8840/8840-utils):</label>
+                <input type="text" name="lib-url" id="lib-url"><br>
+                <button>Import</button>
+            </div>
+        </div>
+        
         <div class="content">
             <div class="libraries">
                 

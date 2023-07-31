@@ -5,7 +5,7 @@ import frc.team_8840_lib.IO.IOManager;
 public class IOLayer {
     private boolean real = true;
     
-    public IOLayer(Object ...args) {
+    public IOLayer() {
         real = true;
 
         //Required method.

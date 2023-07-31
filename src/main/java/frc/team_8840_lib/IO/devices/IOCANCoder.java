@@ -27,7 +27,7 @@ public class IOCANCoder extends IOLayer {
         this.encoderPort = (int) args[0];
 
         if (this.encoderPort >= 0) {
-            Logger.Log("[IO] Initializing (real" + (Robot.isSimulation() ? " <in simulation> " : "") + ") CANCoder on port " + this.encoderPort);
+            Logger.Log("[IO] Initializing (real" + (Robot.isSimulation() ? " <in simulation>" : "") + ") CANCoder on port " + this.encoderPort);
             this.encoder = new CANCoder(this.encoderPort);
         } else {
             Logger.Log("[IO] Initializing (simulated) CANCoder on port " + this.encoderPort);

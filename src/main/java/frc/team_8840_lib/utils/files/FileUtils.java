@@ -30,7 +30,7 @@ public class FileUtils {
         return files;
     }
 
-    public static void write(Path path, String contents) {
+    public static void write(Path path, String contents, boolean append) {
         
         File file = path.toFile();
 
@@ -45,7 +45,7 @@ public class FileUtils {
 
         //Append string to file
         try {
-            java.io.FileWriter fw = new java.io.FileWriter(file, true);
+            java.io.FileWriter fw = new java.io.FileWriter(file, append);
             fw.write(contents);
             fw.close();
         } catch (Exception e) {

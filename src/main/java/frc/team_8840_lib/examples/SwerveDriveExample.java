@@ -1,8 +1,7 @@
 package frc.team_8840_lib.examples;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import frc.team_8840_lib.controllers.SwerveGroup;
+import frc.team_8840_lib.controllers.SwerveDrive;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.info.time.TimeKeeper;
 import frc.team_8840_lib.input.communication.CommunicationManager;
@@ -10,7 +9,8 @@ import frc.team_8840_lib.input.controls.GameController;
 import frc.team_8840_lib.listeners.EventListener;
 import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.GamePhase;
-import frc.team_8840_lib.utils.controllers.Pigeon;
+import frc.team_8840_lib.utils.async.Promise;
+import frc.team_8840_lib.utils.controllers.swerve.ModuleConfig;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveType;
 import frc.team_8840_lib.utils.controls.Axis;
@@ -24,15 +24,15 @@ import java.util.TimerTask;
  * @see frc.team_8840_lib.examples.AutonomousExample
  * @author Jaiden Grimminck
  */
-public class SwerveDrive extends EventListener {
-    private SwerveGroup swerveDrive;
+public class SwerveDriveExample extends EventListener {
+    private SwerveDrive swerveDrive;
 
     @Override
     public void robotInit() {
         //Create a new SwerveSettings
         //This has all the default values from Team 364 and Team 3512's robots, but you might want to adjust them.
         //Edit the values like the example below to your liking
-        SwerveSettings settings = new SwerveSettings(SwerveType.FALCON_500);
+        SwerveSettings settings = new SwerveSettings(SwerveType.SPARK_MAX);
 
         //I would call this function BEFORE making adjustments, just changes any values that were different between the two swerve types.
         //Use at risk though, it might adjust the values to something you don't want.
@@ -63,13 +63,12 @@ public class SwerveDrive extends EventListener {
         settings.useThresholdAsPercentage = true;
 
         //Create a new swerve group
-        swerveDrive = new SwerveGroup("Test Swerve Drive", settings,
-                new int[]{ 1, 3, 5, 7 }, //Drive IDs
-                new int[]{ 2, 4, 6, 8 }, //Turn/Steering IDs
-                new int[]{ 1, 2, 3, 4 },  //Encoder IDs
-                //Create a new Pigeon Gyro with ID of 5 and type of TWO (Pigeon 2.0) and set it to not inverted (false)
-                new Pigeon(Pigeon.Type.TWO, 5, false)
-                //Pigeon IMU also exists if you're using that instead
+        swerveDrive = new SwerveDrive(
+            new ModuleConfig(1, 2, 3, 10.4),
+            new ModuleConfig(4, 5, 6, 53.6),
+            new ModuleConfig(7, 8, 9, 72.8),
+            new ModuleConfig(10, 11, 12, 60.1),
+            settings
         );
 
         //Automatically add the controllers that are connected.
@@ -82,12 +81,19 @@ public class SwerveDrive extends EventListener {
                 onFixedAutonomous();
             }
         }, GamePhase.Autonomous);
+
+        Robot.getRealInstance().waitForFullfillConditions(
+            3000,
+            new Promise((res, rej) -> {
+                Promise.WaitThen(() -> { return swerveDrive.isReady(); }, res, rej, 10);
+            })
+        );
     }
 
     @Override
     public void robotPeriodic() {
         //Update info on the SmartDashboard/NetworkTables about the swerve drive
-        CommunicationManager.getInstance().updateSwerveInfo(swerveDrive);
+        //CommunicationManager.getInstance().updateSwerveInfo(swerveDrive);
     }
 
     @Override
@@ -152,9 +158,9 @@ public class SwerveDrive extends EventListener {
                 .updateInfo("Controller", "horizontal", horizontal);
 
         //Create a new Translation2d with the x and y values of the controller multiplied by the max speed.
-        Translation2d translation = new Translation2d(vertical, horizontal).times(swerveDrive.getSettings().maxSpeed);
+        //Translation2d translation = new Translation2d(vertical, horizontal).times(swerveDrive.getSettings().maxSpeed);
 
-        swerveDrive.drive(translation, direction, false, false);
+        //swerveDrive.drive(translation, direction, false, false);
 
         /*
         VALUES: (0.4, 0.9)

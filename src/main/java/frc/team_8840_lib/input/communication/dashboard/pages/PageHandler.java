@@ -27,8 +27,14 @@ public class PageHandler {
 
         pages.put("/", "home/index.html");
         pages.put("/libraries", "libraries/library.html");
+        pages.put("/finder", "finder/finder.html");
+
         pages.put("/static/library.js", "libraries/library.js");
+        pages.put("/static/finder.js", "finder/finder.js");
+
         pages.put("/static/style.css", "home/style.css");
+        pages.put("/static/finder.css", "finder/finder.css");
+        pages.put("/static/library.css", "libraries/library.css");
     }
 
     public static Constructor get() {
