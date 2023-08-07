@@ -137,7 +137,11 @@ public class Logger implements Loggable {
         if (printLN) {
             System.out.println(raw);
             currentLine += raw;
-            saveAndUpdate(currentLine);
+            saveAndUpdate(
+                // Add a space if the line starts with a or d due to the formatting of the log file
+                (currentLine.startsWith("d") || currentLine.startsWith("a") ? " " : "") + 
+                currentLine
+            );
             currentLine = "";
         } else {
             System.out.print(raw);
@@ -258,6 +262,17 @@ public class Logger implements Loggable {
             }
         }
 
+        public static LogType fromClass(Class<?> klass) {
+            if (klass == String.class) return STRING;
+            if (klass == Double.class) return DOUBLE;
+            if (klass == Boolean.class) return BOOLEAN;
+            if (klass == String[].class) return STRING_ARRAY;
+            if (klass == Double[].class) return DOUBLE_ARRAY;
+            if (klass == byte[].class) return BYTE_ARRAY;
+
+            return STRING;
+        }
+
         public static final byte STRING_CORRESPONDENCE = 1;
         public static final byte DOUBLE_CORRESPONDENCE = 2;
         public static final byte STRING_ARRAY_CORRESPONDENCE = 3;
@@ -290,7 +305,7 @@ public class Logger implements Loggable {
                     if (autoLogInfo == null) continue;
                     
                     String name = autoLogInfo.name();
-                    LogType logType = autoLogInfo.logtype();
+                    LogType logType = LogType.fromClass(method.getReturnType());
                     
                     if (name.contains("/")) {
                         //replace all slashes with underscores, just in case.
@@ -429,7 +444,7 @@ public class Logger implements Loggable {
         }
     }
 
-    @AutoLog(name = "working", logtype = LogType.STRING)
+    @AutoLog(name = "working")
     public String getWorking() {
         return "y";
     }

@@ -8,4 +8,6 @@
 [] Add in HTML to webpage to allow for package requests
 [] Fix CSS on webpage
 [] Generally fix swerve
-[] Move late start -> promise
+[X] Move late start -> promise
+[] Get rid of IOAccess (unnecessary)
+[] Add autolog annotation to variables, plus make the name optional (take method name as default)

@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import frc.team_8840_lib.info.console.AutoLog;
 import frc.team_8840_lib.info.console.Logger;
-import frc.team_8840_lib.info.console.Logger.LogType;
 import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
@@ -27,6 +26,8 @@ public abstract class Replayable extends IOLayer implements Loggable {
     public Replayable() {
         super();
 
+        //TODO: Get rid of IO Access
+        
         //Get the IOAccess annotation of this instance
         IOAccess ioAccess = this.getClass().getAnnotation(IOAccess.class);
         if (ioAccess == null) {
@@ -120,7 +121,7 @@ public abstract class Replayable extends IOLayer implements Loggable {
         ReplayManager.addReplayable(this);
     }
 
-    @AutoLog(logtype = LogType.BOOLEAN, name = "replay", replaylink = "inReplay")
+    @AutoLog(name = "replay", replaylink = "inReplay")
     public boolean replayable() {
         return true;
     }

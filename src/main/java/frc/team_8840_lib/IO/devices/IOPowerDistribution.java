@@ -130,7 +130,7 @@ public class IOPowerDistribution extends IOLayer implements Loggable {
         return "Power_Distribution";
     }
 
-    @AutoLog(logtype = LogType.BYTE_ARRAY, name = "Power Distribution Info")
+    @AutoLog(name = "Power Distribution Info")
     public byte[] logPD() {
         int nOfChannels = getNumberOfChannels();
 

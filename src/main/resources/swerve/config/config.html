@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/static/swerve-config.css">
+    <script src="/static/swerve-config.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>8840-utils</h1>
+        <h2>Swerve Drive Setup</h2>
+    </div>
+    <div class="config-sections">
+        <div class="config-section">
+            <h3>1. Configure Ports</h3>
+            <div class="config-section-content">
+                <div class="port-row">
+                    <div class="port-module">
+                        <h3>TOP LEFT</h3>
+                        <label for="top-left-drive">Drive </label>
+                        <input type="number" name="top-left-drive" id="top-left-drive">
+                        <label for="top-left-turn">Turn </label>
+                        <input type="number" name="top-left-turn" id="top-left-turn">
+                        <label for="top-left-encoder">Encoder </label>
+                        <input type="number" name="top-left-encoder" id="top-left-encoder">
+                    </div>
+
+                    <div class="port-module">
+                        <h3>TOP RIGHT</h3>
+                        <label for="top-right-drive">Drive </label>
+                        <input type="number" name="top-right-drive" id="top-right-drive">
+                        <label for="top-right-turn">Turn </label>
+                        <input type="number" name="top-right-turn" id="top-right-turn">
+                        <label for="top-right-encoder">Encoder </label>
+                        <input type="number" name="top-right-encoder" id="top-right-encoder">
+                    </div>
+                </div>
+                <div class="port-row">
+                    <div class="port-module">
+                        <h3>BOTTOM LEFT</h3>
+                        <label for="bottom-left-drive">Drive </label>
+                        <input type="number" name="bottom-left-drive" id="bottom-left-drive">
+                        <label for="bottom-left-turn">Turn </label>
+                        <input type="number" name="bottom-left-turn" id="bottom-left-turn">
+                        <label for="bottom-left-encoder">Encoder </label>
+                        <input type="number" name="bottom-left-encoder" id="bottom-left-encoder">
+                    </div>
+
+                    <div class="port-module">
+                        <h3>BOTTOM RIGHT</h3>
+                        <label for="bottom-right-drive">Drive </label>
+                        <input type="number" name="bottom-right-drive" id="bottom-right-drive">
+                        <label for="bottom-right-turn">Turn </label>
+                        <input type="number" name="bottom-right-turn" id="bottom-right-turn">
+                        <label for="bottom-right-encoder">Encoder </label>
+                        <input type="number" name="bottom-right-encoder" id="bottom-right-encoder">
+                    </div>
+                </div>
+                
+                <button>Confirm</button>
+            </div>
+        </div>
+        <div class="config-section">
+            <h3>2. Enable "Teleop"</h3>
+            <div class="config-section-content">
+                <p style="font-style: italic;">Waiting for teleop to be enabled...</p>
+            </div>
+        </div>
+        <div class="config-section">
+            <h3>3. Confirm correct configuration</h3>
+            <div class="config-section-content">
+                <div class="test-ports-ready">
+                    <p>
+                        Please make sure the robot is on a stand, and nothing is in the way of the swerve modules.
+                        Click the "Confirm" button when you are ready to test the modules.
+                    </p>
+                    <button>Confirm</button>
+                </div>
+                <div class="test-ports-progress">
+                    <h3>Currently testing: <span id="test-ports-module-location">TOP/BOTTOM LEFT/RIGHT</span></h3>
+                    <p>Is the <span id="test-module-type" style="font-weight: bolder;">DRIVE/TURN</span> motor currently moving?</p>
+                    <button>YES</button> <button>NO</button>
+                </div>
+            </div>
+        </div>
+        <div class="config-section">
+            <h3>4. Disable "Teleop"</h3>
+            <div class="config-section-content">
+                <p id="test-ports-error-msg"></p>
+                <p style="font-style: italic;">Waiting for teleop to be disabled...</p>
+            </div>
+        </div>
+        <div class="config-section">
+            <h3>5. Rotate the Top-Left Module</h3>
+            <div class="config-section-content">
+                <p>
+                    Rotate the top-left module for 1 full rotation, or until step number 6 is enabled.
+                    This is to check whether the encoder is reversed or not.
+                    This should be done by hand, and not by enabling teleop.
+                </p>
+                <button>Confirm</button>
+            </div>
+        </div>
+        <div class="config-section">
+            <h3>6. Position Wheels</h3>
+            <div class="config-section-content">
+                <p>
+                    Use a square to make sure the wheels are facing forward as close as you can.
+                    If the angle is off, this may lead to issues along the way.
+                    Please do not enable teleop for your own safety. 
+                    Turning on teleop may result in the wheels turning in a way that may damage the robot and/or injure you.
+                    <br>
+                    Once you are done, click the "Confirm" button.
+                </p>
+                <button>Confirm</button>
+            </div>
+        </div>
+        <div class="config-section">
+            <h3>7. Enable Teleop</h3>
+            <div class="config-section-content">
+                <p>
+                    Please make sure the robot is on a stand, and nothing is in the way of the swerve modules.
+                    Enable teleop once you are ready.
+                </p>
+                <button>Confirm</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

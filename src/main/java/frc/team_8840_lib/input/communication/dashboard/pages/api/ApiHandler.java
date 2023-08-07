@@ -15,12 +15,15 @@ import frc.team_8840_lib.libraries.LibraryManager;
 import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.http.IP;
 import frc.team_8840_lib.utils.http.Route;
+import frc.team_8840_lib.various.SwerveSetup;
 
 public class ApiHandler {
     private static String[] possibleRoutes = {
         "/api/",
         "/api/libraries",
-        "/api/info"
+        "/api/info",
+        "/api/swerve/config",
+        "/api/swerve/config/next-step"
     };
 
     public static Route.Resolution HandleRequest(HttpExchange req, Route.Resolution res) {
@@ -36,6 +39,10 @@ public class ApiHandler {
             return getLibraries(req, res);
         } else if (path.equalsIgnoreCase("/api/info")) {
             return getInfo(req, res);
+        } else if (path.equalsIgnoreCase("/api/swerve/config")) {
+            return SwerveSetup.handleSwerveSetup(req, res);
+        } else if (path.equalsIgnoreCase("/api/swerve/config/next-step")) {
+            return SwerveSetup.nextStep(req, res);
         }
  
         return res.status(200).json("{ \"message\": \"Page found\" }");

@@ -160,6 +160,14 @@ public class Pigeon extends IOLayer {
     }
 
     /**
+     * Gets the CAN ID of the Pigeon.
+     * @return CAN ID of Pigeon.
+     */
+    public int getID() {
+        return id;
+    }
+
+    /**
      * Gets the rotation of the gyroscope, inverted based on what was provided at creation.
      * @return Rotation of gyroscope.
      */

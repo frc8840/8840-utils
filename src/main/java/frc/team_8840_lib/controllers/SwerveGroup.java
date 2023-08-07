@@ -24,6 +24,7 @@ import frc.team_8840_lib.utils.controllers.swerve.CTREConfig;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
 import frc.team_8840_lib.utils.interfaces.SwerveLoop;
 import frc.team_8840_lib.utils.math.MathUtils;
+import frc.team_8840_lib.utils.math.units.Unit.Type;
 
 /**
  * Your standard swerve drive class. 
@@ -300,7 +301,7 @@ public class SwerveGroup extends Replayable {
         SwerveModuleState[] states = settings.getKinematics().toSwerveModuleStates(chassisSpeeds);
 
         if (applyDesaturation) {
-            SwerveDriveKinematics.desaturateWheelSpeeds(states, settings.maxSpeed);
+            SwerveDriveKinematics.desaturateWheelSpeeds(states, settings.maxSpeed.get(Type.FEET));
         }
 
         return states;
@@ -316,7 +317,7 @@ public class SwerveGroup extends Replayable {
      * */
     public void setModuleStates(SwerveModuleState[] states, boolean isOpenLoop) {
         //Desaturate the states to make sure that the robot doesn't go faster than the max speed
-        SwerveDriveKinematics.desaturateWheelSpeeds(states, settings.maxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, settings.maxSpeed.get(Type.FEET));
 
         topLeft.setDesiredState(
             states[ModuleIndex.kTOP_LEFT.getIndex()], 
@@ -352,7 +353,7 @@ public class SwerveGroup extends Replayable {
      * */
     public void setModuleStates(SwerveModuleState[] states, boolean isOpenLoop, boolean ignoreAngleLimit) {
         //Desaturate the states to make sure that the robot doesn't go faster than the max speed
-        SwerveDriveKinematics.desaturateWheelSpeeds(states, settings.maxSpeed);
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, settings.maxSpeed.get(Type.FEET));
 
         topLeft.setDesiredState(
             states[ModuleIndex.kTOP_LEFT.getIndex()], 
@@ -667,7 +668,7 @@ public class SwerveGroup extends Replayable {
      * Linked with {@link #replaySpeeds(double[])}
      * @return The speeds of the modules
      */
-    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Swerve Drive Module Speeds", replaylink = "Replay Speeds")
+    @AutoLog(name = "Swerve Drive Module Speeds", replaylink = "Replay Speeds")
     public double[] logSpeeds() {
         double[] speeds = new double[4];
         loop((module, i) -> {
@@ -690,7 +691,7 @@ public class SwerveGroup extends Replayable {
      * Logs the angles of the modules
      * @return The angles of the modules
      */
-    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Swerve Drive Module Angles", replaylink = "Replay Angles")
+    @AutoLog(name = "Swerve Drive Module Angles", replaylink = "Replay Angles")
     public double[] logAngles() {
         double[] angles = new double[4];
         loop((module, i) -> {
@@ -712,7 +713,7 @@ public class SwerveGroup extends Replayable {
      * Logs the desired speeds of the modules
      * @return The desired speeds of the modules
      */
-    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Desired Swerve Drive Module Speeds")
+    @AutoLog(name = "Desired Swerve Drive Module Speeds")
     public double[] logDesiredSpeeds() {
         double[] speeds = new double[4];
         loop((module, i) -> {
@@ -726,7 +727,7 @@ public class SwerveGroup extends Replayable {
      * Logs the desired angles of the modules
      * @return The desired angles of the modules
      */
-    @AutoLog(logtype = LogType.DOUBLE_ARRAY, name = "Desired Swerve Drive Module Angles")
+    @AutoLog(name = "Desired Swerve Drive Module Angles")
     public double[] logDesiredAngles() {
         double[] angles = new double[4];
         loop((module, i) -> {

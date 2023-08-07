@@ -78,6 +78,7 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">CTREModuleState</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
+<div class="block">Credit to https://github.com/frc3512/SwerveBot-2022/blob/main/src/main/java/frc/lib/math/OnboardModuleState.java</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -149,8 +150,9 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">edu.wpi.first.math.kinematics.SwerveModuleState</span>&nbsp;<span class="element-name">optimize</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;desiredState,
  edu.wpi.first.math.geometry.Rotation2d&nbsp;currentAngle)</span></div>
 <div class="block">Minimize the change in heading the desired swerve module state would require by potentially
- reversing the direction the wheel spins. Customized from WPILib's version to include placing
- in appropriate scope for CTRE onboard control.</div>
+ reversing the direction the wheel spins. Customized from WPILib's version to include placing in
+ appropriate scope for CTRE and REV onboard control as both controllers as of writing don't have
+ support for continuous input.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>desiredState</code> - The desired state.</dd>

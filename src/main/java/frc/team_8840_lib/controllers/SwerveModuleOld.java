@@ -300,7 +300,7 @@ public class SwerveModuleOld extends IOLayer {
 
         //Inverted
         turnNEO.setInverted(config.getSettings().turnInverted);
-        driveNEO.setInverted(config.getSettings().getReverseDrive(this.getIndex()) ? !config.getSettings().driveInverted : config.getSettings().driveInverted);
+        //driveNEO.setInverted(config.getSettings().getReverseDrive(this.getIndex()) ? !config.getSettings().driveInverted : config.getSettings().driveInverted);
 
         //Idle mode
         turnNEO.setIdleMode(config.getSettings().turnIdleMode);
@@ -393,8 +393,8 @@ public class SwerveModuleOld extends IOLayer {
         this.driveTalonFX.setInverted(config.getSettings().driveInverted);
 
         //Set the neutral mode
-        this.turnTalonFX.setNeutralMode(config.getSettings().turnNeutralMode);
-        this.driveTalonFX.setNeutralMode(config.getSettings().driveNeutralMode);
+        //this.turnTalonFX.setNeutralMode(config.getSettings().turnNeutralMode);
+        //this.driveTalonFX.setNeutralMode(config.getSettings().driveNeutralMode);
 
         this.driveTalonFX.setSelectedSensorPosition(0);
 
@@ -419,12 +419,12 @@ public class SwerveModuleOld extends IOLayer {
      * */
     public void resetToAbsolute() {
         if (this.config.getSettings().getType() == SwerveType.FALCON_500) {
-            double rawDegrees = getRotation().getDegrees() - config.getSettings().angleOffsets[privateID];
+            double rawDegrees = getRotation().getDegrees() - 0;//config.getSettings().angleOffsets[privateID];
             double absPos = FalconConversions.degreesToFalcon(rawDegrees, config.getSettings().angleGearRatio);
             Logger.Log("[" + getBaseName() + "] Resetting to absolute position: " + rawDegrees + " degrees.");
             this.turnTalonFX.setSelectedSensorPosition(absPos);
         } else if (this.config.getSettings().getType() == SwerveType.SPARK_MAX) {
-            double newPosition = getAbsoluteAngle().getDegrees() - config.getSettings().angleOffsets[privateID];
+            double newPosition = 0;//getAbsoluteAngle().getDegrees() - config.getSettings().angleOffsets[privateID];
 
             if (!config.getSettings().manualOffset && !RobotBase.isSimulation()) {
                 Logger.Log("[" + getBaseName() + "] Resetting to absolute position: " + newPosition + " degrees.");
@@ -440,13 +440,13 @@ public class SwerveModuleOld extends IOLayer {
                     neoTurnEncoder.doSubtractionOfStart(config.getSettings().manualOffset);
                 }
 
-                double newPos = angleCANCoder.getAbsolutePosition() - config.getSettings().angleOffsets[privateID];
+                double newPos = 0;//angleCANCoder.getAbsolutePosition() - config.getSettings().angleOffsets[privateID];
 
                 if (!config.getSettings().manualOffset) {
                     Logger.Log("[" + getBaseName() + "] Spark Maxes are not working. Doing the manual offsetting...");
                 } else {
                     Logger.Log("[" + getBaseName() + "] Doing manual offsetting (based on setting)...");
-                    Logger.Log("[" + getBaseName() + "] Angle Offset: " + config.getSettings().angleOffsets[privateID] + " degrees, current position: " + angleCANCoder.getAbsolutePosition() + " degrees. New position: " + newPos + " degrees.");
+                    //Logger.Log("[" + getBaseName() + "] Angle Offset: " + config.getSettings().angleOffsets[privateID] + " degrees, current position: " + angleCANCoder.getAbsolutePosition() + " degrees. New position: " + newPos + " degrees.");
                 }
 
                 neoTurnEncoder.setManualOffset(true);
@@ -454,7 +454,7 @@ public class SwerveModuleOld extends IOLayer {
                     newPos
                 );
 
-                Logger.Log("[" + getBaseName() + "] " + (!config.getSettings().manualOffset ? "TRY 2 " : "") + "Reset to absolute position: " + neoTurnEncoder.getPosition() + " degrees " + (!config.getSettings().manualOffset ? "(should be " + newPosition + " degrees.)" : "(should be " + config.getSettings().angleOffsets[privateID] + " degrees.)"));
+                //Logger.Log("[" + getBaseName() + "] " + (!config.getSettings().manualOffset ? "TRY 2 " : "") + "Reset to absolute position: " + neoTurnEncoder.getPosition() + " degrees " + (!config.getSettings().manualOffset ? "(should be " + newPosition + " degrees.)" : "(should be " + config.getSettings().angleOffsets[privateID] + " degrees.)"));
             }
 
             if (RobotBase.isSimulation()) {
@@ -512,7 +512,7 @@ public class SwerveModuleOld extends IOLayer {
             return;
         }
 
-        this.driveSpeed = speed * config.getSettings().maxSpeed;
+        //this.driveSpeed = speed * config.getSettings().maxSpeed;
 
         if (this.getType() == SwerveType.FALCON_500) {
             if (Math.abs(speed) < this.config.getSettings().threshold) {
@@ -523,9 +523,9 @@ public class SwerveModuleOld extends IOLayer {
         } else if (this.getType() == SwerveType.SPARK_MAX) {
             CommunicationManager.getInstance().updateInfo(
                 "desired_swerve_drive", privateID + "/speed", 
-                speed * config.getSettings().maxSpeed
+                0//speed * config.getSettings().maxSpeed
             );
-            desiredSpeed = speed * config.getSettings().maxSpeed;
+            //desiredSpeed = speed * config.getSettings().maxSpeed;
 
             if (!noRun) driveNEO.set(speed);
         }
@@ -557,7 +557,7 @@ public class SwerveModuleOld extends IOLayer {
      * */
     public void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (isOpenLoop) {
-            this.setSpeed(desiredState.speedMetersPerSecond / config.getSettings().maxSpeed);
+            //this.setSpeed(desiredState.speedMetersPerSecond / config.getSettings().maxSpeed);
         } else {
             if (getType() == SwerveType.FALCON_500) {
                 double velocity = FalconConversions.MPSToFalcon(desiredState.speedMetersPerSecond, config.getSettings().wheelCircumference(), config.getSettings().driveGearRatio);

@@ -58,7 +58,7 @@ public class IOManager implements Loggable {
 
     private HashMap<String, Long> recordedWriteChanges;
 
-    @AutoLog( logtype = LogType.BYTE_ARRAY, name = "IO" )
+    @AutoLog( name = "IO" )
     public byte[] readAndSendIOInformation() {
         HashMap<String, ArrayList<IOInfo>> data = new HashMap<>();
 

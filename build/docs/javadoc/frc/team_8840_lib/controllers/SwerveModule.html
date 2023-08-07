@@ -147,15 +147,35 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#resetToAbsolute()" class="member-name-link">resetToAbsolute</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeoCANStatusFrames(com.revrobotics.CANSparkMax,int,int,int,int,int)" class="member-name-link">setNeoCANStatusFrames</a><wbr>(com.revrobotics.CANSparkMax&nbsp;m_motor,
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setAngle(edu.wpi.first.math.geometry.Rotation2d,boolean)" class="member-name-link">setAngle</a><wbr>(edu.wpi.first.math.geometry.Rotation2d&nbsp;angle,
+ boolean&nbsp;ignoreAngleLimit)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDesiredState(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)" class="member-name-link">setDesiredState</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
+ boolean&nbsp;openLoop)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setDesiredState(edu.wpi.first.math.kinematics.SwerveModuleState,boolean,boolean)" class="member-name-link">setDesiredState</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
+ boolean&nbsp;openLoop,
+ boolean&nbsp;runOptimization)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setNeoCANStatusFrames(com.revrobotics.CANSparkMax,int,int,int,int,int)" class="member-name-link">setNeoCANStatusFrames</a><wbr>(com.revrobotics.CANSparkMax&nbsp;m_motor,
  int&nbsp;CANStatus0,
  int&nbsp;CANStatus1,
  int&nbsp;CANStatus2,
  int&nbsp;CANStatus3,
  int&nbsp;CANStatus4)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Sets the NEO CAN Status Frames</div>
 </div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setSpeed(frc.team_8840_lib.utils.math.units.Unit,boolean)" class="member-name-link">setSpeed</a><wbr>(<a href="../utils/math/units/Unit.html" title="class in frc.team_8840_lib.utils.math.units">Unit</a>&nbsp;speed,
+ boolean&nbsp;openLoop)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -226,6 +246,41 @@ loadScripts(document, 'script');</script>
 <dd><code>CANStatus3</code> - The status frame 3 period</dd>
 <dd><code>CANStatus4</code> - The status frame 4 period</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="setSpeed(frc.team_8840_lib.utils.math.units.Unit,boolean)">
+<h3>setSpeed</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setSpeed</span><wbr><span class="parameters">(<a href="../utils/math/units/Unit.html" title="class in frc.team_8840_lib.utils.math.units">Unit</a>&nbsp;speed,
+ boolean&nbsp;openLoop)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setAngle(edu.wpi.first.math.geometry.Rotation2d,boolean)">
+<h3>setAngle</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setAngle</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Rotation2d&nbsp;angle,
+ boolean&nbsp;ignoreAngleLimit)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setDesiredState(edu.wpi.first.math.kinematics.SwerveModuleState,boolean)">
+<h3>setDesiredState</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setDesiredState</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
+ boolean&nbsp;openLoop)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setDesiredState(edu.wpi.first.math.kinematics.SwerveModuleState,boolean,boolean)">
+<h3>setDesiredState</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setDesiredState</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
+ boolean&nbsp;openLoop,
+ boolean&nbsp;runOptimization)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="stop()">
+<h3>stop</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">stop</span>()</div>
 </section>
 </li>
 <li>

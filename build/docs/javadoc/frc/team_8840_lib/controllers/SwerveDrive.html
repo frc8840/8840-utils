@@ -97,10 +97,11 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.SwerveSettings)" class="member-name-link">SwerveDrive</a><wbr>(<a href="../utils/controllers/swerve/ModuleConfig.html" title="class in frc.team_8840_lib.utils.controllers.swerve">ModuleConfig</a>&nbsp;frontLeft,
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.Pigeon,frc.team_8840_lib.utils.controllers.swerve.SwerveSettings)" class="member-name-link">SwerveDrive</a><wbr>(<a href="../utils/controllers/swerve/ModuleConfig.html" title="class in frc.team_8840_lib.utils.controllers.swerve">ModuleConfig</a>&nbsp;frontLeft,
  <a href="../utils/controllers/swerve/ModuleConfig.html" title="class in frc.team_8840_lib.utils.controllers.swerve">ModuleConfig</a>&nbsp;frontRight,
  <a href="../utils/controllers/swerve/ModuleConfig.html" title="class in frc.team_8840_lib.utils.controllers.swerve">ModuleConfig</a>&nbsp;backLeft,
  <a href="../utils/controllers/swerve/ModuleConfig.html" title="class in frc.team_8840_lib.utils.controllers.swerve">ModuleConfig</a>&nbsp;backRight,
+ <a href="../utils/controllers/Pigeon.html" title="class in frc.team_8840_lib.utils.controllers">Pigeon</a>&nbsp;pigeon,
  <a href="../utils/controllers/swerve/SwerveSettings.html" title="class in frc.team_8840_lib.utils.controllers.swerve">SwerveSettings</a>&nbsp;settings)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
@@ -118,16 +119,65 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#exitReplay()" class="member-name-link">exitReplay</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#drive(edu.wpi.first.math.geometry.Translation2d,edu.wpi.first.math.geometry.Rotation2d,boolean,boolean)" class="member-name-link">drive</a><wbr>(edu.wpi.first.math.geometry.Translation2d&nbsp;translation,
+ edu.wpi.first.math.geometry.Rotation2d&nbsp;rotationSpeed,
+ boolean&nbsp;fieldRelative,
+ boolean&nbsp;openLoop)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Sets the speed and rotation of each module using a translation and rotation.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#exitReplay()" class="member-name-link">exitReplay</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Rotation2d</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getAngle()" class="member-name-link">getAngle</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns the angle of the gyroscope on the robot.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double[]</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getAngles()" class="member-name-link">getAngles</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getBaseName()" class="member-name-link">getBaseName</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getBaseName()" class="member-name-link">getBaseName</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double[]</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getPointing()" class="member-name-link">getPointing</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double[]</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getSpeeds()" class="member-name-link">getSpeeds</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isOpenLoop()" class="member-name-link">isOpenLoop</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isReady()" class="member-name-link">isReady</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#replayInit()" class="member-name-link">replayInit</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#replayAngles(double%5B%5D)" class="member-name-link">replayAngles</a><wbr>(double[]&nbsp;angles)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#replayInit()" class="member-name-link">replayInit</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#replayOpenLoop(boolean)" class="member-name-link">replayOpenLoop</a><wbr>(boolean&nbsp;openLoop)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#replaySpeeds(double%5B%5D)" class="member-name-link">replaySpeeds</a><wbr>(double[]&nbsp;speeds)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setModuleStates(edu.wpi.first.math.kinematics.SwerveModuleState,edu.wpi.first.math.kinematics.SwerveModuleState,edu.wpi.first.math.kinematics.SwerveModuleState,edu.wpi.first.math.kinematics.SwerveModuleState,boolean,boolean)" class="member-name-link">setModuleStates</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;frontRight,
+ edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;backRight,
+ edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;frontLeft,
+ edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;backLeft,
+ boolean&nbsp;openLoop,
+ boolean&nbsp;runOptimization)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#spin(edu.wpi.first.math.geometry.Rotation2d,boolean)" class="member-name-link">spin</a><wbr>(edu.wpi.first.math.geometry.Rotation2d&nbsp;rotationPerSecond,
+ boolean&nbsp;openLoop)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
 </div>
@@ -153,12 +203,13 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.SwerveSettings)">
+<section class="detail" id="&lt;init&gt;(frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.swerve.ModuleConfig,frc.team_8840_lib.utils.controllers.Pigeon,frc.team_8840_lib.utils.controllers.swerve.SwerveSettings)">
 <h3>SwerveDrive</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">SwerveDrive</span><wbr><span class="parameters">(<a href="../utils/controllers/swerve/ModuleConfig.html" title="class in frc.team_8840_lib.utils.controllers.swerve">ModuleConfig</a>&nbsp;frontLeft,
  <a href="../utils/controllers/swerve/ModuleConfig.html" title="class in frc.team_8840_lib.utils.controllers.swerve">ModuleConfig</a>&nbsp;frontRight,
  <a href="../utils/controllers/swerve/ModuleConfig.html" title="class in frc.team_8840_lib.utils.controllers.swerve">ModuleConfig</a>&nbsp;backLeft,
  <a href="../utils/controllers/swerve/ModuleConfig.html" title="class in frc.team_8840_lib.utils.controllers.swerve">ModuleConfig</a>&nbsp;backRight,
+ <a href="../utils/controllers/Pigeon.html" title="class in frc.team_8840_lib.utils.controllers">Pigeon</a>&nbsp;pigeon,
  <a href="../utils/controllers/swerve/SwerveSettings.html" title="class in frc.team_8840_lib.utils.controllers.swerve">SwerveSettings</a>&nbsp;settings)</span></div>
 </section>
 </li>
@@ -170,6 +221,58 @@ loadScripts(document, 'script');</script>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="drive(edu.wpi.first.math.geometry.Translation2d,edu.wpi.first.math.geometry.Rotation2d,boolean,boolean)">
+<h3>drive</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">drive</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Translation2d&nbsp;translation,
+ edu.wpi.first.math.geometry.Rotation2d&nbsp;rotationSpeed,
+ boolean&nbsp;fieldRelative,
+ boolean&nbsp;openLoop)</span></div>
+<div class="block">Sets the speed and rotation of each module using a translation and rotation.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>translation</code> - Translation for the robot</dd>
+<dd><code>rotationSpeed</code> - Rotation speed of the robot.</dd>
+<dd><code>fieldRelative</code> - Whether the translation is field relative or not</dd>
+<dd><code>openLoop</code> - Whether to use open loop or closed loop</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="stop()">
+<h3>stop</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">stop</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="spin(edu.wpi.first.math.geometry.Rotation2d,boolean)">
+<h3>spin</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">spin</span><wbr><span class="parameters">(edu.wpi.first.math.geometry.Rotation2d&nbsp;rotationPerSecond,
+ boolean&nbsp;openLoop)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="setModuleStates(edu.wpi.first.math.kinematics.SwerveModuleState,edu.wpi.first.math.kinematics.SwerveModuleState,edu.wpi.first.math.kinematics.SwerveModuleState,edu.wpi.first.math.kinematics.SwerveModuleState,boolean,boolean)">
+<h3>setModuleStates</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setModuleStates</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;frontRight,
+ edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;backRight,
+ edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;frontLeft,
+ edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;backLeft,
+ boolean&nbsp;openLoop,
+ boolean&nbsp;runOptimization)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getAngle()">
+<h3>getAngle</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Rotation2d</span>&nbsp;<span class="element-name">getAngle</span>()</div>
+<div class="block">Returns the angle of the gyroscope on the robot.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The angle of the gyroscope on the robot</dd>
+</dl>
+</section>
+</li>
 <li>
 <section class="detail" id="isReady()">
 <h3>isReady</h3>
@@ -186,6 +289,48 @@ loadScripts(document, 'script');</script>
 <dt>Specified by:</dt>
 <dd><code><a href="../replay/Replayable.html#getBaseName()">getBaseName</a></code>&nbsp;in class&nbsp;<code><a href="../replay/Replayable.html" title="class in frc.team_8840_lib.replay">Replayable</a></code></dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getPointing()">
+<h3>getPointing</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double[]</span>&nbsp;<span class="element-name">getPointing</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="isOpenLoop()">
+<h3>isOpenLoop</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isOpenLoop</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="replayOpenLoop(boolean)">
+<h3>replayOpenLoop</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">replayOpenLoop</span><wbr><span class="parameters">(boolean&nbsp;openLoop)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getAngles()">
+<h3>getAngles</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double[]</span>&nbsp;<span class="element-name">getAngles</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="replayAngles(double[])">
+<h3>replayAngles</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">replayAngles</span><wbr><span class="parameters">(double[]&nbsp;angles)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="getSpeeds()">
+<h3>getSpeeds</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double[]</span>&nbsp;<span class="element-name">getSpeeds</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="replaySpeeds(double[])">
+<h3>replaySpeeds</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">replaySpeeds</span><wbr><span class="parameters">(double[]&nbsp;speeds)</span></div>
 </section>
 </li>
 <li>

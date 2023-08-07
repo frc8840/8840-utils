@@ -10,11 +10,13 @@ import frc.team_8840_lib.listeners.EventListener;
 import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.async.Promise;
+import frc.team_8840_lib.utils.controllers.Pigeon;
 import frc.team_8840_lib.utils.controllers.swerve.ModuleConfig;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveType;
 import frc.team_8840_lib.utils.controls.Axis;
 import frc.team_8840_lib.utils.math.MathUtils;
+import frc.team_8840_lib.utils.math.units.Unit;
 
 import java.util.TimerTask;
 
@@ -40,7 +42,7 @@ public class SwerveDriveExample extends EventListener {
 
         //The default is 4.5 for maxSpeed already, but you can adjust it how you want.
         //If you want to look at the default values, check out https://github.com/frc8840/8840-utils/tree/main/src/main/java/frc/team_8840_lib/utils/controllers/swerve/SwerveSettings.java
-        settings.maxSpeed = 4.5;
+        settings.maxSpeed = new Unit(4.5, Unit.Type.FEET);
 
         //This value is also the default
         settings.wheelBase = Units.inchesToMeters(21.73);
@@ -48,13 +50,6 @@ public class SwerveDriveExample extends EventListener {
         //If you do change the wheelBase in the settings, you will need to call this function to update the kinematics.
         //This is because the kinematics are based on the wheelBase.
         settings.updateKinematics();
-
-        //Very important! Adjust the angle offset to zero out the angles.
-        //These are just random values, take time to adjust them to your liking.
-        settings.angleOffsets[0] = 36.3; //First module
-        settings.angleOffsets[1] = 10.51; //Second module
-        settings.angleOffsets[2] = 2.25; //Third module
-        settings.angleOffsets[3] = 70.31; //Fourth module
 
         //Set the threshold for the drive to be 0.01 and set it to be a percentage of the max speed.
         //This means that if the joystick is less than 1% of the max speed, it will be 0.
@@ -68,6 +63,7 @@ public class SwerveDriveExample extends EventListener {
             new ModuleConfig(4, 5, 6, 53.6),
             new ModuleConfig(7, 8, 9, 72.8),
             new ModuleConfig(10, 11, 12, 60.1),
+            new Pigeon(Pigeon.Type.TWO, 13),
             settings
         );
 

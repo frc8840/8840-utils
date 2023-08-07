@@ -38,10 +38,10 @@ public class AutonomousExample extends EventListener {
         settings.defaultAdjustToType();
         settings.updateKinematics();
 
-        settings.angleOffsets[0] = 0; //First module
-        settings.angleOffsets[1] = 0; //Second module
-        settings.angleOffsets[2] = 0; //Third module
-        settings.angleOffsets[3] = 0; //Fourth module
+        // settings.angleOffsets[0] = 0; //First module
+        // settings.angleOffsets[1] = 0; //Second module
+        // settings.angleOffsets[2] = 0; //Third module
+        // settings.angleOffsets[3] = 0; //Fourth module
 
         settings.threshold = 0.01;
         settings.useThresholdAsPercentage = true;
@@ -187,7 +187,7 @@ public class AutonomousExample extends EventListener {
     public void onTeleopPeriodic() {
         GameController controller = GameController.get(-1);
 
-        Translation2d translation = new Translation2d(controller.getAxis(Axis.Horizontal), controller.getAxis(Axis.Vertical)).times(swerveDrive.getSettings().maxSpeed);
+        Translation2d translation = new Translation2d(0,0);// new Translation2d(controller.getAxis(Axis.Horizontal), controller.getAxis(Axis.Vertical)).times(swerveDrive.getSettings().maxSpeed);
         double rotation = ((360 - controller.getAxis(Axis.Twist)) / 360) * 2 * Math.PI;
 
         swerveDrive.drive(translation, rotation, true, false);

@@ -6,6 +6,7 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 import com.revrobotics.REVPhysicsSim;
@@ -20,6 +21,7 @@ import frc.team_8840_lib.controllers.specifics.SparkMaxEncoderWrapper;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.async.Promise;
+import frc.team_8840_lib.utils.controllers.swerve.CTREModuleState;
 import frc.team_8840_lib.utils.controllers.swerve.ModuleConfig;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
 import frc.team_8840_lib.utils.math.units.Unit;
@@ -44,7 +46,7 @@ public class SwerveModule {
     private SparkMaxPIDController m_drivePIDController;
     private SparkMaxPIDController m_turnPIDController;
 
-    private Rotation2d m_lastAngle;
+    private Rotation2d m_lastDesiredAngle;
     private SimpleMotorFeedforward m_feedforward;
 
     private double m_drivePositionConversionFactor;
@@ -264,7 +266,7 @@ public class SwerveModule {
             );
         });
     }
-
+    
     /**
      * Sets the NEO CAN Status Frames
      * @param m_motor The motor to set the status frames for
@@ -284,6 +286,51 @@ public class SwerveModule {
         //  https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
     }
 
+    public void setSpeed(Unit speed, boolean openLoop) {
+        if (openLoop) {
+            m_driveMotor.set(speed.get(Unit.Type.METERS) / m_settings.maxSpeed.get(Unit.Type.METERS));
+        } else {
+            m_drivePIDController.setReference(
+                speed.get(Unit.Type.METERS),
+                ControlType.kVelocity,
+                0,
+                m_feedforward.calculate(speed.get(Unit.Type.METERS))
+            );
+        }
+    }
+
+    public void setAngle(Rotation2d angle, boolean ignoreAngleLimit) {
+        double difference = Math.abs(angle.getDegrees() - m_lastDesiredAngle.getDegrees());
+
+        if ((difference > 179 || difference < 0.2) && !ignoreAngleLimit) {
+            return;
+        }
+
+        m_turnPIDController.setReference(
+            m_turnEncoderWrapper.calculatePosition(angle.getDegrees(), true),
+            ControlType.kPosition,
+            0,
+            m_settings.turnPID.kF
+        );
+    }
+
+    public void setDesiredState(SwerveModuleState state, boolean openLoop) {
+        setDesiredState(state, openLoop, true);
+    }
+
+    public void setDesiredState(SwerveModuleState state, boolean openLoop, boolean runOptimization) {
+        SwerveModuleState optimizedState = runOptimization ? CTREModuleState.optimize(state, m_lastDesiredAngle) : state;
+
+        setSpeed(new Unit(optimizedState.speedMetersPerSecond, Unit.Type.METERS), openLoop);
+        setAngle(optimizedState.angle, false);
+
+        m_lastDesiredAngle = optimizedState.angle;
+    }
+
+    public void stop() {
+        setSpeed(new Unit(0, Unit.Type.METERS), true);
+    }
+
     public Rotation2d getAbsoluteAngle() {
         return Rotation2d.fromDegrees(m_encoder.getAbsolutePosition());
     }
@@ -300,7 +347,7 @@ public class SwerveModule {
     }
 
     public Unit getSpeed() {
-        return new Unit(m_driveEncoderWrapper.getVelocity(), Type.FEET);
+        return new Unit(m_driveEncoderWrapper.getVelocity(), Type.METERS);
     }
 
     public boolean initalized() {
