@@ -3,6 +3,7 @@ package frc.team_8840_lib.various;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.TimerTask;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
@@ -17,6 +18,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.listeners.EventListener;
+import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.http.IP;
 import frc.team_8840_lib.utils.http.Route;
@@ -26,6 +28,11 @@ public class SwerveSetup extends EventListener {
     private static boolean using = false;
     private static int step = 1;
 
+    private static boolean testingPorts = false;
+    private static int testingSide = 0; //0 for front-left, 1 for front-right, 2 for back-left, 3 for back-right
+    private static int testingMotor = 0; //0 for drive, 1 for turn
+    private static String testingMotorError = "";
+
     private static JSONObject config = new JSONObject();
 
     public static Route.Resolution nextStep(HttpExchange req, Route.Resolution res) {
@@ -34,6 +41,8 @@ public class SwerveSetup extends EventListener {
         }
 
         step++;
+
+        Logger.Log("Moving to step " + step + " of Swerve Setup!");
 
         JSONObject json = new JSONObject();
         json.put("step", step);
@@ -98,6 +107,54 @@ public class SwerveSetup extends EventListener {
             config.put("ports", ports);
 
             return res.json("{ \"message\": \"Step 1 complete\", \"success\": \"true\" }").status(200);
+        } else if (step == 3) {
+            if (json.has("confirm")) {
+                testingPorts = true;
+
+                Logger.Log("Starting to test ports!");
+
+                return res.json("{ \"message\": \"Testing ports...\" }").status(200);
+            } else if (json.has("userResponse")) {
+                boolean wasCorrect = json.getBoolean("userResponse");
+
+                if (wasCorrect) {
+                    JSONObject testingJson = new JSONObject();
+
+                    if (testingMotorError.length() > 0) {
+                        testingJson.put("continue", false);
+                        testingJson.put("error", testingMotorError);
+                        testingPorts = false;
+                        testingSide = 0;
+                        testingMotor = 0;
+                        testingMotorError = "";
+                        config.remove("ports");
+                        
+                        return res.json(testingJson).status(200);
+                    }
+                    
+                    if (testingMotor == 1) {
+                        testingSide++;
+                        testingMotor = 0;
+                    } else {
+                        testingMotor++;
+                    }
+
+
+                    testingJson.put("continue", true);
+
+                    if (testingSide == 4) {
+                        testingPorts = false;
+
+                        testingSide = 0;
+                        testingMotor = 0;
+
+                        testingJson.put("finished", true);
+                        
+                        return res.json(testingJson).status(200);
+                    }
+                }
+
+            }
         }
 
         return res.json("{ \"message\": \"Page not found\" }").status(404);
@@ -125,6 +182,8 @@ public class SwerveSetup extends EventListener {
 
         Logger.Log("Swerve Setup", "Swerve Setup is enabled!");
         Logger.Log("Swerve Setup", "Please open your browser to http://" + IP.getIP() + "/swerve/setup");
+        
+        Robot.getInstance().subscribeFixedPhase(this::onFixedTeleop, GamePhase.Teleop);
     }
 
     @Override
@@ -140,7 +199,8 @@ public class SwerveSetup extends EventListener {
 
     @Override
     public void onTeleopEnable() {
-        if (config.has("ports") && step == 2) {
+        //2 or 3 just in case the request is somehow faster.
+        if (config.has("ports") && step == 2 || step == 3) {
             JSONObject ports = config.getJSONObject("ports");
 
             frontLeftDrive = new CANSparkMax(ports.getJSONObject("frontLeft").getInt("drive"), CANSparkMax.MotorType.kBrushless);
@@ -177,6 +237,110 @@ public class SwerveSetup extends EventListener {
         }
     }
 
+    private int testCounter = 0;
+    private double testTotalMotorMovement = 0;
+    private double testTotalEncoderMovement = 0;
+
+    private String lastTestCombo = "";
+
+    public void onFixedTeleop() {
+        if (step == 3 && testingPorts) {
+            CANSparkMax motor = getMotorFromNumbers();
+            CANCoder encoder = getEncoderFromNumbers();
+
+            if (lastTestCombo != testingSide + "," + testingMotor) {
+                //stop the last motor
+                if (lastTestCombo != "") {
+                    CANSparkMax lastMotor = getMotorFromNumbers(
+                        (int) Integer.parseInt(lastTestCombo.split(",")[0]), 
+                        (int) Integer.parseInt(lastTestCombo.split(",")[1])
+                    );
+
+                    lastMotor.set(0);
+                }
+
+                lastTestCombo = testingSide + "," + testingMotor;
+                testTotalMotorMovement = 0;
+                testTotalEncoderMovement = 0;
+                testCounter = 0;
+            }
+
+            if (motor != null && encoder != null) {
+                motor.set(0.3);
+
+                if (testingMotor == 1) {
+                    //If the counter has been going for more than a second but there has been no movement,
+                    //then there is an error.
+                    if (testCounter > 32 && Math.abs(testTotalEncoderMovement / testCounter) < 0.1) {
+                        if (Math.abs(testTotalMotorMovement / testCounter) < 0.1) {
+                            testingMotorError = "Motor is not moving!";
+                            throw new RuntimeException("Motor is not moving!");
+                        } else {
+                            testingMotorError = "Encoder is not updating!";
+                            throw new RuntimeException("Encoder is not updating!");
+                        }
+                    }
+
+                    if (testCounter >= 64) {
+                        motor.set(0);
+                    }
+                } else {
+                    if (testCounter > 32) {
+                        if (Math.abs(testTotalMotorMovement / testCounter) < 0.1) {
+                            testingMotorError = "Motor is not moving!";
+                            throw new RuntimeException("Motor is not moving!");
+                        }
+                    }
+
+                    if (testCounter >= 64) {
+                        motor.set(0);
+                    }
+                }
+
+                if (testCounter < 64) {
+                    testTotalMotorMovement += motor.getEncoder().getVelocity();
+                    testTotalEncoderMovement += encoder.getVelocity();
+                    testCounter++;
+                }
+            } else {
+                testingMotorError = "Motor or encoder is null!";
+                throw new RuntimeException("Motor is null!");
+            }
+        }
+    }
+
+    private CANCoder getEncoderFromNumbers() {
+        if (testingSide == 0) {
+            return frontLeftEncoder;
+        } else if (testingSide == 1) {
+            return frontRightEncoder;
+        } else if (testingSide == 2) {
+            return backLeftEncoder;
+        } else if (testingSide == 3) {
+            return backRightEncoder;
+        }
+
+        return null;
+    }
+
+    private CANSparkMax getMotorFromNumbers() {
+        return getMotorFromNumbers(testingSide, testingMotor);
+    }
+
+    private CANSparkMax getMotorFromNumbers(int testingSide, int testingMotor) {
+        if (testingSide == 0) {
+            return testingMotor == 0 ? frontLeftDrive : frontLeftTurn;
+        } else if (testingSide == 1) {
+            return testingMotor == 0 ? frontRightDrive : frontRightTurn;
+        } else if (testingSide == 2) {
+            return testingMotor == 0 ? backLeftDrive : backLeftTurn;
+        } else if (testingSide == 3) {
+            return testingMotor == 0 ? backRightDrive : backRightTurn;
+        }
+
+        return null;
+    }
+
     private void setupMotor(CANSparkMax motor, boolean isDrive) {
         motor.restoreFactoryDefaults();
 
@@ -203,11 +367,8 @@ public class SwerveSetup extends EventListener {
         canCoder.configAllSettings(encoderConfig);
     }
 
-
     @Override
-    public void onTeleopPeriodic() {
-
-    }
+    public void onTeleopPeriodic() {}
 
     @Override
     public void onAutonomousEnable() {

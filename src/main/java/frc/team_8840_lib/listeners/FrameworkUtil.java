@@ -11,6 +11,7 @@ import frc.team_8840_lib.info.time.TimeKeeper;
 import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.libraries.LibraryManager;
 import frc.team_8840_lib.utils.GamePhase;
+import frc.team_8840_lib.utils.interfaces.Callback;
 
 /**
  * This class is supposed to be the framework of what will make the library work.
@@ -86,6 +87,15 @@ public class FrameworkUtil {
         Logger.closeLogger();
 
         IOManager.close();
+    }
+
+    public void subscribeFixedPhase(Callback method, GamePhase phase) {
+        subscribeFixedPhase(new TimerTask() {
+            @Override
+            public void run() {
+                method.run();
+            }
+        }, phase);
     }
 
     /**

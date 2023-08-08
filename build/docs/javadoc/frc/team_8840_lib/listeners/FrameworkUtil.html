@@ -144,9 +144,13 @@ loadScripts(document, 'script');</script>
 <div class="block">This method is supposed to be called periodically/often.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#subscribeFixedPhase(java.util.TimerTask,frc.team_8840_lib.utils.GamePhase)" class="member-name-link">subscribeFixedPhase</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/TimerTask.html" title="class or interface in java.util" class="external-link">TimerTask</a>&nbsp;timerTask,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#subscribeFixedPhase(frc.team_8840_lib.utils.interfaces.Callback,frc.team_8840_lib.utils.GamePhase)" class="member-name-link">subscribeFixedPhase</a><wbr>(<a href="../utils/interfaces/Callback.html" title="interface in frc.team_8840_lib.utils.interfaces">Callback</a>&nbsp;method,
  <a href="../utils/GamePhase.html" title="enum class in frc.team_8840_lib.utils">GamePhase</a>&nbsp;phase)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#subscribeFixedPhase(java.util.TimerTask,frc.team_8840_lib.utils.GamePhase)" class="member-name-link">subscribeFixedPhase</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/TimerTask.html" title="class or interface in java.util" class="external-link">TimerTask</a>&nbsp;timerTask,
+ <a href="../utils/GamePhase.html" title="enum class in frc.team_8840_lib.utils">GamePhase</a>&nbsp;phase)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Due to the nature of periodic tasks (called 3500 to 4000 times per second), it's hard to get an accurate time for timing each call.</div>
 </div>
 </div>
@@ -228,6 +232,13 @@ loadScripts(document, 'script');</script>
 <h3>onEnd</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">onEnd</span>()</div>
 <div class="block">Supposed to be called when the program finishes.</div>
+</section>
+</li>
+<li>
+<section class="detail" id="subscribeFixedPhase(frc.team_8840_lib.utils.interfaces.Callback,frc.team_8840_lib.utils.GamePhase)">
+<h3>subscribeFixedPhase</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">subscribeFixedPhase</span><wbr><span class="parameters">(<a href="../utils/interfaces/Callback.html" title="interface in frc.team_8840_lib.utils.interfaces">Callback</a>&nbsp;method,
+ <a href="../utils/GamePhase.html" title="enum class in frc.team_8840_lib.utils">GamePhase</a>&nbsp;phase)</span></div>
 </section>
 </li>
 <li>

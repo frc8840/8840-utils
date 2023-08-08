@@ -6,6 +6,7 @@ package frc.team_8840_lib;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.examples.*;
+import frc.team_8840_lib.various.*;
 
 public final class Main {
     private Main() {}
@@ -35,7 +36,7 @@ public final class Main {
         </code>
         * */
         frc.team_8840_lib.listeners.Robot.assignListener(
-            new SwerveDriveExample()
+            new SwerveSetup()
         );
 
         /**

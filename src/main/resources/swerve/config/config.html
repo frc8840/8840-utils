@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 
-                <button>Confirm</button>
+                <button onclick="onPortsConfirm()">Confirm</button>
             </div>
         </div>
         <div class="config-section">
@@ -76,12 +76,12 @@
                         Please make sure the robot is on a stand, and nothing is in the way of the swerve modules.
                         Click the "Confirm" button when you are ready to test the modules.
                     </p>
-                    <button>Confirm</button>
+                    <button onclick="moveToTestPorts()">Confirm</button>
                 </div>
-                <div class="test-ports-progress">
+                <div class="test-ports-progress" style="display: none;">
                     <h3>Currently testing: <span id="test-ports-module-location">TOP/BOTTOM LEFT/RIGHT</span></h3>
                     <p>Is the <span id="test-module-type" style="font-weight: bolder;">DRIVE/TURN</span> motor currently moving?</p>
-                    <button>YES</button> <button>NO</button>
+                    <button onclick="testingPortsUserResponse(true)">YES</button> <button onclick="testingPortsUserResponse(false)">NO</button>
                 </div>
             </div>
         </div>
