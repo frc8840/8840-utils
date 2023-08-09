@@ -24,14 +24,18 @@ public class SparkMaxEncoderWrapper extends IOLayer {
 
     private double offset = 0; //Offset is subtracted from the position
 
+    // Starting position of the encoder, just incase subtraction of the start is enabled.
     private double startingPosition = 0;
 
+    // Conversion factors
     private double positionConversionFactor = 1;
     private double velocityConversionFactor = 1;
 
+    // Whether or not to do manual offset
     private boolean doManualOffset = false;
     private boolean doManualConversion = false;
     
+    // Identifier of the encoder - pretty much a nickname
     private String specificIdentifier = "";
 
     /**
@@ -44,7 +48,7 @@ public class SparkMaxEncoderWrapper extends IOLayer {
         
         encoder = sparkMax.getEncoder();
 
-        try {
+        try { //Try to add the identifier
             this.specificIdentifier = "-" + sparkMax.getDeviceId();
         } catch (Exception e) { //If closed, just don't add the identifier
             this.specificIdentifier = "";
@@ -79,7 +83,7 @@ public class SparkMaxEncoderWrapper extends IOLayer {
      */
     public REVLibError setInverted(boolean inverted) {
         if (encoder == null) {
-            Logger.Log("[SparkMaxEncoder] WARNING: Encoder is null, and you're setting the inverted.");
+            Logger.Log("SparkMaxEncoder", "WARNING: Encoder is null, and you're setting the inverted.");
             return REVLibError.kError;
         }
 
@@ -93,7 +97,6 @@ public class SparkMaxEncoderWrapper extends IOLayer {
     @IOMethod(name="Position", value_type=IOValue.DOUBLE, method_type = IOMethodType.READ)
     public double getPosition() {
         if (encoder == null) {
-            //Logger.Log("[SparkMaxEncoder] WARNING: Encoder is null, and you're getting the position.");
             return 0;
         }
 
@@ -106,7 +109,6 @@ public class SparkMaxEncoderWrapper extends IOLayer {
      */
     public double getVelocity() {
         if (encoder == null) {
-            Logger.Log("[SparkMaxEncoder] WARNING: Encoder is null, and you're getting the velocity.");
             return 0;
         }
 
@@ -217,6 +219,10 @@ public class SparkMaxEncoderWrapper extends IOLayer {
         return offset;
     }
 
+    /**
+     * Returns the "nickname" of the encoder for IO purposes.
+     * @return The "nickname" of the encoder for IO purposes.
+     */
     public String getBaseName() {
         return "SparkMaxEncoder" + this.specificIdentifier.replaceAll("/", "_");
     }

@@ -33,6 +33,13 @@ async function nextStep() {
                     nextStep();
                 }
             }, 500);
+        } else if (currentStep == 4) {
+            let waitForTeleop = setInterval(async () => {
+                if (!await teleopEnabled()) {
+                    clearInterval(waitForTeleop);
+                    nextStep();
+                }
+            }, 500);
         }
     }
 }
@@ -105,6 +112,20 @@ async function moveToTestPorts() {
     if (request.ok) {
         document.querySelector(".test-ports-progress").style = "display: block;"
         document.querySelector(".test-ports-ready").style = "display: none;" 
+
+        const json = await request.json();
+
+        const testing = json.testing;
+
+        //EX: Front Left Drive
+        const location = testing.split(" ")[0] + " " + testing.split(" ")[1];
+        const motor = testing.split(" ")[2];
+
+        const testLocationText = document.getElementById("test-ports-module-location");;
+        const testMotorText = document.getElementById("test-motor-type");
+
+        testLocationText.innerText = location;
+        testMotorText.innerText = motor;
     } else {
         alert("There was an error getting the information from the robot!")
     }
@@ -125,7 +146,27 @@ async function testingPortsUserResponse(correct) {
         const json = await request.json();
 
         if (!json.continue) {
-            alert("There was an issue with this process!")
+            alert("There was an issue with this process!");
+            alert(json.error);
+            alert("Please try again, and make sure you are using the correct ports!");
+            currentStep = 1;
+            showOnlyCurrentStep();
+        } else {
+            if (json.finished) {
+                nextStep();
+            } else {
+                const testing = json.testing;
+
+                //EX: Front Left Drive
+                const location = testing.split(" ")[0] + " " + testing.split(" ")[1];
+                const motor = testing.split(" ")[2];
+
+                const testLocationText = document.getElementById("test-ports-module-location");;
+                const testMotorText = document.getElementById("test-motor-type");
+
+                testLocationText.innerText = location.toUpperCase();
+                testMotorText.innerText = motor.toUpperCase();
+            }
         }
     }
 }

@@ -113,12 +113,18 @@ public class SwerveSetup extends EventListener {
 
                 Logger.Log("Starting to test ports!");
 
-                return res.json("{ \"message\": \"Testing ports...\" }").status(200);
+                JSONObject beginTestJSON = new JSONObject();
+
+                beginTestJSON.put("message", "Testing ports...");
+                beginTestJSON.put("testing", "Front Left Drive");
+
+                return res.json(beginTestJSON).status(200);
             } else if (json.has("userResponse")) {
                 boolean wasCorrect = json.getBoolean("userResponse");
-
+                
+                JSONObject testingJson = new JSONObject();
+                                
                 if (wasCorrect) {
-                    JSONObject testingJson = new JSONObject();
 
                     if (testingMotorError.length() > 0) {
                         testingJson.put("continue", false);
@@ -128,6 +134,8 @@ public class SwerveSetup extends EventListener {
                         testingMotor = 0;
                         testingMotorError = "";
                         config.remove("ports");
+
+                        step = 1;
                         
                         return res.json(testingJson).status(200);
                     }
@@ -138,7 +146,6 @@ public class SwerveSetup extends EventListener {
                     } else {
                         testingMotor++;
                     }
-
 
                     testingJson.put("continue", true);
 
@@ -152,6 +159,47 @@ public class SwerveSetup extends EventListener {
                         
                         return res.json(testingJson).status(200);
                     }
+
+                    String testing = "";
+
+                    if (testingSide == 0) {
+                        testing = "Front Left";
+                    } else if (testingSide == 1) {
+                        testing = "Front Right";
+                    } else if (testingSide == 2) {
+                        testing = "Back Left";
+                    } else if (testingSide == 3) {
+                        testing = "Back Right";
+                    }
+
+                    if (testingMotor == 0) {
+                        testing += " Drive";
+                    } else {
+                        testing += " Turn";
+                    }
+
+                    Logger.Log("Swerve Setup", "Testing: " + testing);
+
+                    testingJson.put("testing", testing);
+
+                    return res.json(testingJson).status(200);
+                } else {
+                    testingJson.put("continue", false);
+                    if (testingMotorError.length() == 0) {
+                        testingMotorError = "The motor did not move! Please find the correct port of the CAN Spark Max.";
+                    }
+                    testingJson.put("error", testingMotorError);
+
+                    testingPorts = false;
+                    testingSide = 0;
+                    testingMotor = 0;
+                    testingMotorError = "";
+
+                    config.remove("ports");
+
+                    step = 1;
+
+                    return res.json(testingJson).status(200);
                 }
 
             }
