@@ -30,6 +30,11 @@
                 <button onclick="redirectToFiles()" class="libraries-button">See File Explorer <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="color: white;"><title>arrow-right</title><path color="white" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" /></svg></button>
                 <p></p>
             </div>
+            <div class="quick-info quick-info-hidden">
+                <h3>Swerve Setup</h3>
+                <p>Swerve Setup is currently <span style="font-weight: bold;" id="swerve-enabled">enabled</span>!</p>
+                <p id="swerve-setup-info"></p>
+            </div>
         </div>
 
         <script>
@@ -70,11 +75,29 @@
                 libraries.textContent = data.count;
             }
 
+            async function checkIfSwerveConfigIsEnabled() {
+                const request = await fetch("/api/swerve/config/enabled");
+                const data = await request.json();
+
+                if (data.enabled == "true") {
+                    document.getElementById("swerve-enabled").textContent = "enabled";
+                    document.getElementById("swerve-setup-info").innerHTML = `
+                    Go <a href="/swerve/setup">here</a> in order to configure your swerve drive!
+                    `;
+                } else {
+                    document.getElementById("swerve-enabled").textContent = "disabled";
+                    document.getElementById("swerve-setup-info").innerHTML = `
+                    In your Main class, please set the event listener to <code>new SwerveSetup()</code> in order to enable the swerve setup!
+                    `;
+                }
+            }
+
             const quickInfo = document.getElementsByClassName("quick-info");
             
             setTimeout(() => {
                 fillOutSummary();
                 getLibraries();
+                checkIfSwerveConfigIsEnabled();
 
                 let i = 0;
                 for (let qi of quickInfo) {

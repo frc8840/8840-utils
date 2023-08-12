@@ -45,7 +45,7 @@ public class SwerveDriveExample extends EventListener {
         settings.maxSpeed = new Unit(4.5, Unit.Type.FEET);
 
         //This value is also the default
-        settings.wheelBase = Units.inchesToMeters(21.73);
+        settings.wheelBase = new Unit(21.73, Unit.Type.INCHES);
 
         //If you do change the wheelBase in the settings, you will need to call this function to update the kinematics.
         //This is because the kinematics are based on the wheelBase.

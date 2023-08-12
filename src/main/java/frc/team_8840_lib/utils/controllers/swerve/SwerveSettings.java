@@ -28,8 +28,8 @@ public class SwerveSettings {
 
     public boolean invertGyro = false; // Counterclockwise is positive, clockwise is negative
 
-    public double trackWidth = Units.inchesToMeters(21.73);
-    public double wheelBase = Units.inchesToMeters(21.73);
+    public Unit trackWidth = new Unit(21.73, Unit.Type.INCHES);
+    public Unit wheelBase = new Unit(21.73, Unit.Type.INCHES);
     public double wheelDiameter = Units.inchesToMeters(3.94);
 
     public boolean doManualConversion = Robot.isSimulation();
@@ -68,9 +68,9 @@ public class SwerveSettings {
 
     public double voltageCompensation = 12;
 
-    public double driveKS = (0.667 / 12);
-    public double driveKV = (2.44 / 12);
-    public double driveKA = (0.27 / 12);
+    public double driveKS = (0.667);
+    public double driveKV = (2.44);
+    public double driveKA = (0.27);
 
     public CANSparkMax.IdleMode driveIdleMode = CANSparkMax.IdleMode.kBrake;
     public CANSparkMax.IdleMode turnIdleMode = CANSparkMax.IdleMode.kBrake;
@@ -108,11 +108,14 @@ public class SwerveSettings {
      * Returns the calculated positions of the modules with the given track width and wheel base
      * */
     public Translation2d[] getPositions() {
+        double ctrackWidth = trackWidth.get(Type.METERS);
+        double cwheelBase = wheelBase.get(Type.METERS);
+
         return new Translation2d[] {
-            new Translation2d(trackWidth / 2.0, wheelBase / 2.0), //TOP RIGHT
-            new Translation2d(-trackWidth / 2.0, wheelBase / 2.0), //tech TOP LEFT, but it's actually the bottom right
-            new Translation2d(trackWidth / 2.0, -wheelBase / 2.0), //tech BOTTOM RIGHT, but it's actually the top left
-            new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0) //BOTTOM LEFT
+            new Translation2d(ctrackWidth / 2.0, cwheelBase / 2.0), //TOP RIGHT
+            new Translation2d(-ctrackWidth / 2.0, cwheelBase / 2.0), //tech TOP LEFT, but it's actually the bottom right
+            new Translation2d(ctrackWidth / 2.0, -cwheelBase / 2.0), //tech BOTTOM RIGHT, but it's actually the top left
+            new Translation2d(-ctrackWidth / 2.0, -cwheelBase / 2.0) //BOTTOM LEFT
         };
     }
 

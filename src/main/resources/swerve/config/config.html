@@ -96,11 +96,10 @@
             <h3>5. Rotate the Top-Left Module</h3>
             <div class="config-section-content">
                 <p>
-                    Rotate the top-left module for 1 full rotation, or until step number 6 is enabled.
+                    Rotate the top-left module until step number 6 is enabled.
                     This is to check whether the encoder is reversed or not.
                     This should be done by hand, and not by enabling teleop.
                 </p>
-                <button>Confirm</button>
             </div>
         </div>
         <div class="config-section">
@@ -114,7 +113,7 @@
                     <br>
                     Once you are done, click the "Confirm" button.
                 </p>
-                <button>Confirm</button>
+                <button onclick="confirmOffsets()">Confirm</button>
             </div>
         </div>
         <div class="config-section">
@@ -124,7 +123,35 @@
                     Please make sure the robot is on a stand, and nothing is in the way of the swerve modules.
                     Enable teleop once you are ready.
                 </p>
-                <button>Confirm</button>
+            </div>
+        </div>
+        <div class="config-section">
+            <h3>8. Confirm Wheel Direction</h3>
+            <div class="config-section-content">
+                <p>
+                    Confirm that all wheels are moving forward (if you hold a sheet of paper underneath, it should move towards the back of the robot). Also confirm that all wheels are turning in the same direction.
+                    If they all do, press yes. If not, press no. This will bring you to the 6th step. Just rotate the modules going the wrong direction 180°.
+                </p>
+                <button onclick="nextStep()">Yes</button> <button onclick="redoPositions()">No</button>
+            </div>
+        </div>
+        <div class="config-section">
+            <h3>9. Disable Teleop</h3>
+            <div class="config-section-content">
+                <p>
+                    Please make sure the robot is on a stand, and nothing is in the way of the swerve modules.
+                    Disable teleop once you are ready.
+                </p>
+            </div>
+        </div>
+        <div class="config-section">
+            <h3>10. Get Code!</h3>
+            <div class="config-section-content">
+                <p>
+                    Your code is pretty much ready!
+                    <br>
+                    <textarea id="code" readonly></textarea>
+                </p>
             </div>
         </div>
     </div>

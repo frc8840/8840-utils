@@ -26,12 +26,19 @@ import frc.team_8840_lib.utils.http.Route;
 public class SwerveSetup extends EventListener {
 
     private static boolean using = false;
+
+    public static boolean isEnabled() {
+        return using;
+    }
+
     private static int step = 1;
 
     private static boolean testingPorts = false;
     private static int testingSide = 0; //0 for front-left, 1 for front-right, 2 for back-left, 3 for back-right
     private static int testingMotor = 0; //0 for drive, 1 for turn
     private static String testingMotorError = "";
+    
+    private static boolean startEncoderTurnTest = false;
 
     private static JSONObject config = new JSONObject();
 
@@ -41,6 +48,10 @@ public class SwerveSetup extends EventListener {
         }
 
         step++;
+
+        if (step == 5) {
+            startEncoderTurnTest = true;
+        }
 
         Logger.Log("Moving to step " + step + " of Swerve Setup!");
 
@@ -71,6 +82,19 @@ public class SwerveSetup extends EventListener {
         json.put("teleop", GamePhase.getCurrentPhase().equals(GamePhase.Teleop));
 
         JSONObject data = new JSONObject();
+
+        if (step == 5) {
+            if (config.has("direction_test")) {
+                data.put("finished_test", config.getJSONObject("direction_test").getBoolean("finished"));
+                data.put("inversed_encoder", config.getJSONObject("direction_test").getBoolean("inversed_encoder"));
+            } else {
+                data.put("finished_test", false);
+            }
+        }
+
+        if (step == 6) {
+            data.put("offsets", config.get("offsets"));
+        }
 
         json.put("data", data);
 
@@ -203,6 +227,10 @@ public class SwerveSetup extends EventListener {
                 }
 
             }
+        } else if (step == 8) {
+            if (json.getBoolean("redo")) {
+                step = 6;
+            }
         }
 
         return res.json("{ \"message\": \"Page not found\" }").status(404);
@@ -234,9 +262,60 @@ public class SwerveSetup extends EventListener {
         Robot.getInstance().subscribeFixedPhase(this::onFixedTeleop, GamePhase.Teleop);
     }
 
+    private double startRotation = 0;
+    private int encoderSameDirection = 0;
+    private int encoderOppositeDirection = 0;
+
     @Override
     public void robotPeriodic() {
-        
+        if (step == 5) {
+            if (startEncoderTurnTest) {
+                startRotation = frontLeftTurn.getEncoder().getPosition();
+
+                encoderSameDirection = 0;
+                encoderOppositeDirection = 0;
+
+                config.remove("direction_test");
+
+                startEncoderTurnTest = false;
+            }
+
+            if (Math.abs(startRotation - frontLeftTurn.getEncoder().getPosition()) < 20 && !config.has("direction_test")) {
+                if (Math.abs(frontLeftTurn.getEncoder().getVelocity()) > 0.1) {
+                    if (frontLeftTurn.getEncoder().getVelocity() > 0 && frontLeftEncoder.getVelocity() > 0) {
+                        encoderSameDirection++;
+                    } else if (frontLeftTurn.getEncoder().getVelocity() < 0 && frontLeftEncoder.getVelocity() < 0) {
+                        encoderSameDirection++;
+                    } else {
+                        encoderOppositeDirection++;
+                    }
+                }
+            } else {
+                JSONObject directionTest = new JSONObject();
+
+                directionTest.put("encoder_inversed", encoderOppositeDirection > encoderSameDirection);
+                directionTest.put("finished_test", true);
+
+                if (encoderOppositeDirection > encoderSameDirection) {
+                    //reverse all the encoders
+                    setupEncoder(frontLeftEncoder, true);
+                    setupEncoder(frontRightEncoder, true);
+                    setupEncoder(backLeftEncoder, true);
+                    setupEncoder(backRightEncoder, true);
+                }
+
+                config.put("direction_test", directionTest);
+            }
+        } else if (step == 6) {
+            JSONObject offsets = new JSONObject();
+
+            offsets.put("topLeft", frontLeftEncoder.getPosition());
+            offsets.put("topRight", frontRightEncoder.getPosition());
+            offsets.put("bottomLeft", backLeftEncoder.getPosition());
+            offsets.put("bottomRight", backRightEncoder.getPosition());
+
+            config.put("offsets", offsets);
+        }
     }
 
     @Override
@@ -403,12 +482,16 @@ public class SwerveSetup extends EventListener {
     }
 
     private void setupEncoder(CANCoder canCoder) {
+        setupEncoder(canCoder, false);
+    }
+
+    private void setupEncoder(CANCoder canCoder, boolean inverted) {
         canCoder.configFactoryDefault();
 
         CANCoderConfiguration encoderConfig = new CANCoderConfiguration();
 
         encoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
-        encoderConfig.sensorDirection = false;
+        encoderConfig.sensorDirection = inverted;
         encoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
         encoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
 

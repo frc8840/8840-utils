@@ -1,10 +1,12 @@
 package frc.team_8840_lib.controllers;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.team_8840_lib.info.console.AutoLog;
 import frc.team_8840_lib.info.console.Logger;
@@ -61,6 +63,10 @@ public class SwerveDrive extends Replayable {
             Promise.WaitThen(() -> {
                 return m_frontLeft.initalized() && m_frontRight.initalized() && m_backLeft.initalized() && m_backRight.initalized();
             }, res, rej, 10);
+        }).then((res, rej) -> {
+            m_odometry = new SwerveDriveOdometry(settings.getKinematics(), getAngle(), getSwervePositions());
+
+            Logger.Log(getBaseName(), "Enabled odometry!");
         }).then((res, rej) -> {
             int endTime = (int) System.currentTimeMillis();
 
@@ -126,6 +132,26 @@ public class SwerveDrive extends Replayable {
         m_backRight.setDesiredState(backRight, openLoop, runOptimization);
         m_frontLeft.setDesiredState(frontLeft, openLoop, runOptimization);
         m_backLeft.setDesiredState(backLeft, openLoop, runOptimization);
+    }
+
+    public SwerveModulePosition[] getSwervePositions() {
+        return new SwerveModulePosition[] {
+            m_frontRight.getPosition(),
+            m_backRight.getPosition(),
+            m_frontLeft.getPosition(),
+            m_backLeft.getPosition()
+        };
+    }
+
+    /**
+     * Updates the odometry of the robot using the positions of the encoders.
+    * */
+    public void updateOdometry() {
+        m_odometry.update(getAngle(), getSwervePositions());
+    }
+
+    public void resetOdometry(Pose2d pose) {
+        m_odometry.resetPosition(getAngle(), getSwervePositions(), pose);
     }
 
     /**

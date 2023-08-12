@@ -13,6 +13,7 @@ import com.revrobotics.REVPhysicsSim;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -348,6 +349,13 @@ public class SwerveModule {
 
     public Unit getSpeed() {
         return new Unit(m_driveEncoderWrapper.getVelocity(), Type.METERS);
+    }
+
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(
+            m_driveEncoderWrapper.getPosition(), 
+            getAngle()
+        );
     }
 
     public boolean initalized() {

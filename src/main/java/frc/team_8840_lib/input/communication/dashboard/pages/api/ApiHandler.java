@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import com.sun.net.httpserver.HttpExchange;
 
 import frc.team_8840_lib.Info;
+import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.libraries.LibraryInfo;
 import frc.team_8840_lib.libraries.LibraryManager;
 import frc.team_8840_lib.listeners.Robot;
@@ -18,12 +19,15 @@ import frc.team_8840_lib.utils.http.Route;
 import frc.team_8840_lib.various.SwerveSetup;
 
 public class ApiHandler {
+    public static boolean verbose_api = false;
+
     private static String[] possibleRoutes = {
         "/api/",
         "/api/libraries",
         "/api/info",
         "/api/swerve/config",
-        "/api/swerve/config/next-step"
+        "/api/swerve/config/next-step",
+        "/api/swerve/config/enabled"
     };
 
     public static Route.Resolution HandleRequest(HttpExchange req, Route.Resolution res) {
@@ -35,6 +39,10 @@ public class ApiHandler {
             return res.status(404).json("{ \"message\": \"Page not found\" }");
         }
 
+        if (verbose_api) {
+            Logger.Log("API", req.getRequestMethod() + " " + path);
+        }
+
         if (path.equalsIgnoreCase("/api/libraries")) {
             return getLibraries(req, res);
         } else if (path.equalsIgnoreCase("/api/info")) {
@@ -43,6 +51,16 @@ public class ApiHandler {
             return SwerveSetup.handleSwerveSetup(req, res);
         } else if (path.equalsIgnoreCase("/api/swerve/config/next-step")) {
             return SwerveSetup.nextStep(req, res);
+        } else if (path.equalsIgnoreCase("/api/swerve/config/enabled")) {
+            if (!req.getRequestMethod().equalsIgnoreCase("GET")) {
+                return res.status(405).json("{ \"message\": \"Method not allowed\" }");
+            }
+
+            JSONObject json = new JSONObject();
+
+            json.put("enabled", SwerveSetup.isEnabled() ? "true" : "false");
+
+            return res.json(json).status(200);
         }
  
         return res.status(200).json("{ \"message\": \"Page found\" }");
