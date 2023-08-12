@@ -2,7 +2,6 @@ package frc.team_8840_lib.input.communication;
 
 import com.sun.net.httpserver.HttpExchange;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.BooleanArrayPublisher;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoubleArrayPublisher;
@@ -19,7 +18,8 @@ import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team_8840_lib.controllers.ControllerGroup;
-import frc.team_8840_lib.controllers.SwerveGroup;
+import frc.team_8840_lib.controllers.SwerveDrive;
+import frc.team_8840_lib.controllers.SwerveModule;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.input.communication.dashboard.ModuleBuilder;
 import frc.team_8840_lib.input.communication.dashboard.pages.PageHandler;
@@ -36,6 +36,7 @@ import frc.team_8840_lib.utils.http.Route;
 import frc.team_8840_lib.utils.http.html.Element;
 import frc.team_8840_lib.utils.http.html.EncodingUtil;
 import frc.team_8840_lib.utils.interfaces.Callback;
+import frc.team_8840_lib.utils.math.units.Unit.Type;
 import frc.team_8840_lib.utils.pathplanner.PathCallback;
 import frc.team_8840_lib.utils.pathplanner.TimePoint;
 import org.json.JSONArray;
@@ -799,9 +800,9 @@ public class CommunicationManager {
         return this;
     }
 
-    public CommunicationManager updateSwerveInfo(SwerveGroup swerveGroup) {
+    public CommunicationManager updateSwerveInfo(SwerveDrive swerveGroup) {
         final String name = "swerve_drive";
-        final String groupName = EncodingUtil.encodeURIComponent(swerveGroup.getName());
+        final String groupName = EncodingUtil.encodeURIComponent(swerveGroup.getBaseName());
 
         try {
             updateInfo(name, "swerve_name", groupName);
@@ -810,12 +811,16 @@ public class CommunicationManager {
             return this;
         }
 
-        swerveGroup.loop(((module, index) -> {
-            updateInfo(name, "module_" + index + "/last_angle", module.getLastAngle().getDegrees());
-            updateInfo(name, "module_" + index + "/speed", module.getSpeed());
-            updateInfo(name, "module_" + index + "/velocity_ms", module.getState().speedMetersPerSecond);
-            updateInfo(name, "module_" + index + "/rotation", module.getRotation().getDegrees());
-        }));
+        SwerveModule[] modules = swerveGroup.getModules();
+
+        for (int i = 0; i < modules.length; i++) {
+            SwerveModule module = modules[i];
+
+            updateInfo(name, "module_" + i + "/last_angle", module.getDesiredAngle().getDegrees());
+            updateInfo(name, "module_" + i + "/speed", module.getSpeed().get(Type.METERS));
+            updateInfo(name, "module_" + i + "/velocity_ms", module.getState().speedMetersPerSecond);
+            updateInfo(name, "module_" + i + "/rotation", module.getAngle().getDegrees());
+        }
 
         Pose2d swervePose = swerveGroup.getPose();
 
@@ -1035,23 +1040,6 @@ public class CommunicationManager {
         if (!fieldExists()) return;
         field.getObject(name).setPose(pose);
         if (!pushingLargeAmount) SmartDashboard.updateValues();
-    }
-
-    public CommunicationManager logSwerveStates(String tab, String key, SwerveModuleState[] states) {
-        if (states.length == 0) return this;
-
-        for (int i = 0; i < states.length; i++) {
-            updateInfo(
-                tab, key + "/" + SwerveGroup.getModName(i) + "/angle", 
-                states[i].angle.getDegrees()
-            );
-            updateInfo(
-                tab, key + "/" + SwerveGroup.getModName(i) + "/speed",
-                states[i].speedMetersPerSecond
-            );
-        }
-
-        return this;
     }
     
     /**

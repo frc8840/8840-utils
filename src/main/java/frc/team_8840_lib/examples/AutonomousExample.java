@@ -3,7 +3,7 @@ package frc.team_8840_lib.examples;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import frc.team_8840_lib.controllers.SwerveGroup;
+import frc.team_8840_lib.controllers.SwerveDrive;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.input.controls.GameController;
@@ -16,7 +16,6 @@ import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.async.Promise;
 import frc.team_8840_lib.utils.controllers.Pigeon;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
-import frc.team_8840_lib.utils.controllers.swerve.SwerveType;
 import frc.team_8840_lib.utils.controls.Axis;
 
 import java.util.TimerTask;
@@ -28,14 +27,13 @@ import com.revrobotics.REVPhysicsSim;
  * @author Jaiden Grimminck
  */
 public class AutonomousExample extends EventListener {
-    private SwerveGroup swerveDrive;
+    private SwerveDrive swerveDrive;
 
     @Override
     public void robotInit() {
         //All of this is documented in the SwerveDrive.java file, I'm just simplifying it down for this file.
-        SwerveSettings settings = new SwerveSettings(SwerveType.SPARK_MAX);
+        SwerveSettings settings = new SwerveSettings();
 
-        settings.defaultAdjustToType();
         settings.updateKinematics();
 
         // settings.angleOffsets[0] = 0; //First module
@@ -46,12 +44,12 @@ public class AutonomousExample extends EventListener {
         settings.threshold = 0.01;
         settings.useThresholdAsPercentage = true;
 
-        swerveDrive = new SwerveGroup("NEO Swerve Drive", settings,
-                new int[]{ 1, 3, 5, 7 }, //Drive IDs
-                new int[]{ 2, 4, 6, 8 }, //Turn/Steering IDs
-                new int[]{ 9, 10, 11, 12 },  //Encoder IDs
-                new Pigeon(Pigeon.Type.TWO, 13, false)
-        );
+        // swerveDrive = new SwerveDrive(settings,
+        //         new int[]{ 1, 3, 5, 7 }, //Drive IDs
+        //         new int[]{ 2, 4, 6, 8 }, //Turn/Steering IDs
+        //         new int[]{ 9, 10, 11, 12 },  //Encoder IDs
+        //         new Pigeon(Pigeon.Type.TWO, 13, false)
+        // );
 
         Robot.getInstance().subscribeFixedPhase(new TimerTask() {
             @Override
@@ -119,7 +117,7 @@ public class AutonomousExample extends EventListener {
         Robot.getRealInstance()
             .waitForFullfillConditions(1000, new Promise((res, rej) -> {
                 Promise.WaitThen(() -> {
-                    return swerveDrive.ready();
+                    return swerveDrive.isReady();
                 }, res, rej, 10);
             }))
             .onFinishFullfillment(() -> {
@@ -138,8 +136,6 @@ public class AutonomousExample extends EventListener {
             swerveDrive.updateOdometry();
 
             CommunicationManager.getInstance().updateFieldObjectPose("SwerveRobot", swerveDrive.getPose());
-
-            swerveDrive.updateFieldRobot();
         }
     }
 
@@ -172,7 +168,7 @@ public class AutonomousExample extends EventListener {
                 Translation2d translation = new Translation2d(xDiff / Robot.DELTA_TIME, yDiff / Robot.DELTA_TIME);
 
                 //Use pose to calculate the swerve module states
-                swerveDrive.drive(translation, pose.getRotation().getRadians(), true, false);
+                swerveDrive.drive(translation, pose.getRotation(), true, false);
             }
             PathPlanner.getSelectedAuto().fixedExecute();
         }
@@ -190,7 +186,7 @@ public class AutonomousExample extends EventListener {
         Translation2d translation = new Translation2d(0,0);// new Translation2d(controller.getAxis(Axis.Horizontal), controller.getAxis(Axis.Vertical)).times(swerveDrive.getSettings().maxSpeed);
         double rotation = ((360 - controller.getAxis(Axis.Twist)) / 360) * 2 * Math.PI;
 
-        swerveDrive.drive(translation, rotation, true, false);
+        swerveDrive.drive(translation, Rotation2d.fromRadians(rotation), true, false);
     }
 
     @Override

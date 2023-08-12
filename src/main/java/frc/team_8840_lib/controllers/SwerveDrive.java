@@ -154,6 +154,19 @@ public class SwerveDrive extends Replayable {
         m_odometry.resetPosition(getAngle(), getSwervePositions(), pose);
     }
 
+    public Pose2d getPose() {
+        return m_odometry.getPoseMeters();
+    }
+
+    public SwerveModule[] getModules() {
+        return new SwerveModule[] {
+            m_frontRight,
+            m_backRight,
+            m_frontLeft,
+            m_backLeft
+        };
+    }
+
     /**
      * Returns the angle of the gyroscope on the robot.
      * @return The angle of the gyroscope on the robot

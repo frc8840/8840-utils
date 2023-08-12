@@ -13,7 +13,6 @@ import frc.team_8840_lib.utils.async.Promise;
 import frc.team_8840_lib.utils.controllers.Pigeon;
 import frc.team_8840_lib.utils.controllers.swerve.ModuleConfig;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
-import frc.team_8840_lib.utils.controllers.swerve.SwerveType;
 import frc.team_8840_lib.utils.controls.Axis;
 import frc.team_8840_lib.utils.math.MathUtils;
 import frc.team_8840_lib.utils.math.units.Unit;
@@ -34,11 +33,7 @@ public class SwerveDriveExample extends EventListener {
         //Create a new SwerveSettings
         //This has all the default values from Team 364 and Team 3512's robots, but you might want to adjust them.
         //Edit the values like the example below to your liking
-        SwerveSettings settings = new SwerveSettings(SwerveType.SPARK_MAX);
-
-        //I would call this function BEFORE making adjustments, just changes any values that were different between the two swerve types.
-        //Use at risk though, it might adjust the values to something you don't want.
-        settings.defaultAdjustToType();
+        SwerveSettings settings = new SwerveSettings();
 
         //The default is 4.5 for maxSpeed already, but you can adjust it how you want.
         //If you want to look at the default values, check out https://github.com/frc8840/8840-utils/tree/main/src/main/java/frc/team_8840_lib/utils/controllers/swerve/SwerveSettings.java

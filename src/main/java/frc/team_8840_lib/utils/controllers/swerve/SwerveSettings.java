@@ -1,6 +1,5 @@
 package frc.team_8840_lib.utils.controllers.swerve;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -10,22 +9,11 @@ import edu.wpi.first.math.util.Units;
 import frc.team_8840_lib.listeners.Robot;
 import frc.team_8840_lib.utils.controllers.swerve.structs.CurrentLimit;
 import frc.team_8840_lib.utils.controllers.swerve.structs.PIDStruct;
-import frc.team_8840_lib.utils.math.operators.Operation;
 import frc.team_8840_lib.utils.math.units.Unit;
 import frc.team_8840_lib.utils.math.units.Unit.Type;
 
 //A lot of these values are taken from Team 364's Constants.java file, esp the PID values: these can be fine-tuned since it's an instantiable class though, so it's not a big deal
 public class SwerveSettings {
-    private SwerveType type = SwerveType.FALCON_500;
-
-    public SwerveType getType() {
-        return type;
-    }
-
-    public SwerveSettings(SwerveType type) {
-        this.type = type;
-    }
-
     public boolean invertGyro = false; // Counterclockwise is positive, clockwise is negative
 
     public Unit trackWidth = new Unit(21.73, Unit.Type.INCHES);
@@ -87,7 +75,7 @@ public class SwerveSettings {
      * */
     public double relativeThreshold() {
         if (useThresholdAsPercentage) {
-            return maxSpeed.get(Type.FEET) * threshold;
+            return maxSpeed.get(Type.METERS) * threshold;
         } else {
             return threshold;
         }
@@ -130,25 +118,6 @@ public class SwerveSettings {
     }
 
     /**
-     * This function adjusts any values that may be different between the two swerve types
-     * Use at your own risk, I would do adjustments AFTER calling this function.
-     * */
-    public void defaultAdjustToType() {
-        if (this.type == SwerveType.FALCON_500) {
-            //Drive KS, KV, and KA values are different for the TalonFX
-            driveKS = 0.667 / 12;
-            driveKV = 2.44 / 12;
-            driveKA = 0.27 / 12;
-
-        } else if (this.type == SwerveType.SPARK_MAX) {
-            //Drive KS, KV, and KA values are different for the SparkMax
-            driveKS = 0.667;
-            driveKV = 2.44;
-            driveKA = 0.27;
-        }
-    }
-
-    /**
      * A list of settings for the Swerve Drive Specialties.
      */
     public static class SDS {
@@ -161,7 +130,6 @@ public class SwerveSettings {
              */
             public static class L1 {
                 public static final double maxSpeed_NEO = 12.0;
-                public static final double maxSpeed_Falcon500 = 13.5;
             }
 
             /**
@@ -169,7 +137,6 @@ public class SwerveSettings {
              */
             public static class L2 {
                 public static final double maxSpeed_NEO = 14.5;
-                public static final double maxSpeed_Falcon500 = 16.3;
             }
 
             /**
@@ -177,7 +144,6 @@ public class SwerveSettings {
              */
             public static class L3 {
                 public static final double maxSpeed_NEO = 16.0;
-                public static final double maxSpeed_Falcon500 = 18.0;
             }
         }
     }

@@ -347,6 +347,10 @@ public class SwerveModule {
         return Rotation2d.fromDegrees(m_turnEncoderWrapper.getPosition());
     }
 
+    public Rotation2d getDesiredAngle() {
+        return m_lastDesiredAngle;
+    }
+
     public Unit getSpeed() {
         return new Unit(m_driveEncoderWrapper.getVelocity(), Type.METERS);
     }
