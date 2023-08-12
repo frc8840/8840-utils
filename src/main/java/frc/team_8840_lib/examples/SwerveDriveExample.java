@@ -134,6 +134,7 @@ public class SwerveDriveExample extends EventListener {
         if (m_zeroed) {
             SwerveModuleState zeroed = new SwerveModuleState(0, new Rotation2d(0));
             m_swerveDrive.setModuleStates(zeroed, zeroed, zeroed, zeroed, Robot.isReal(), false);
+            return;
         }
         
         //If the threshold is not met, stop the robot
