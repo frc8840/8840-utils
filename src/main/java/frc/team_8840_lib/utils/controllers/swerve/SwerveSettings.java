@@ -129,21 +129,21 @@ public class SwerveSettings {
              * A list of settings for the MK4i Level 1.
              */
             public static class L1 {
-                public static final double maxSpeed_NEO = 12.0;
+                public static final Unit maxSpeed_NEO = new Unit(12.0, Unit.Type.FEET);
             }
 
             /**
              * A list of settings for the MK4i Level 2.
              */
             public static class L2 {
-                public static final double maxSpeed_NEO = 14.5;
+                public static final Unit maxSpeed_NEO = new Unit(14.5, Unit.Type.FEET);
             }
 
             /**
              * A list of settings for the MK4i Level 3.
              */
             public static class L3 {
-                public static final double maxSpeed_NEO = 16.0;
+                public static final Unit maxSpeed_NEO = new Unit(16.0, Unit.Type.FEET);
             }
         }
     }

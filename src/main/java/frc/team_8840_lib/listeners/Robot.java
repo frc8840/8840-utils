@@ -3,7 +3,6 @@ package frc.team_8840_lib.listeners;
 import java.nio.file.Path;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.function.Supplier;
 
 import edu.wpi.first.hal.DriverStationJNI;
 import edu.wpi.first.hal.HAL;
@@ -13,6 +12,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Watchdog;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.async.Promise;
@@ -344,7 +344,16 @@ public class Robot extends RobotBase {
 
             GamePhase currentPhase = GamePhase.getCurrentPhase();
 
-            listener.robotPeriodic();
+            try {
+                listener.robotPeriodic();
+
+                //Run any commands that are scheduled (WPILib default).
+                CommandScheduler.getInstance().run();
+            } catch (Exception e) {
+                Logger.Log("[Robot] Error in robotPeriodic()!");
+                e.printStackTrace();
+            }
+
             watchdog.reset();
 
             if (Robot.isSimulation()) {

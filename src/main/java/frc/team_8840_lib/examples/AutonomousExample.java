@@ -51,12 +51,7 @@ public class AutonomousExample extends EventListener {
         //         new Pigeon(Pigeon.Type.TWO, 13, false)
         // );
 
-        Robot.getInstance().subscribeFixedPhase(new TimerTask() {
-            @Override
-            public void run() {
-                onFixedAutonomous();
-            }
-        }, GamePhase.Autonomous);
+        Robot.getInstance().subscribeFixedPhase(this::onFixedAutonomous, GamePhase.Autonomous);
 
         /**
          * This is an example of constructing a path.

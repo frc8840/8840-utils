@@ -1,23 +1,21 @@
 package frc.team_8840_lib.examples;
 
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.team_8840_lib.controllers.SwerveDrive;
 import frc.team_8840_lib.info.console.Logger;
-import frc.team_8840_lib.info.time.TimeKeeper;
-import frc.team_8840_lib.input.communication.CommunicationManager;
-import frc.team_8840_lib.input.controls.GameController;
 import frc.team_8840_lib.listeners.EventListener;
 import frc.team_8840_lib.listeners.Robot;
-import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.async.Promise;
 import frc.team_8840_lib.utils.controllers.Pigeon;
 import frc.team_8840_lib.utils.controllers.swerve.ModuleConfig;
 import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
-import frc.team_8840_lib.utils.controls.Axis;
-import frc.team_8840_lib.utils.math.MathUtils;
+import frc.team_8840_lib.utils.controllers.swerve.structs.PIDStruct;
 import frc.team_8840_lib.utils.math.units.Unit;
-
-import java.util.TimerTask;
 
 /**
  * This example goes more into detail about initializing the SwerveDrive class.
@@ -26,10 +24,18 @@ import java.util.TimerTask;
  * @author Jaiden Grimminck
  */
 public class SwerveDriveExample extends EventListener {
-    private SwerveDrive swerveDrive;
+    private SwerveDrive m_swerveDrive;
+
+    private XboxController m_controller;
+
+    private boolean m_zeroed = false;
 
     @Override
     public void robotInit() {
+        Logger.Log("SwerveDriveExample", "Swerve Drive Example Initialized!");
+        Logger.Log("SwerveDriveExample", "This example is meant to show how to initialize the SwerveDrive class, and how to potentially use it.");
+        Logger.Log("SwerveDriveExample", "The code in this class should ideally be spread out in many different classes and commands, but it's all in one class for simplicity.");
+
         //Create a new SwerveSettings
         //This has all the default values from Team 364 and Team 3512's robots, but you might want to adjust them.
         //Edit the values like the example below to your liking
@@ -39,8 +45,18 @@ public class SwerveDriveExample extends EventListener {
         //If you want to look at the default values, check out https://github.com/frc8840/8840-utils/tree/main/src/main/java/frc/team_8840_lib/utils/controllers/swerve/SwerveSettings.java
         settings.maxSpeed = new Unit(4.5, Unit.Type.FEET);
 
-        //This value is also the default
-        settings.wheelBase = new Unit(21.73, Unit.Type.INCHES);
+        //Set the track width and wheel base of the robot.
+        settings.trackWidth = new Unit(18.75, Unit.Type.INCHES);
+        settings.wheelBase = new Unit(22.75, Unit.Type.INCHES);
+
+        if (Robot.isReal()) {
+            settings.drivePID = new PIDStruct(0.025, 0, 0, 0);
+            settings.turnPID = new PIDStruct(0.012, 0, 0, 0);
+
+            settings.driveKA = 0.0;
+            settings.driveKV = 0.0;
+            settings.driveKS = 0.0;
+        }
 
         //If you do change the wheelBase in the settings, you will need to call this function to update the kinematics.
         //This is because the kinematics are based on the wheelBase.
@@ -52,39 +68,41 @@ public class SwerveDriveExample extends EventListener {
         settings.threshold = 0.01;
         settings.useThresholdAsPercentage = true;
 
+        final ModuleConfig frontLeft = new ModuleConfig(11, 12, 23, 105.8203);
+        final ModuleConfig frontRight = new ModuleConfig(18, 17, 22, 323.877);
+        final ModuleConfig backRight = new ModuleConfig(16, 15, 21, 41.8359);
+        final ModuleConfig backLeft = new ModuleConfig(13, 14, 24, 215.332);
+
         //Create a new swerve group
-        swerveDrive = new SwerveDrive(
-            new ModuleConfig(1, 2, 3, 10.4),
-            new ModuleConfig(4, 5, 6, 53.6),
-            new ModuleConfig(7, 8, 9, 72.8),
-            new ModuleConfig(10, 11, 12, 60.1),
-            new Pigeon(Pigeon.Type.TWO, 13),
+        m_swerveDrive = new SwerveDrive(
+            frontLeft,
+            frontRight,
+            backLeft,
+            backRight,
+            new Pigeon(Pigeon.Type.TWO, 42),
             settings
         );
+        
+        //Setup Xbox Controller
+        m_controller = new XboxController(0);
 
-        //Automatically add the controllers that are connected.
-        GameController.autoConnect();
-
-        //Add a fixed autonomous to the Robot
-        Robot.getInstance().subscribeFixedPhase(new TimerTask() {
-            @Override
-            public void run() {
-                onFixedAutonomous();
-            }
-        }, GamePhase.Autonomous);
+        new Trigger(m_controller::getBButton).onTrue(
+            Commands.runOnce(() -> {
+                m_zeroed = !m_zeroed;
+            })
+        );
 
         Robot.getRealInstance().waitForFullfillConditions(
             3000,
             new Promise((res, rej) -> {
-                Promise.WaitThen(() -> { return swerveDrive.isReady(); }, res, rej, 10);
+                Promise.WaitThen(() -> { return m_swerveDrive.isReady(); }, res, rej, 10);
             })
         );
     }
 
     @Override
     public void robotPeriodic() {
-        //Update info on the SmartDashboard/NetworkTables about the swerve drive
-        //CommunicationManager.getInstance().updateSwerveInfo(swerveDrive);
+
     }
 
     @Override
@@ -95,25 +113,6 @@ public class SwerveDriveExample extends EventListener {
     @Override
     public void onAutonomousPeriodic() {
 
-    }
-
-    double lastSecond = 0;
-    int counter = 0;
-
-    public void onFixedAutonomous() {
-        //This method is called every ~1/32 of a second (32/33 times a second, I would assume 32 times a second due to 1/32 = 0.03125 [Robot.DELTA_TIME])
-        //You can do whatever you want in here, but it is recommended to use this method instead of onAutonomousPeriodic() because it is more accurate with timing.
-        //You can also use this method for teleop if you want to.
-
-        double currentSecond = TimeKeeper.getInstance().getPhaseTime();
-        if (currentSecond >= lastSecond + 1 - Robot.DELTA_TIME) { //subtract a bit, so it's consistent 32 lol
-            //Print the current speed of the swerve drive every second
-            Logger.Log("Times called in the last second: " + counter);
-            lastSecond = currentSecond;
-            counter = 0;
-        }
-
-        counter++;
     }
 
     @Override
@@ -127,41 +126,42 @@ public class SwerveDriveExample extends EventListener {
      * */
     @Override
     public void onTeleopPeriodic() {
-        //Get the game controller
-        GameController mainController = GameController.get(0);
+        //If the zeroed is enabled, zero the swerve drive.
+        if (m_zeroed) {
+            SwerveModuleState zeroed = new SwerveModuleState(0, new Rotation2d(0));
+            m_swerveDrive.setModuleStates(zeroed, zeroed, zeroed, zeroed, Robot.isReal(), false);
+        }
+        
+        //If the threshold is not met, stop the robot
+        if (Math.abs(getForward()) < 0.1 && Math.abs(getStrafe()) < 0.1) {
+            if (Math.abs(m_controller.getRightX()) < 0.1) {
+                m_swerveDrive.stop();
+            } else {
+                //If the rotate threshold is met, rotate the robot
+                m_swerveDrive.spin(Rotation2d.fromRadians(m_controller.getRightX()), Robot.isReal());
+            }
+            return;
+        }
 
-        //Get the vertical axis and the horizontal axis of the controller.
-        double vertical = -mainController.getAxis(Axis.Vertical); //Invert the vertical axis since it's usually inverted (at least for us).
-        double horizontal = mainController.getAxis(Axis.Horizontal);
+        //Create a new Translation2d with the x and y values of the controller.
+        Translation2d translation = new Translation2d(
+            getForward(),
+            getStrafe()
+        );
+        
+        //Multiply by the max speed.
+        translation = translation.times(m_swerveDrive.getSettings().maxSpeed.get(Unit.Type.METERS));
 
-        //Calculate the direction of the robot
-        double direction = Math.atan2(vertical, horizontal);
-        //Convert the direction to degrees from radians, but subtract 90 degrees for up to be 0 degrees.
-        direction = Units.radiansToDegrees(direction) - 90;
+        //Drive
+        m_swerveDrive.drive(translation, Rotation2d.fromRadians(m_controller.getRightX()), true, Robot.isReal());
+    }
 
-        //Convert direction to be between 0 and 360
-        direction = MathUtils.normalizeAngle(direction);
+    public double getForward() {
+        return -m_controller.getLeftY();
+    }
 
-        //Send the controller info to the SmartDashboard/NetworkTables
-        CommunicationManager.getInstance()
-                .updateInfo("Controller", "direction", direction)
-                .updateInfo("Controller", "vertical", vertical)
-                .updateInfo("Controller", "horizontal", horizontal);
-
-        //Create a new Translation2d with the x and y values of the controller multiplied by the max speed.
-        //Translation2d translation = new Translation2d(vertical, horizontal).times(swerveDrive.getSettings().maxSpeed);
-
-        //swerveDrive.drive(translation, direction, false, false);
-
-        /*
-        VALUES: (0.4, 0.9)
-        _____________
-        |       0   |  Example of the joystick GameController values
-        |      //   |  In this example, the robot will go in the direction of the top right corner
-        |     /_/   |  (but might not be relative, you may want to do some adjustments if you want it to be relative!)
-        |           |  The robot will also go at the speed of how much it's pushed.
-        |___________|  Note: This may not be exact example of what will happen. A lot of stuff needs to be tested still since we don't have swerve modules yet (lol).
-        */
+    public double getStrafe() {
+        return m_controller.getLeftX();
     }
 
     @Override

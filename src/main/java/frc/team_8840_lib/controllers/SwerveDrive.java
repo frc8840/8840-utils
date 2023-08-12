@@ -83,7 +83,7 @@ public class SwerveDrive extends Replayable {
 
     /**
      * Sets the speed and rotation of each module using a translation and rotation.
-     * @param translation Translation for the robot
+     * @param translation Translation for the robot (in meters).
      * @param rotationSpeed Rotation speed of the robot.
      * @param fieldRelative Whether the translation is field relative or not
      * @param openLoop Whether to use open loop or closed loop
@@ -156,6 +156,10 @@ public class SwerveDrive extends Replayable {
 
     public Pose2d getPose() {
         return m_odometry.getPoseMeters();
+    }
+
+    public SwerveSettings getSettings() {
+        return m_settings;
     }
 
     public SwerveModule[] getModules() {
