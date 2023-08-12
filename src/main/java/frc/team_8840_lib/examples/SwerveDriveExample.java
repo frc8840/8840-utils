@@ -49,6 +49,10 @@ public class SwerveDriveExample extends EventListener {
         settings.trackWidth = new Unit(18.75, Unit.Type.INCHES);
         settings.wheelBase = new Unit(22.75, Unit.Type.INCHES);
 
+        settings.invertGyro = true;
+
+        settings.canCoderInverted = true;
+
         if (Robot.isReal()) {
             settings.drivePID = new PIDStruct(0.025, 0, 0, 0);
             settings.turnPID = new PIDStruct(0.012, 0, 0, 0);

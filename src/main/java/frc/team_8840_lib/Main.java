@@ -6,6 +6,7 @@ package frc.team_8840_lib;
 
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.examples.*;
+import frc.team_8840_lib.info.console.EmptyLog;
 import frc.team_8840_lib.various.*;
 
 public final class Main {
@@ -46,7 +47,8 @@ public final class Main {
          * 
          * In this example, it's creating a FileWriter to be writen to the default path.
          */
-        frc.team_8840_lib.info.console.Logger.setWriter(new frc.team_8840_lib.info.console.FileWriter("default"));
+        //frc.team_8840_lib.info.console.Logger.setWriter(new frc.team_8840_lib.info.console.FileWriter("default"));
+        frc.team_8840_lib.info.console.Logger.setWriter(new EmptyLog());
 
         //Start the robot - Don't change this line
         RobotBase.startRobot(frc.team_8840_lib.listeners.Robot::new);
