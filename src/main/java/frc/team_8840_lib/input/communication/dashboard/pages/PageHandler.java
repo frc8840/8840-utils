@@ -8,10 +8,7 @@ import frc.team_8840_lib.utils.http.Route;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 import com.sun.net.httpserver.HttpExchange;
 

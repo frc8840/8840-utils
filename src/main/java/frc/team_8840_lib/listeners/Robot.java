@@ -233,9 +233,15 @@ public class Robot extends RobotBase {
     }
 
     int randomInt = 0;
+    boolean startupFlag = false;
+    boolean startCompetitionFlag = false;
 
     @Override
     public void startCompetition() {
+        if (startCompetitionFlag) return;
+
+        startCompetitionFlag = true;
+        
         watchdog = new Watchdog(watchdogPeriod, this::printLoopOverrunMessage);
 
         startTime = System.currentTimeMillis();
@@ -261,14 +267,27 @@ public class Robot extends RobotBase {
             duringCompetition(noRun);
             return;
         } else {
-            listener.robotInit();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            Thread initThread = new Thread() {
+                @Override
+                public void run() {
+                    listener.robotInit();
+                }
+            };
+
+            initThread.start();
 
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
+            
             if (!conditionsFullfilled) {
                 Logger.Log("Robot", "Conditions not fullfilled for startup, waiting until conditions are fullfilled...");
 
@@ -280,6 +299,12 @@ public class Robot extends RobotBase {
                                 return conditionsFullfilled;
                             }, res, rej, 100);
                         }).then((res, rej) -> {
+                            if (startupFlag) {
+                                return;
+                            }
+
+                            startupFlag = true;
+
                             Logger.Log("Robot", "Conditions fullfilled, continuing startup!");
 
                             if (finishFullfillmentCallback != null) finishFullfillmentCallback.run();
