@@ -125,8 +125,8 @@ public class SwerveDriveExample extends EventListener {
     }
 
     /**
-     * By the way, this method is very scuffed, so I would make major adjustments before using it.
-     * Also, I have no clue if swerve works. Test it before using it. (heheheha)
+     * This method should be spread out throughout different commands, but it's all in one method for simplicity.
+     * This method is called constantly whenever the robot is in teleop mode.
      * */
     @Override
     public void onTeleopPeriodic() {

@@ -48,6 +48,7 @@ public class SwerveModule {
     private SparkMaxPIDController m_turnPIDController;
 
     private Rotation2d m_lastDesiredAngle;
+    private Unit m_lastDesiredSpeed;
     private SimpleMotorFeedforward m_feedforward;
 
     private double m_drivePositionConversionFactor;
@@ -98,9 +99,14 @@ public class SwerveModule {
             Promise.WaitThen(() -> {
                 return configPromise.resolved();
             }, res, rej, 10);
-        }).finish((res, rej) -> {
+        }).then((res, rej) -> {
             //Set the last angle.
 
+            m_lastDesiredSpeed = new Unit(0, Type.METERS);
+            m_lastDesiredAngle = getAngle();
+
+            res.run();
+        }).finish((res, rej) -> {
             int initializationTime = (int) System.currentTimeMillis() - startInitialization;
             Logger.Log(this.m_position.name() + " Swerve Module", "Initialized in " + (initializationTime / 1000) + " seconds!");
 
@@ -288,7 +294,23 @@ public class SwerveModule {
     }
 
     public void setSpeed(Unit speed, boolean openLoop) {
+        setSpeed(speed, openLoop, false);
+    }
+
+    public void setSpeed(Unit speed, boolean openLoop, boolean ignoreSpeedFlags) {
+        double speedDifference = Math.abs(speed.get(Unit.Type.METERS) - m_lastDesiredSpeed.get(Unit.Type.METERS));
+
+        if (speedDifference < 0.01 && Math.abs(speed.get(Unit.Type.METERS)) > 0.1 && !ignoreSpeedFlags) {
+            return;
+        }
+        
         if (openLoop) {
+            double speedPercentage = speed.get(Unit.Type.METERS) / m_settings.maxSpeed.get(Unit.Type.METERS);
+
+            if (Math.abs(speedPercentage) > 1) {
+                speedPercentage = Math.signum(speedPercentage);
+            }
+
             m_driveMotor.set(speed.get(Unit.Type.METERS) / m_settings.maxSpeed.get(Unit.Type.METERS));
         } else {
             m_drivePIDController.setReference(
@@ -308,7 +330,7 @@ public class SwerveModule {
         }
 
         m_turnPIDController.setReference(
-            m_turnEncoderWrapper.calculatePosition(angle.getDegrees(), true),
+            m_turnEncoderWrapper.calculatePosition(angle.getDegrees()),
             ControlType.kPosition,
             0,
             m_settings.turnPID.kF
@@ -322,14 +344,14 @@ public class SwerveModule {
     public void setDesiredState(SwerveModuleState state, boolean openLoop, boolean runOptimization) {
         SwerveModuleState optimizedState = runOptimization ? CTREModuleState.optimize(state, m_lastDesiredAngle) : state;
 
-        setSpeed(new Unit(optimizedState.speedMetersPerSecond, Unit.Type.METERS), openLoop);
-        setAngle(optimizedState.angle, false);
+        setSpeed(new Unit(optimizedState.speedMetersPerSecond, Unit.Type.METERS), openLoop, runOptimization);
+        setAngle(optimizedState.angle, runOptimization);
 
         m_lastDesiredAngle = optimizedState.angle;
     }
 
     public void stop() {
-        setSpeed(new Unit(0, Unit.Type.METERS), true);
+        setSpeed(new Unit(0, Unit.Type.METERS), true, true);
     }
 
     public Rotation2d getAbsoluteAngle() {

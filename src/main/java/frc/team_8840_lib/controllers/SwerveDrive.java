@@ -124,7 +124,7 @@ public class SwerveDrive extends Replayable {
 
         SwerveDriveKinematics.desaturateWheelSpeeds(states, m_settings.maxSpeed.get(Type.METERS));
 
-        setModuleStates(states[0], states[1], states[2], states[3], openLoop, false);
+        setModuleStates(states[0], states[1], states[2], states[3], openLoop, true);
     }
 
     public void setModuleStates(SwerveModuleState frontRight, SwerveModuleState backRight, SwerveModuleState frontLeft, SwerveModuleState backLeft, boolean openLoop, boolean runOptimization) {
