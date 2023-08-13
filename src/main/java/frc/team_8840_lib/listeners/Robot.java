@@ -232,7 +232,6 @@ public class Robot extends RobotBase {
         if (doQuickStart) Logger.Log("[Robot] DOING QUICK START. NOTE: THIS IS NOT RECOMMENDED FOR NORMAL USE.");
     }
 
-    int randomInt = 0;
     boolean startupFlag = false;
     boolean startCompetitionFlag = false;
 
@@ -325,9 +324,11 @@ public class Robot extends RobotBase {
                 startupThread.start();
 
                 while (!conditionsFullfilled) {
-                    //most stupid fix but it works. basically just stalls the thread until the conditions are fullfilled and the main thread starts.
-                    //this took me an hour to figure out. i hate this.
-                    randomInt++;
+                    try {
+                        Thread.sleep(100);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             } else {
                 duringCompetition(noRun);
