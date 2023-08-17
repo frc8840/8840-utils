@@ -5,7 +5,6 @@ import com.revrobotics.REVLibError;
 import com.revrobotics.RelativeEncoder;
 
 import frc.team_8840_lib.info.console.Logger;
-import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
 import frc.team_8840_lib.utils.IO.IOMethodType;
@@ -18,7 +17,6 @@ import frc.team_8840_lib.utils.IO.IOValue;
  * 
  * @author Jaiden Grimminck
  */
-@IOAccess(IOPermission.READ)
 public class SparkMaxEncoderWrapper extends IOLayer {
     private RelativeEncoder encoder;
 

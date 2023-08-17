@@ -11,10 +11,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.team_8840_lib.info.console.AutoLog;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.replay.Replayable;
-import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOMethod;
 import frc.team_8840_lib.utils.IO.IOMethodType;
-import frc.team_8840_lib.utils.IO.IOPermission;
 import frc.team_8840_lib.utils.IO.IOValue;
 import frc.team_8840_lib.utils.async.Promise;
 import frc.team_8840_lib.utils.controllers.Pigeon;
@@ -23,7 +21,6 @@ import frc.team_8840_lib.utils.controllers.swerve.SwerveSettings;
 import frc.team_8840_lib.utils.math.units.Unit;
 import frc.team_8840_lib.utils.math.units.Unit.Type;
 
-@IOAccess(IOPermission.READ_WRITE)
 public class SwerveDrive extends Replayable {
 
     private SwerveDriveOdometry m_odometry;

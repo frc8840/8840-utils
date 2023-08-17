@@ -7,14 +7,11 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.info.console.Logger;
-import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
 import frc.team_8840_lib.utils.IO.IOMethodType;
-import frc.team_8840_lib.utils.IO.IOPermission;
 import frc.team_8840_lib.utils.IO.IOValue;
 
-@IOAccess(IOPermission.READ)
 public class Pigeon extends IOLayer {
     private static HashMap<Integer, Pigeon> pigeonMap = new HashMap<>();
 

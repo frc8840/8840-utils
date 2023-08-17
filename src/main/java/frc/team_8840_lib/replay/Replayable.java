@@ -7,15 +7,12 @@ import java.util.HashMap;
 
 import frc.team_8840_lib.info.console.AutoLog;
 import frc.team_8840_lib.info.console.Logger;
-import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
 import frc.team_8840_lib.utils.IO.IOMethodType;
-import frc.team_8840_lib.utils.IO.IOPermission;
 import frc.team_8840_lib.utils.IO.IOValue;
 import frc.team_8840_lib.utils.logging.Loggable;
 
-@IOAccess(IOPermission.READ_WRITE)
 public abstract class Replayable extends IOLayer implements Loggable {
     private HashMap<String, String> replayLogs = new HashMap<>();
     private HashMap<String, Method> replaySaveMethods = new HashMap<>();
@@ -31,26 +28,6 @@ public abstract class Replayable extends IOLayer implements Loggable {
         super();
 
         //TODO: Get rid of IO Access
-        
-        //Get the IOAccess annotation of this instance
-        IOAccess ioAccess = this.getClass().getAnnotation(IOAccess.class);
-        if (ioAccess == null) {
-            throw new RuntimeException("Replayable must have IOAccess.READ_WRITE");
-        }
-
-        if (ioAccess.value() != IOPermission.READ_WRITE) {
-            throw new RuntimeException("Replayable must have IOAccess.READ_WRITE");
-        }
-
-        //Get the IOAccess annotation of the parent class
-        ioAccess = this.getClass().getSuperclass().getAnnotation(IOAccess.class);
-        if (ioAccess == null) {
-            throw new RuntimeException("Replayable must have IOAccess.READ_WRITE");
-        }
-
-        if (ioAccess.value() != IOPermission.READ_WRITE) {
-            throw new RuntimeException("Replayable must have IOAccess.READ_WRITE");
-        }
 
         //Get all methods in the super class with the AutoLog/IOMethod annotation
         Method[] methods = this.getClass().getSuperclass().getMethods();

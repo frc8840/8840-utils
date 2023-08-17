@@ -4,17 +4,13 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.info.console.AutoLog;
 import frc.team_8840_lib.info.console.Logger;
-import frc.team_8840_lib.info.console.Logger.LogType;
-import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
 import frc.team_8840_lib.utils.IO.IOMethodType;
-import frc.team_8840_lib.utils.IO.IOPermission;
 import frc.team_8840_lib.utils.IO.IOValue;
 import frc.team_8840_lib.utils.buffer.ByteConversions;
 import frc.team_8840_lib.utils.logging.Loggable;
 
-@IOAccess(IOPermission.READ_WRITE)
 public class IOPowerDistribution extends IOLayer implements Loggable {
     private static IOPowerDistribution instance;
     public static void init() {

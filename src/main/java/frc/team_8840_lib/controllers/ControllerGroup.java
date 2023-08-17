@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 import frc.team_8840_lib.input.communication.CommunicationManager;
-import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
 import frc.team_8840_lib.utils.IO.IOMethodType;
@@ -284,7 +283,6 @@ public class ControllerGroup {
         setSpeed(0);
     }
 
-    @IOAccess(IOPermission.READ_WRITE)
     public static class SpeedController extends IOLayer {
         private int port;
         private SCType type;

@@ -6,14 +6,11 @@ import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.listeners.Robot;
-import frc.team_8840_lib.utils.IO.IOAccess;
 import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
 import frc.team_8840_lib.utils.IO.IOMethodType;
-import frc.team_8840_lib.utils.IO.IOPermission;
 import frc.team_8840_lib.utils.IO.IOValue;
 
-@IOAccess(IOPermission.READ_WRITE)
 public class IOCANCoder extends IOLayer {
     private int encoderPort = -1;
 
