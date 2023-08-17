@@ -1,5 +1,6 @@
 package frc.team_8840_lib.info.console;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -292,6 +293,7 @@ public class Logger implements Loggable {
         readyToSave = ready;
     }
 
+    @SuppressWarnings({"null", "deprecated"})
     private static void loadAndSaveAllAutoLogs() {
         writer.saveInfo("ALC" + cycle++ + (cycle < 3 ? "(s)" : ""));
 
@@ -299,13 +301,52 @@ public class Logger implements Loggable {
 
         try {
             for (Loggable klass : loggingClasses) {
-                for (Method method : klass.getClass().getMethods()) {
-                    AutoLog autoLogInfo = method.getAnnotation(AutoLog.class);
+                Field[] fields = klass.getClass().getDeclaredFields();
+                Method[] methods = klass.getClass().getMethods();
+
+                boolean movedToMethods = false;
+
+                for (int i = 0; i < fields.length + methods.length; i++) {
+                    AutoLog autoLogInfo;
+                    Method method = null;
+                    Field field = null;
+
+                    if (i >= fields.length) {
+                        if (!movedToMethods) {
+                            movedToMethods = true;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    boolean fieldWasAccessible = false;
+
+                    if (!movedToMethods) {
+                        autoLogInfo = fields[i].getAnnotation(AutoLog.class);
+                        field = fields[i];
+
+                        fieldWasAccessible = field.isAccessible();
+                        field.setAccessible(true);
+                    } else {
+                        autoLogInfo = methods[i - fields.length].getAnnotation(AutoLog.class);
+                        method = methods[i - fields.length];
+                    }
 
                     if (autoLogInfo == null) continue;
+                    if (method == null && movedToMethods) continue;
+                    if (field == null && !movedToMethods) continue;
                     
                     String name = autoLogInfo.name();
-                    LogType logType = LogType.fromClass(method.getReturnType());
+                    
+                    if (name == "") {
+                        if (movedToMethods) {
+                            name = method.getName();
+                        } else {
+                            name = field.getName();
+                        }
+                    }
+
+                    LogType logType = LogType.fromClass(movedToMethods ? method.getReturnType() : field.getType());
                     
                     if (name.contains("/")) {
                         //replace all slashes with underscores, just in case.
@@ -324,20 +365,20 @@ public class Logger implements Loggable {
                         try {
                             switch (logType) {
                                 case STRING:
-                                    assignable = (String) method.invoke(klass);
+                                    assignable = movedToMethods ? (String) method.invoke(klass) : (String) field.get(klass);
                                     break;
                                 case DOUBLE:
-                                    assignable = "" + (Double) method.invoke(klass);
+                                    assignable = movedToMethods ? "" + (Double) method.invoke(klass) : "" + (Double) field.get(klass);
                                     break;
                                 case BOOLEAN:
-                                    assignable = "" + (Boolean) method.invoke(klass);
+                                    assignable = movedToMethods ? "" + (Boolean) method.invoke(klass) : "" + (Boolean) field.get(klass);
                                     break;
                                 case STRING_ARRAY:
                                     //save as string, separated by commas
-                                    assignable = Arrays.toString((String[]) method.invoke(klass));
+                                    assignable = movedToMethods ? Arrays.toString((String[]) method.invoke(klass)) : Arrays.toString((String[]) field.get(klass));
                                     break;
                                 case DOUBLE_ARRAY:
-                                    double[] doubles = (double[]) method.invoke(klass);
+                                    double[] doubles = movedToMethods ? (double[]) method.invoke(klass) : (double[]) field.get(klass);
 
                                     //Convert to a string
                                     String doubleString = "[";
@@ -351,7 +392,7 @@ public class Logger implements Loggable {
                                     assignable = doubleString;
                                     break;
                                 case BYTE_ARRAY:
-                                    byte[] bytes = (byte[]) method.invoke(klass);
+                                    byte[] bytes = movedToMethods ? (byte[]) method.invoke(klass) : (byte[]) field.get(klass);
 
                                     //Convert to a string
                                     String byteString = "";
@@ -376,6 +417,8 @@ public class Logger implements Loggable {
                             lastAssign.put(assignedTo, assignable);
                         }
                     }
+
+                    if (field != null) field.setAccessible(fieldWasAccessible);
                 }
             }
         } catch (Exception e) {

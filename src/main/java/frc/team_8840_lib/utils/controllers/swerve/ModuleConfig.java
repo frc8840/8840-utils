@@ -6,6 +6,8 @@ public class ModuleConfig {
     private int encoderID;
     private double turnOffset;
 
+    public boolean manualOffset;
+
     public ModuleConfig(int driveMotorID, int turnMotorID, int encoderID, double turnOffset) {
         this.driveMotorID = driveMotorID;
         this.turnMotorID = turnMotorID;

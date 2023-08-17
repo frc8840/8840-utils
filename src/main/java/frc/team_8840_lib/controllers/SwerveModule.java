@@ -234,6 +234,11 @@ public class SwerveModule {
                 return;
             }
 
+            if (m_config.manualOffset) {
+                rej.onError(new Exception("Skipped to wrapper setup because manual offset is enabled!"));
+                return;
+            }
+
             int start = (int) System.currentTimeMillis();
 
             double newPosition = getAbsoluteAngle().getDegrees() - m_config.getTurnOffset();
