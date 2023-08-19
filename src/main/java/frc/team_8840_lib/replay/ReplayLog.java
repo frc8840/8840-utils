@@ -127,4 +127,8 @@ public class ReplayLog {
     public LogDataThread[] getThreads() {
         return this.info.values().toArray(new LogDataThread[0]);
     }
+
+    public HashMap<String, LogDataThread> getThreadsMap() {
+        return this.info;
+    }
 }

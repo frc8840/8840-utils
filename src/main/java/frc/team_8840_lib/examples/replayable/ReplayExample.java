@@ -4,9 +4,11 @@ import frc.team_8840_lib.listeners.EventListener;
 
 public class ReplayExample extends EventListener {
 
+    ReplayableExample replayableExample = new ReplayableExample();
+
     @Override
     public void robotInit() {
-        
+
     }
 
     @Override

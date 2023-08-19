@@ -216,7 +216,7 @@ public class Logger implements Loggable {
         };
 
         logTimer = new Timer();
-        logTimer.scheduleAtFixedRate(autoLogInfoTimer, 100, 100);
+        logTimer.scheduleAtFixedRate(autoLogInfoTimer, logInterval, logInterval);
     }
 
     private static void saveAndUpdate(String nl) {
@@ -235,6 +235,11 @@ public class Logger implements Loggable {
 
     private static TimerTask autoLogInfoTimer;
     private static Timer logTimer;
+    private static long logInterval = 100;
+
+    public static long getLogInterval() {
+        return logInterval;
+    }
 
     public enum LogType {
         STRING,

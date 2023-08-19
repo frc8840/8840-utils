@@ -27,8 +27,6 @@ public abstract class Replayable extends IOLayer implements Loggable {
     public Replayable() {
         super();
 
-        //TODO: Get rid of IO Access
-
         //Get all methods in the super class with the AutoLog/IOMethod annotation
         Method[] methods = this.getClass().getSuperclass().getMethods();
 
@@ -168,6 +166,10 @@ public abstract class Replayable extends IOLayer implements Loggable {
     @IOMethod(name = "inReplay", value_type = IOValue.BOOLEAN, method_type = IOMethodType.WRITE, toNT = false)
     public void replay(boolean inReplay) {
         this.inReplay = inReplay;
+    }
+
+    public Field getField(String name) {
+        return replayFields.get(name);
     }
 
     public Method getReplaySaveMethod(String name) {

@@ -3,10 +3,13 @@ package frc.team_8840_lib.replay;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.json.JSONObject;
 
 import frc.team_8840_lib.info.console.FileWriter;
+import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.utils.files.FileUtils;
 
 public class ReplayManager {
@@ -26,6 +29,8 @@ public class ReplayManager {
     private ArrayList<Replayable> replayables = new ArrayList<>();
 
     private HashMap<Replayable, Boolean> preReplayStates = new HashMap<>();
+
+    private int replayCycle = 0;
 
     private ReplayManager() {
         replayables = new ArrayList<>();
@@ -49,6 +54,34 @@ public class ReplayManager {
             replayable.setReal(false);
             replayable.replayInit();
         }
+
+        replayCycle = 0;
+
+        final int totalReplayCycles = replayLog.getCycles();
+
+        Timer replayTimer = new Timer();
+
+        TimerTask replayFrame = new TimerTask() {
+            @Override
+            public void run() {
+                if (replayCycle >= totalReplayCycles) {
+                    exitReplay();
+                    return;
+                }
+
+                HashMap<String, LogDataThread> data = replayLog.getThreadsMap();
+
+                for (String key : data.keySet()) {
+                    LogDataThread thread = data.get(key);
+                    
+                    //TODO: feed thread to replayable
+                }
+
+                replayCycle++;
+            }
+        };
+
+        replayTimer.scheduleAtFixedRate(replayFrame, Logger.getLogInterval(), Logger.getLogInterval());
     }
 
     public void exitReplay() {

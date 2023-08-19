@@ -75,7 +75,7 @@ public class LogDataThread {
         for (DataCyclePair pair : rawData) {
             if (pair.cycle == cycle) {
                 return getByIndex(rawData.indexOf(pair));
-            } else if (pair.cycle > cycle) {
+            } else if (pair.cycle < cycle) {
                 //Fill in the gaps (since data is only sent when it changes)
                 return getByIndex(rawData.indexOf(pair) - 1);
             }
