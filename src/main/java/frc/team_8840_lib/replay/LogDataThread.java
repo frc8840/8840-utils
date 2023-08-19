@@ -14,9 +14,8 @@ public class LogDataThread {
         }
     }
 
-    private String name;
+    protected String name;
     private ReplayLog.DataType dataType;
-
 
     private ArrayList<DataCyclePair> rawData = new ArrayList<>();
 

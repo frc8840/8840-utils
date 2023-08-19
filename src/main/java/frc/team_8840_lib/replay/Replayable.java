@@ -155,6 +155,11 @@ public abstract class Replayable extends IOLayer implements Loggable {
         Logger.Log(getBaseName(), "Added " + replayLogs.size() + " replay logs.");
         
         ReplayManager.addReplayable(this);
+        Logger.addClassToBeAutoLogged(this);
+    }
+
+    protected void feedThread(LogDataThread thread, int cycle) {
+
     }
 
     @AutoLog(name = "replay", replaylink = "inReplay")

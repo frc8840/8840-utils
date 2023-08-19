@@ -13,6 +13,14 @@ public class ReplayableExample extends Replayable {
         super();
     }
 
+    public void increaseExampleVariable() {
+        exampleVariable++;
+    }
+
+    public void increaseExampleVariable2() {
+        exampleVariable2++;
+    }
+
     @Override
     public String getBaseName() {
         return "ReplayableExample";

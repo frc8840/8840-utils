@@ -11,6 +11,7 @@ import java.util.TimerTask;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.team_8840_lib.info.time.TimeKeeper;
+import frc.team_8840_lib.libraries.LibraryManager;
 import frc.team_8840_lib.listeners.Preferences;
 import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.logging.LogWriter;
@@ -25,8 +26,7 @@ public class Logger implements Loggable {
             "Have fun",
             "Have a good time",
             "Support your alliance",
-            "Be very cool",
-            "Idk what to say. Good luck I guess",
+            "Good luck",
             "Don't break the robot",
     };
 
@@ -41,10 +41,12 @@ public class Logger implements Loggable {
 
         Log(new String[] {
             "Welcome to " + competitionName + "!",
+            "Libraries Loaded: " + LibraryManager.getLoadedLibraries().size(),
             "Your Alliance: " + alliance,
             "Match Number: " + matchNumber,
             "Match Type: " + matchType,
-            funStartingMessages[(int) Math.floor(Math.random() * funStartingMessages.length)] + ", " + alliance + "! Go team! 8840-utils made by FRC Team 8840 Bay Robotics (https://team8840.org).",
+            funStartingMessages[(int) Math.floor(Math.random() * funStartingMessages.length)] + ", " + alliance + "! Go team! 8840-utils is made by FRC Team 8840, Bay Robotics.",
+            "https://team8840.org | https://github.com/frc8840",
             "",
             "--------------------",
             ""
@@ -139,8 +141,8 @@ public class Logger implements Loggable {
             System.out.println(raw);
             currentLine += raw;
             saveAndUpdate(
-                // Add a space if the line starts with a or d due to the formatting of the log file
-                (currentLine.startsWith("d") || currentLine.startsWith("a") ? " " : "") + 
+                //add a [] if there is no time stamp
+                (!raw.startsWith("[") ? "[] " : "") + 
                 currentLine
             );
             currentLine = "";
@@ -243,11 +245,13 @@ public class Logger implements Loggable {
 
     public enum LogType {
         STRING,
+        INT,
         DOUBLE,
         BOOLEAN,
         STRING_ARRAY,
         DOUBLE_ARRAY,
-        BYTE_ARRAY;
+        BYTE_ARRAY,
+        UNKNOWN;
 
         public String smallString() {
             switch(this) {
@@ -255,6 +259,8 @@ public class Logger implements Loggable {
                     return "s";
                 case DOUBLE:
                     return "d";
+                case INT:
+                    return "i";
                 case STRING_ARRAY:
                     return "S";
                 case DOUBLE_ARRAY:
@@ -270,13 +276,14 @@ public class Logger implements Loggable {
 
         public static LogType fromClass(Class<?> klass) {
             if (klass == String.class) return STRING;
-            if (klass == Double.class) return DOUBLE;
-            if (klass == Boolean.class) return BOOLEAN;
+            if (klass == Integer.class || klass == int.class) return INT;
+            if (klass == Double.class || klass == double.class) return DOUBLE;
+            if (klass == Boolean.class || klass == boolean.class) return BOOLEAN;
             if (klass == String[].class) return STRING_ARRAY;
-            if (klass == Double[].class) return DOUBLE_ARRAY;
+            if (klass == Double[].class || klass == double[].class) return DOUBLE_ARRAY;
             if (klass == byte[].class) return BYTE_ARRAY;
 
-            return STRING;
+            return UNKNOWN;
         }
 
         public static final byte STRING_CORRESPONDENCE = 1;
@@ -319,8 +326,6 @@ public class Logger implements Loggable {
                     if (i >= fields.length) {
                         if (!movedToMethods) {
                             movedToMethods = true;
-                        } else {
-                            break;
                         }
                     }
 
@@ -343,13 +348,15 @@ public class Logger implements Loggable {
                     
                     String name = autoLogInfo.name();
                     
-                    if (name == "") {
+                    if (name == "" || name.length() == 0) {
                         if (movedToMethods) {
                             name = method.getName();
                         } else {
                             name = field.getName();
                         }
                     }
+
+                    //if (!movedToMethods) System.out.println("name: " + name + ", " + field.getName());
 
                     LogType logType = LogType.fromClass(movedToMethods ? method.getReturnType() : field.getType());
                     
@@ -370,7 +377,10 @@ public class Logger implements Loggable {
                         try {
                             switch (logType) {
                                 case STRING:
-                                    assignable = movedToMethods ? (String) method.invoke(klass) : (String) field.get(klass);
+                                    assignable = movedToMethods ? (String) method.invoke(klass).toString() : (String) field.get(klass).toString();
+                                    break;
+                                case INT:
+                                    assignable = movedToMethods ? "" + (Integer) method.invoke(klass) : "" + (Integer) field.get(klass);
                                     break;
                                 case DOUBLE:
                                     assignable = movedToMethods ? "" + (Double) method.invoke(klass) : "" + (Double) field.get(klass);
@@ -386,7 +396,7 @@ public class Logger implements Loggable {
                                     double[] doubles = movedToMethods ? (double[]) method.invoke(klass) : (double[]) field.get(klass);
 
                                     //Convert to a string
-                                    String doubleString = "[";
+                                    String doubleString = "["; 
 
                                     for (double d : doubles) {
                                         doubleString += d + ",";
@@ -408,6 +418,8 @@ public class Logger implements Loggable {
 
                                     assignable = byteString;
                                     break;
+                                case UNKNOWN:
+                                    throw new Exception("Unknown log type! Please only use String, int, double, boolean, String[], double[], or byte[], or encode your information into a String!");
                             }
                         } catch (Exception e) {
                             Logger.Log("e/" + assignedTo + " [Logger] Issue w/ auto log " + name + ". Skipping past this log, but this may lead to logging missing information.", TimeStamp.None);

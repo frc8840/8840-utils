@@ -74,7 +74,13 @@ public class ReplayManager {
                 for (String key : data.keySet()) {
                     LogDataThread thread = data.get(key);
                     
-                    //TODO: feed thread to replayable
+                    String name = thread.name;
+                    
+                    for (Replayable replayable : replayables) {
+                        if (replayable.getBaseName().equals(name)) {
+                            replayable.feedThread(thread, replayCycle);
+                        }
+                    }
                 }
 
                 replayCycle++;

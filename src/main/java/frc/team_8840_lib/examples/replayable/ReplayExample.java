@@ -1,6 +1,8 @@
 package frc.team_8840_lib.examples.replayable;
 
 import frc.team_8840_lib.listeners.EventListener;
+import frc.team_8840_lib.listeners.Robot;
+import frc.team_8840_lib.utils.GamePhase;
 
 public class ReplayExample extends EventListener {
 
@@ -8,7 +10,13 @@ public class ReplayExample extends EventListener {
 
     @Override
     public void robotInit() {
+        Robot.getInstance().subscribeFixedPhase(() -> {
+            replayableExample.increaseExampleVariable();
+        }, GamePhase.Teleop);
 
+        Robot.getInstance().subscribeFixedPhase(() -> {
+            replayableExample.increaseExampleVariable2();
+        }, GamePhase.Autonomous);
     }
 
     @Override
