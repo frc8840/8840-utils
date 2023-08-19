@@ -13,11 +13,11 @@ public class SwerveLibraryInfo extends LibraryInfo {
     }
 
     public String author() {
-        return "Team 8840";
+        return "Jaiden Grimminck - 8840";
     }
 
     public String description() {
-        return "A swerve library for FRC teams. Core package. Note: Experimental, use at your own risk.";
+        return "A swerve library for FRC teams with MK4i + NEOs + CANCoders. Core package. Note: This library may not work with your robot if you're not 8840! Use at your own discretion.";
     }
 
     public String repo() {
@@ -25,6 +25,6 @@ public class SwerveLibraryInfo extends LibraryInfo {
     }
 
     public boolean experimental() {
-        return true;
+        return false;
     }
 }

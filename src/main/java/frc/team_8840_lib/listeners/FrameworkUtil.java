@@ -52,7 +52,11 @@ public class FrameworkUtil {
         Logger.initWriter();
         IOManager.init();
         TimeKeeper.init();
+
+        LibraryManager.start();
+
         Logger.logCompetitionStart();
+        
 
         lastPhase = GamePhase.Disabled;
     }

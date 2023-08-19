@@ -13,7 +13,7 @@ public class AutonomousLibraryInfo extends LibraryInfo {
     }
 
     public String author() {
-        return "Team 8840";
+        return "Jaiden Grimminck - 8840";
     }
 
     public String description() {

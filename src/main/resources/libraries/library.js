@@ -58,6 +58,7 @@ async function formatLibraries() {
         const button_ = document.createElement("button");
         button_.textContent = "Import Library";
         button_.addEventListener("click", openImportLibrary);
+        button_.disabled = true;
         
         addLibrarySection.appendChild(button_);
         libraryContainer.appendChild(addLibrarySection);

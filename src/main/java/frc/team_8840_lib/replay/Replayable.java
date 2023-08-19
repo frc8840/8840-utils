@@ -48,23 +48,22 @@ public abstract class Replayable extends IOLayer implements Loggable {
 
             boolean fieldWasAccessible = false;
 
-            if (i < methods.length) {
-                method = methods[i];
-
-                autoLog = method.getAnnotation(AutoLog.class);
-            } else {
-                if (!movedToMethods) {
-                    i = 0;
-                    movedToMethods = true;
-                }
-
-                field = fields[i - methods.length];
+            if (i < fields.length) {
+                field = fields[i];
 
                 autoLog = field.getAnnotation(AutoLog.class);
 
                 fieldWasAccessible = field.isAccessible();
 
                 field.setAccessible(true);
+            } else {
+                if (!movedToMethods) {
+                    movedToMethods = true;
+                }
+
+                method = methods[i - fields.length];
+
+                autoLog = method.getAnnotation(AutoLog.class);
             }
 
             //If the method has the AutoLog annotation, it's a write to the replay file method (save method)

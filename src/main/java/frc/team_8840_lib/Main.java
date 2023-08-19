@@ -7,7 +7,7 @@ package frc.team_8840_lib;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.team_8840_lib.examples.*;
 import frc.team_8840_lib.examples.replayable.ReplayExample;
-import frc.team_8840_lib.info.console.EmptyLog;
+import frc.team_8840_lib.info.console.*;
 import frc.team_8840_lib.various.*;
 
 public final class Main {
@@ -18,9 +18,6 @@ public final class Main {
      * This function assigns a listener to the robot, then starts the robot.
      */
     public static void main(String... args) {
-        /* Load all libraries. TODO: Temporary, alternate will be made soon. */
-        Libraries.main();
-
         /*
         Assign a listener to the robot.
         You can do any type of EventListener here, but only one can be assigned at a time.
@@ -49,9 +46,9 @@ public final class Main {
          * In this example, it's creating a FileWriter to be writen to the default path.
          */
         //frc.team_8840_lib.info.console.Logger.setWriter(new frc.team_8840_lib.info.console.FileWriter("default"));
-        frc.team_8840_lib.info.console.Logger.setWriter(new EmptyLog());
+        frc.team_8840_lib.info.console.Logger.setWriter(new FileWriter());
 
-        //Start the robot - Don't change this line
+        //Start the robot through 8840-utils - Don't change this line
         RobotBase.startRobot(frc.team_8840_lib.listeners.Robot::new);
     }
 }

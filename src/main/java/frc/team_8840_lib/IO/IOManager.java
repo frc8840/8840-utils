@@ -23,10 +23,16 @@ public class IOManager implements Loggable {
     private static IOManager instance;
 
     public static IOManager getInstance() {
+        if (instance == null) {
+            instance = new IOManager();
+        }
+
         return instance;
     }
 
     public static void init() {
+        if (instance != null) return;
+        
         instance = new IOManager();
 
         //IOPowerDistribution.init();
