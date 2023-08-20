@@ -59,6 +59,12 @@ public class SwerveModule {
 
     private boolean m_isInitialized = false;
 
+    /**
+     * Creates a new swerve module
+     * @param settings The settings for the swerve drive itself (gyro reversed, etc)
+     * @param config The config for the swerve module (motor IDs, encoder IDs, etc)
+     * @param position The position of the swerve module (front left, front right, back left, back right)
+     */
     public SwerveModule(SwerveSettings settings, ModuleConfig config, Position position) {
         super();
 
@@ -67,11 +73,14 @@ public class SwerveModule {
         m_config = config;
         m_position = position;
 
+        //declare the motors
         m_driveMotor = new CANSparkMax(m_config.getDriveMotorID(), MotorType.kBrushless);
         m_turnMotor = new CANSparkMax(m_config.getTurnMotorID(), MotorType.kBrushless);
 
+        //declare the encoder
         m_encoder = new IOCANCoder(m_config.getEncoderID());
 
+        //blah blah blah some simulation stuff
         m_encoder.setReal(Robot.isReal());
         if (Robot.isSimulation()) m_encoder.setCache(0);
 
@@ -85,6 +94,9 @@ public class SwerveModule {
 
         int startInitialization = (int) System.currentTimeMillis();
 
+        //a promise to go step by step through the initialization process
+        //to make sure that everything is ready before we start
+        //(similar to a promise in javascript)
         new Promise((res, rej) -> {
             //First, wait for CANCoders to be ready
             configCANCoder();
@@ -114,19 +126,28 @@ public class SwerveModule {
         });
     }
 
+    /**
+     * Configures the CANCoder settings (ran through the IOCANCoder class, but is the same as what you would do with a normal CANCoder)
+     */
     public void configCANCoder() {
         m_encoder.configFactoryDefault();
 
         CANCoderConfiguration encoderConfig = new CANCoderConfiguration();
 
+        //setup the settings of the cancoder
         encoderConfig.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
         encoderConfig.sensorDirection = m_settings.canCoderInverted;
         encoderConfig.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
         encoderConfig.sensorTimeBase = SensorTimeBase.PerSecond;
 
+        //send the settings to the cancoder
         m_encoder.configAllSettings(encoderConfig);
     }
 
+    /**
+     * Configure the settings of the motors
+     * @return a promise that will be resolved (finished) when the motors are ready
+     */
     public Promise configMotors() {
         m_turnEncoderWrapper.setManualConversion(m_settings.doManualConversion);
         m_driveEncoderWrapper.setManualConversion(m_settings.doManualConversion);
@@ -222,6 +243,10 @@ public class SwerveModule {
         });  
     }
 
+    /**
+     * Sets the angle of the turn encoder to the absolute angle subtracted by the offset so forward is 0°
+     * @return A promise that resolves (finishes) when the turn encoder is successfully set to the absolute angle subtracted by the offset
+     */
     public Promise resetToAbsolute() {
         m_turnEncoderWrapper.getEncoder().setPosition(0);
 
@@ -298,10 +323,21 @@ public class SwerveModule {
         //  https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces
     }
 
+    /**
+     * Sets the speed of the drive motor
+     * @param speed The speed to set the motor to. Assume the units are per second
+     * @param openLoop Whether or not to use open loop control
+     */
     public void setSpeed(Unit speed, boolean openLoop) {
         setSpeed(speed, openLoop, false);
     }
 
+    /**
+     * Sets the speed of the drive motor
+     * @param speed The speed to set the motor to. Assume the units are per second
+     * @param openLoop Whether or not to use open loop control
+     * @param ignoreSpeedFlags Whether or not to ignore the speed flags
+     */
     public void setSpeed(Unit speed, boolean openLoop, boolean ignoreSpeedFlags) {
         double speedDifference = Math.abs(speed.get(Unit.Type.METERS) - m_lastDesiredSpeed.get(Unit.Type.METERS));
 
@@ -327,6 +363,11 @@ public class SwerveModule {
         }
     }
 
+    /**
+     * Sets the angle of the turn motor
+     * @param angle The angle to set the motor to
+     * @param ignoreAngleLimit Whether or not to ignore the angle movement limit (used for preventing jolts/snapping and damage to the module)
+     */
     public void setAngle(Rotation2d angle, boolean ignoreAngleLimit) {
         double difference = Math.abs(angle.getDegrees() - m_lastDesiredAngle.getDegrees());
 
@@ -342,10 +383,21 @@ public class SwerveModule {
         );
     }
 
+    /**
+     * Sets the desired state of the module (speed and angle) with automatic angle optimization
+     * @param state The state to set the module to
+     * @param openLoop Whether or not to use open loop control
+     */
     public void setDesiredState(SwerveModuleState state, boolean openLoop) {
         setDesiredState(state, openLoop, true);
     }
 
+    /**
+     * Sets the desired state of the module (speed and angle)
+     * @param state The state to set the module to
+     * @param openLoop Whether or not to use open loop control
+     * @param runOptimization Whether or not to run the optimization algorithm on the angle
+     */
     public void setDesiredState(SwerveModuleState state, boolean openLoop, boolean runOptimization) {
         SwerveModuleState optimizedState = runOptimization ? CTREModuleState.optimize(state, m_lastDesiredAngle) : state;
 
@@ -355,14 +407,25 @@ public class SwerveModule {
         m_lastDesiredAngle = optimizedState.angle;
     }
 
+    /**
+     * Sets the speed of the drive motor to 0
+     */
     public void stop() {
         setSpeed(new Unit(0, Unit.Type.METERS), true, true);
     }
 
+    /**
+     * Gets the absolute angle (angle of the encoder) of the module
+     * @return The absolute angle/angle of the encoder of the module
+     */
     public Rotation2d getAbsoluteAngle() {
         return Rotation2d.fromDegrees(m_encoder.getAbsolutePosition());
     }
 
+    /**
+     * Gets the current state of the module
+     * @return The swerve module state derived through the internal encoder velocity and the rotation of the module
+     */
     public SwerveModuleState getState() {
         return new SwerveModuleState(
             m_driveEncoderWrapper.getVelocity(),
@@ -370,18 +433,34 @@ public class SwerveModule {
         );
     }
 
+    /**
+     * Gets the current angle of the module
+     * @return The current angle of the module
+     */
     public Rotation2d getAngle() {
         return Rotation2d.fromDegrees(m_turnEncoderWrapper.getPosition());
     }
 
+    /**
+     * Gets the desired angle of the module
+     * @return The desired angle of the module
+     */
     public Rotation2d getDesiredAngle() {
         return m_lastDesiredAngle;
     }
 
+    /**
+     * Gets the current speed of the module
+     * @return The current speed of the module. Assume these units are per seconds.
+     */
     public Unit getSpeed() {
         return new Unit(m_driveEncoderWrapper.getVelocity(), Type.METERS);
     }
 
+    /**
+     * Gets the current position of the module
+     * @return The current position of the module derived through the internal encoder position and the rotation of the module
+     */
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
             m_driveEncoderWrapper.getPosition(), 
@@ -389,6 +468,9 @@ public class SwerveModule {
         );
     }
 
+    /**
+     * Returns if the initialized flag has been enabled.
+     */
     public boolean initalized() {
         return m_isInitialized;
     }

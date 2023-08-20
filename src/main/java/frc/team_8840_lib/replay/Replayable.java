@@ -159,7 +159,42 @@ public abstract class Replayable extends IOLayer implements Loggable {
     }
 
     protected void feedThread(LogDataThread thread, int cycle) {
+        String thread_name = thread.getSpecificName();
 
+        boolean movedToMethods = false;
+
+        Method[] methods = this.getClass().getSuperclass().getMethods();
+        Field[] fields = this.getClass().getSuperclass().getDeclaredFields();
+
+        for (int i = 0; i < methods.length + fields.length; i++) {
+            Method method = null;
+            Field field = null;
+
+            if (i >= fields.length) {
+                if (!movedToMethods) {
+                    movedToMethods = true;
+                }
+            }
+
+            if (movedToMethods) {
+                method = methods[i - fields.length];
+            } else {
+                field = fields[i];
+            }
+
+            AutoLog autoLog = movedToMethods ? method.getAnnotation(AutoLog.class) : field.getAnnotation(AutoLog.class);
+
+            if (autoLog == null) {
+                continue;
+            }
+
+            String name = (autoLog.name() == "" || autoLog.name().length() == 0) ? (movedToMethods ? method.getName() : field.getName()) : autoLog.name();
+
+            //TODO: might have to remove base name, idk check thi
+            if (name.equals(thread_name)) {
+                
+            }
+        }
     }
 
     @AutoLog(name = "replay", replaylink = "inReplay")

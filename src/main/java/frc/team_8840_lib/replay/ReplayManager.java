@@ -64,6 +64,8 @@ public class ReplayManager {
         TimerTask replayFrame = new TimerTask() {
             @Override
             public void run() {
+                Thread.currentThread().setName("Replay Cycle " + replayCycle);
+
                 if (replayCycle >= totalReplayCycles) {
                     exitReplay();
                     return;

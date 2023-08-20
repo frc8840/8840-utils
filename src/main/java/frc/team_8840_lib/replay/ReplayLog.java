@@ -65,14 +65,18 @@ public class ReplayLog {
     }
     
     private void analyzeLine(String line) {
-        if (line.startsWith("a")) {
-            int reference = Integer.getInteger(line.substring(1, line.indexOf("/")));
+        if (line.startsWith("d")) {
+            String rawReference = line.substring(1, line.indexOf("/")).trim();
+            int reference = Integer.valueOf(rawReference);
             String value = line.substring(line.indexOf("/") + 1);
+            
             this.analyzeDatapoint(reference, value);
         } else if (line.startsWith("a")) {
             String name = line.substring(1, line.indexOf("/") - 1);
             String type = line.substring(line.indexOf("/") - 1, line.indexOf("/"));
-            int reference = Integer.getInteger(line.substring(line.indexOf("/") + 1));
+            String rawReference = line.substring(line.indexOf("/") + 1).trim();
+            int reference = Integer.valueOf(rawReference);
+
             this.analyzeDeclaration(name, type, reference);
         } else if (line.startsWith("ALC")) {
             boolean isEarlyCycle = line.contains("(s)");

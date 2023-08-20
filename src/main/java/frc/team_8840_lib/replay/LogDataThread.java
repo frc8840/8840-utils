@@ -28,6 +28,14 @@ public class LogDataThread {
         rawData.add(new DataCyclePair(cycle, data));
     }
 
+    public String getSpecificName() {
+        return name.split("|")[1];
+    }
+
+    public String getBaseName() {
+        return name.split("|")[0];
+    }
+
     public String getAsString(int index) {
         return rawData.get(index).rawData;
     }
