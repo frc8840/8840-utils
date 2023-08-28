@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.json.JSONObject;
-
 import frc.team_8840_lib.info.console.FileWriter;
 import frc.team_8840_lib.info.console.Logger;
 import frc.team_8840_lib.utils.files.FileUtils;
@@ -36,6 +34,8 @@ public class ReplayManager {
         replayables = new ArrayList<>();
     }
 
+    Timer replayTimer;
+
     public void enterReplay(File file) {
         if (!file.exists()) {
             throw new RuntimeException("Log file does not exist!");
@@ -59,7 +59,7 @@ public class ReplayManager {
 
         final int totalReplayCycles = replayLog.getCycles();
 
-        Timer replayTimer = new Timer();
+        replayTimer = new Timer();
 
         TimerTask replayFrame = new TimerTask() {
             @Override
@@ -76,10 +76,10 @@ public class ReplayManager {
                 for (String key : data.keySet()) {
                     LogDataThread thread = data.get(key);
                     
-                    String name = thread.name;
+                    String bname = thread.getBaseName();
                     
                     for (Replayable replayable : replayables) {
-                        if (replayable.getBaseName().equals(name)) {
+                        if (replayable.getBaseName().equals(bname)) {
                             replayable.feedThread(thread, replayCycle);
                         }
                     }
@@ -97,5 +97,8 @@ public class ReplayManager {
             replayable.setReal(preReplayStates.get(replayable));
             replayable.exitReplay();
         }
+        
+        replayTimer.cancel();
+        replayCycle = 0;
     }
 }

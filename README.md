@@ -7,7 +7,7 @@
 **Java Reference:**
 [https://frc8840.github.io/8840-utils/build/docs/javadoc/index.html](https://frc8840.github.io/8840-utils/build/docs/javadoc/index.html)
 
-**Read the Docs:** [https://readthedocs.org/projects/8840-utils-docs/](https://readthedocs.org/projects/8840-utils-docs/)
+**Read the Docs:** [https://readthedocs.org/projects/8840-utils-docs/](https://8840-utils-docs.readthedocs.io/en/latest/)
 
 ## What is this?
 

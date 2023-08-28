@@ -274,6 +274,27 @@ public class Logger implements Loggable {
             }
         }
 
+        public static LogType fromSmallString(String s) {
+            switch (s) {
+                case "s":
+                    return STRING;
+                case "d":
+                    return DOUBLE;
+                case "i":
+                    return INT;
+                case "S":
+                    return STRING_ARRAY;
+                case "D":
+                    return DOUBLE_ARRAY;
+                case "B":
+                    return BYTE_ARRAY;
+                case "b":
+                    return BOOLEAN;
+                default:
+                    return STRING;
+            }
+        }
+
         public static LogType fromClass(Class<?> klass) {
             if (klass == String.class) return STRING;
             if (klass == Integer.class || klass == int.class) return INT;

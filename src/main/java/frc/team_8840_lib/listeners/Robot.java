@@ -210,6 +210,10 @@ public class Robot extends RobotBase {
 
     Callback finishFullfillmentCallback = null;
 
+    public void onFinishStartup(Callback callback) {
+        finishFullfillmentCallback = callback;
+    }
+
     public void onFinishFullfillment(Callback callback) {
         finishFullfillmentCallback = callback;
     }
@@ -306,8 +310,6 @@ public class Robot extends RobotBase {
 
                             Logger.Log("Robot", "Conditions fullfilled, continuing startup!");
 
-                            if (finishFullfillmentCallback != null) finishFullfillmentCallback.run();
-
                             duringCompetition(false);
 
                             res.run();
@@ -339,6 +341,20 @@ public class Robot extends RobotBase {
 
     public void duringCompetition(boolean noRun) {
         Logger.Log("[Robot] Robot program startup completed in " + (System.currentTimeMillis() - startTime) + "ms.");
+        
+        Thread runFinishFullfillment = new Thread() {
+            @Override
+            public void run() {
+                Thread.currentThread().setName("Finish Robot Startup Thread");
+                try {
+                    if (finishFullfillmentCallback != null) finishFullfillmentCallback.run();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        runFinishFullfillment.start();
 
         lastPhase = GamePhase.Disabled;
 

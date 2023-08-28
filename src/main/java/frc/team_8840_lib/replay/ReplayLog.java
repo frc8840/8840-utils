@@ -3,31 +3,17 @@ package frc.team_8840_lib.replay;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ReplayLog {
-    private class Types {
-        public final static String _String = "s";
-        public final static String _Double = "d";
-        public final static String String_Array = "S";
-        public final static String Double_Array = "D";
-        public final static String Byte_Array = "B";
-    }
+import frc.team_8840_lib.info.console.Logger.LogType;
 
+public class ReplayLog {
     private class NameTypePair {
         public String name;
-        public DataType type;
+        public LogType type;
 
-        public NameTypePair(String name, DataType type) {
+        public NameTypePair(String name, LogType type) {
             this.name = name;
             this.type = type;
         }
-    }
-
-    public enum DataType {
-        String,
-        Double,
-        String_Array,
-        Double_Array,
-        Byte_Array;
     }
 
     private ArrayList<String> rawLines = new ArrayList<>();
@@ -87,22 +73,6 @@ public class ReplayLog {
         }
     }
 
-    private DataType getValueType(String value) {
-        if (value == Types._String) {
-            return DataType.String;
-        } else if (value == Types._Double) {
-            return DataType.Double;
-        } else if (value == Types.String_Array) {
-            return DataType.String_Array;
-        } else if (value == Types.Double_Array) {
-            return DataType.Double_Array;
-        } else if (value == Types.Byte_Array) {
-            return DataType.Byte_Array;
-        } else {
-            return null;
-        }
-    }
-
     private void analyzeDatapoint(int reference, String value) {
         if (!this.references.containsKey(reference)) {
             throw new RuntimeException("Reference " + reference + " does not exist!");
@@ -118,7 +88,7 @@ public class ReplayLog {
             throw new RuntimeException("Reference " + reference + " already exists!");
         }
 
-        DataType dataType = this.getValueType(type);
+        LogType dataType = LogType.fromSmallString(type);
 
         this.references.put(reference, new NameTypePair(name, dataType));
 

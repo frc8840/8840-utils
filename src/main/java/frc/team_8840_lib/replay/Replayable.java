@@ -159,12 +159,14 @@ public abstract class Replayable extends IOLayer implements Loggable {
     }
 
     protected void feedThread(LogDataThread thread, int cycle) {
-        String thread_name = thread.getSpecificName();
+        String spef_name = thread.getSpecificName();
 
         boolean movedToMethods = false;
 
-        Method[] methods = this.getClass().getSuperclass().getMethods();
-        Field[] fields = this.getClass().getSuperclass().getDeclaredFields();
+        Method[] methods = this.getClass().getMethods();
+        Field[] fields = this.getClass().getDeclaredFields();
+
+        String linkName = "";
 
         for (int i = 0; i < methods.length + fields.length; i++) {
             Method method = null;
@@ -183,18 +185,45 @@ public abstract class Replayable extends IOLayer implements Loggable {
             }
 
             AutoLog autoLog = movedToMethods ? method.getAnnotation(AutoLog.class) : field.getAnnotation(AutoLog.class);
+            IOMethod ioMethod = movedToMethods ? method.getAnnotation(IOMethod.class) : null;
 
             if (autoLog == null) {
+                if (ioMethod == null || !movedToMethods) {
+                    continue;
+                }
+                
+                String name = ioMethod.name() == "" ? method.getName() : ioMethod.name();
+
+                if (linkName.length() > 0 && name.equals(linkName)) {
+                    thread.setMethod(method, cycle, this);
+                }
+                
                 continue;
             }
 
             String name = (autoLog.name() == "" || autoLog.name().length() == 0) ? (movedToMethods ? method.getName() : field.getName()) : autoLog.name();
 
-            //TODO: might have to remove base name, idk check thi
-            if (name.equals(thread_name)) {
-                
+            if (name.equals(spef_name) && linkName.length() == 0) {
+                linkName = autoLog.replaylink().length() == 0 ? (movedToMethods ? name : "field_" + name) : autoLog.replaylink();
+
+                //restart the loop
+                i = -1;
+                movedToMethods = false;
+                continue;
+            }
+
+            boolean fieldLinkFound = linkName.length() != 0 && linkName.equals("field_" + name) && !movedToMethods;
+
+            if ((name.equals(linkName) && linkName.length() != 0) || fieldLinkFound) {
+                if (movedToMethods) {
+                    thread.setMethod(method, cycle, this);
+                } else {
+                    thread.setField(field, cycle, this);
+                }
             }
         }
+
+        if (linkName.length() == 0) System.out.println("did not find link name! " + spef_name);
     }
 
     @AutoLog(name = "replay", replaylink = "inReplay")
