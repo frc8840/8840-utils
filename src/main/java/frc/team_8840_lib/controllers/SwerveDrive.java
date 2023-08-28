@@ -193,6 +193,13 @@ public class SwerveDrive extends Replayable {
         return m_pigeon.getYawPitchRoll();
     }
 
+    @IOMethod(name = "replayGyroscope", value_type = IOValue.DOUBLE_ARRAY, method_type = IOMethodType.WRITE, toNT = false)
+    public void replayGyroscope(double[] pointing) {
+        if (!this.replaying()) return;
+
+        m_pigeon.setDummyAngle(pointing[0]);
+    }
+
     @AutoLog(name = "openLoop", replaylink = "replayOpenLoop")
     public boolean isOpenLoop() {
         return m_replayOpenLoop;
@@ -232,7 +239,7 @@ public class SwerveDrive extends Replayable {
         m_backLeft.setAngle(rotAngles[3], m_isInitialized);
     }
 
-    @AutoLog(name = "Speeds")
+    @AutoLog(name = "Speeds", replaylink = "replaySpeeds")
     public double[] getSpeeds() {
         return new double[] {
             m_frontRight.getSpeed().get(Type.METERS),

@@ -9,7 +9,6 @@ import frc.team_8840_lib.input.communication.CommunicationManager;
 import frc.team_8840_lib.utils.IO.IOLayer;
 import frc.team_8840_lib.utils.IO.IOMethod;
 import frc.team_8840_lib.utils.IO.IOMethodType;
-import frc.team_8840_lib.utils.IO.IOPermission;
 import frc.team_8840_lib.utils.IO.IOValue;
 import frc.team_8840_lib.utils.controllers.EncoderInformation;
 import frc.team_8840_lib.utils.controllers.MotorInfo;
