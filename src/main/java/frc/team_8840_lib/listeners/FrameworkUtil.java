@@ -18,8 +18,18 @@ import frc.team_8840_lib.utils.interfaces.Callback;
  * This will be returned from "no8840LibEventListener" 
  */
 public class FrameworkUtil {
+    private static FrameworkUtil instance_copy = null;
+
     public static FrameworkUtil getInstance() {
-        return Robot.getInstance();
+        if (Robot.getInstance() != null) {
+            instance_copy = Robot.getInstance();
+            return Robot.getInstance();
+        } else {
+            if (instance_copy == null) {
+                instance_copy = new FrameworkUtil();
+            }
+            return instance_copy;
+        }
     }
 
     public static final double DELTA_TIME = 0.03125; //32 times per sec
