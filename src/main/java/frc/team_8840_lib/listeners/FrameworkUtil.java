@@ -34,6 +34,26 @@ public class FrameworkUtil {
 
     private GamePhase lastPhase;
 
+    private boolean m_isFTC = false;
+
+    /**
+     * This is supposed to be called at the start of the FTC program.
+     */
+    public void FTC_Start() {
+        m_isFTC = true;
+        
+        Logger.addClassToBeAutoLogged(new Logger());
+
+        CommunicationManager.init();
+        Logger.initWriter();
+        IOManager.init();
+        TimeKeeper.init();
+
+        LibraryManager.start();
+
+        Logger.logCompetitionStart();
+    }
+
     /**
      * This is supposed to be called at the start.
      */
@@ -57,8 +77,15 @@ public class FrameworkUtil {
 
         Logger.logCompetitionStart();
         
-
         lastPhase = GamePhase.Disabled;
+    }
+
+    /**
+     * Returns whether the program is running on an FTC robot or not.
+     * @return Whether the program is running on an FTC robot or not.
+     */
+    public boolean isFTC() {
+        return m_isFTC;
     }
 
     /**

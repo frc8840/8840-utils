@@ -81,6 +81,8 @@ public class ApiHandler {
 
         json.put("os", Robot.os());
 
+        json.put("is_ftc", Robot.getInstance().isFTC() ? "true" : "false");
+
         long freeStorage = new File("/").getFreeSpace();
         long totalStorage = new File("/").getTotalSpace();
 

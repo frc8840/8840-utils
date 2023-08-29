@@ -104,11 +104,13 @@ public class CommunicationManager {
     private CommunicationManager() {
         instance = this;
 
-        NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
+        if (!Robot.getInstance().isFTC()) {
+            NetworkTableInstance ntinst = NetworkTableInstance.getDefault();
 
-        ntinst.startServer();
+            ntinst.startServer();
 
-        table = ntinst.getTable(base());
+            table = ntinst.getTable(base());
+        }
 
         createdTitles = new ArrayList<>();
         entries = new HashMap<>();

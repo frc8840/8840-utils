@@ -189,6 +189,9 @@
               "open": true
             }
           },
+          "ReplayableExample": {
+            "open": true
+          },
           "SparkMaxEncoder-D1-3": {
             "open": true
           },
