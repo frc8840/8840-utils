@@ -1,0 +1,96 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    overflow-y: hidden;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+}
+
+.small-sidebar {
+    width: 300px;
+    background-color: rgb(52, 45, 52);
+    color: rgb(235,235,235);
+    transition: width 0.3s ease;
+    height: 100%;
+}
+
+.small-sidebar:first-of-type {
+    border-right: 1px solid black;
+}
+
+.small-sidebar:last-of-type {
+    border-left: 1px solid black;
+}
+
+.small-sidebar h2 {
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #484848;
+}
+
+.important-folders {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.important-folders * {
+    width: 100%;
+    border-bottom: 1px solid #454545;
+    padding: 10px;
+    margin:0;
+}
+
+.important-folders *:hover {
+    cursor: pointer;
+}
+
+.important-folders *:active {
+    background-color: rgb(76, 69, 76);
+}
+
+.big-sidebar {
+    width: calc(100vw - 600px);
+}
+
+.file-list {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    color: rgb(225, 225, 225);
+    background-color: rgb(46, 40, 46);
+    padding-top: 20px;
+}
+
+.file-list * {
+    width: calc(100% - 50px);
+    padding: 12px;
+    margin-left: 10px;
+    margin-right: 10px;
+    border-radius: 14px;
+    overflow-y: hidden;
+    /* turn off wrap */
+    word-wrap: unset;
+}
+
+.file-list > div {
+    min-height: 21px;
+    cursor: pointer;
+}
+
+.file-list *:nth-child(odd) {
+    background-color: rgb(56, 50, 56);
+}
+
+.file-list *:nth-child(even) {
+    background-color: rgb(46, 40, 46);
+}

@@ -3,6 +3,8 @@ plugins {
     id "edu.wpi.first.GradleRIO" version "2023.4.3"
 }
 
+def build_with_dependencies = true
+
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
@@ -91,9 +93,15 @@ wpi.sim.addDriverstation()
 // in order to make them all available at runtime. Also adding the manifest so WPILib
 // knows where to look for our Robot Class.
 jar {
-    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-    manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    if (build_with_dependencies) {
+        from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+        manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    } else {
+        //include all of the code in the jar, but not the dependencies
+        from sourceSets.main.output
+        manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
+    }
 
     // add javadoc to jar
     from javadoc
