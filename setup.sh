@@ -1,5 +1,5 @@
 # easy changing of version:
-latest_version="v2023.2.1"
+latest_version="v2023.3.0"
 latest_jar="https://github.com/frc8840/8840-utils/releases/download/$latest_version/8840-utils.jar"
 
 # check if the folder libs exist
