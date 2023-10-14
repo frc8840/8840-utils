@@ -55,6 +55,12 @@ body {
     background-color: rgb(76, 69, 76);
 }
 
+.important-folders input {
+    background-color: #484848;
+    color: white;
+    border: none;
+}
+
 .big-sidebar {
     width: calc(100vw - 600px);
 }
@@ -93,4 +99,12 @@ body {
 
 .file-list *:nth-child(even) {
     background-color: rgb(46, 40, 46);
+}
+
+.file-info > button {
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    cursor: pointer;
 }

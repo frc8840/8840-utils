@@ -9,12 +9,12 @@
     <body>
         <div class="main-container">
             <div class="small-sidebar">
-                <h2>8840-utils</h2>
+                <h2 onclick="location.href = '/'" style="cursor: pointer;">8840-utils</h2>
                 <div class="important-folders">
-                    <input placeholder="ip address of robot" value="localhost" id="ip-addr">
-                    <p>8840appdata</p>
-                    <p>paths</p>
-                    <p>logs</p>
+                    <input placeholder="ip address of robot" disabled value="localhost" id="ip-addr">
+                    <!-- <p onclick="window.changeFolder('..'); window.finder.forceUpdate();">8840appdata</p>
+                    <p onclick="window.changeFolder('8840appdata'); window.finder.forceUpdate();">paths</p>
+                    <p onclick="window.changeFolder('8840applogs'); window.finder.forceUpdate();">logs</p> -->
                 </div>
             </div>
             <div class="big-sidebar">
@@ -28,9 +28,7 @@
             </div>
             <div class="small-sidebar">
                 <div class="file-info">
-                    <p id="file-name"></p>
-                    <p id="file-path"></p>
-                    <p id="file-size"></p>
+                    <button onclick="window.finder.sendFile()">Upload File</button>
                 </div>
             </div>
         </div>

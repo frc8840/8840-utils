@@ -1,4 +1,11 @@
 const path = "/files"
+const folderSVG = `📁`;
+const fileSVG = `📄`;
+const backSVG = `⬅`;
+
+const currentIP = document.location.href.replace("http://", "").split(":")[0];
+
+document.querySelector("#ip-addr").value = currentIP;
 
 class FileSystem {
     static instance = null;
@@ -86,7 +93,7 @@ class FileSystem {
         }
     }
     async requestFiles(type=FileSystem.FileType.Log) {
-        const base = "http://" + document.getElementById("ip-addr").value + ":5805" + path;
+        const base = "http://" + currentIP + ":5805" + path;
 
         const req = await fetch(base, {
             method: "POST",
@@ -110,7 +117,7 @@ class FileSystem {
     }
 
     async writeFile(_path, rawData) {
-        const base = "http://" + window.nt.host + ":" + window.nt.port + path;
+        const base = "http://" + currentIP + ":5805" + path;
 
         const base64Data = btoa(rawData);
 
@@ -134,7 +141,7 @@ class FileSystem {
 
     async readFile(_path) {
         console.log("opening " + _path + "...")
-        const base = "http://" + document.getElementById("ip-addr").value + ":5805" + path;
+        const base = "http://" + currentIP + ":5805" + path;
 
         const req = await fetch(base, {
             method: "POST",
@@ -154,7 +161,7 @@ class FileSystem {
     }
 
     async mkdir(_path) {
-        const base = "http://" + window.nt.host + ":" + window.nt.port + path;
+        const base = "http://" + currentIP + ":5805" + path;
 
         const req = await fetch(base, {
             method: "POST",
@@ -245,6 +252,7 @@ class Finder {
             `);
         }
 
+        window.finder = this;
     }
     getFilesInFolder() {
         //This goes through the files and returns the ones that are in the current folder
@@ -423,7 +431,7 @@ class Finder {
         for (let file of this.getFilesInFolder()) {
             const newDiv = document.createElement("div");
 
-            newDiv.textContent = file.name;
+            newDiv.innerHTML = (file.folder ? folderSVG : (file.name == ".." ? backSVG : fileSVG)) + " " + file.name + " (" + file.size + ")";
             newDiv.dataset.name = file.name;
             newDiv.dataset.size = file.size;
             newDiv.dataset.path = file.path;
