@@ -16,7 +16,7 @@ public class Info extends LibraryInfo {
     }
 
     public String version() {
-        return "v2023.3.0";
+        return "v2024.1.1";
     }
 
     public String author() {
