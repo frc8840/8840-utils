@@ -5,11 +5,11 @@ import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.REVPhysicsSim;
+import com.revrobotics.SparkPIDController;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -44,8 +44,8 @@ public class SwerveModule {
     private SparkMaxEncoderWrapper m_driveEncoderWrapper;
     private SparkMaxEncoderWrapper m_turnEncoderWrapper;
 
-    private SparkMaxPIDController m_drivePIDController;
-    private SparkMaxPIDController m_turnPIDController;
+    private SparkPIDController m_drivePIDController;
+    private SparkPIDController m_turnPIDController;
 
     private Rotation2d m_lastDesiredAngle;
     private Unit m_lastDesiredSpeed;
@@ -129,6 +129,7 @@ public class SwerveModule {
     /**
      * Configures the CANCoder settings (ran through the IOCANCoder class, but is the same as what you would do with a normal CANCoder)
      */
+    @SuppressWarnings("deprecation")
     public void configCANCoder() {
         m_encoder.configFactoryDefault();
 

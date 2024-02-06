@@ -22,6 +22,13 @@ import frc.team_8840_lib.utils.GamePhase;
 import frc.team_8840_lib.utils.http.IP;
 import frc.team_8840_lib.utils.http.Route;
 
+/**
+ * Swerve Setup is a tool that allows the user to setup the swerve drive of the robot. But I wouldn't recommend using it haha.
+ * 
+ * Deprication Note for 2025:
+ * A lot of these need to be updated to 2025 standards for pheonix.
+ */
+@SuppressWarnings("deprecation")
 public class SwerveSetup extends EventListener {
 
     private static boolean using = false;
@@ -484,6 +491,7 @@ public class SwerveSetup extends EventListener {
         setupEncoder(canCoder, false);
     }
 
+    @SuppressWarnings("deprecation")
     private void setupEncoder(CANCoder canCoder, boolean inverted) {
         canCoder.configFactoryDefault();
 

@@ -10,6 +10,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.team_8840_lib.info.time.TimeKeeper;
 import frc.team_8840_lib.libraries.LibraryManager;
 import frc.team_8840_lib.listeners.Preferences;
@@ -35,7 +36,7 @@ public class Logger implements Loggable {
     public static void logCompetitionStart() {
         Log("\n-- Competition started! --", TimeStamp.All);
         String competitionName = DriverStation.getEventName();
-        DriverStation.Alliance alliance = DriverStation.getAlliance();
+        DriverStation.Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
         int matchNumber = DriverStation.getMatchNumber();
         DriverStation.MatchType matchType = DriverStation.getMatchType();
 

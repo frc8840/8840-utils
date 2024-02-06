@@ -2,7 +2,8 @@ package frc.team_8840_lib.controllers.specifics;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -17,7 +18,7 @@ import edu.wpi.first.wpilibj.RobotController;
  */
 public class SparkMaxPIDWrapper {
     //Onboard PID controller
-    private SparkMaxPIDController onboardPIDController;
+    private SparkPIDController onboardPIDController;
     private CANSparkMax controllerRef;
 
     //Encoder
