@@ -14,7 +14,8 @@
 
 **Document with all of our technical details explained:** [https://github.com/frc8840/8840-utils/blob/main/FRC%208840%20-%20Bay%20Robotics%20-%20Technical%20Notebook.pdf](https://github.com/frc8840/8840-utils/blob/main/FRC%208840%20-%20Bay%20Robotics%20-%20Technical%20Notebook.pdf)
 
-**See the web dashboard [here](https://github.com/frc8840/8840-app) (the other half of this project).**
+> [!INFO]
+> **See the web dashboard [here](https://github.com/frc8840/8840-app) (the other half of this project).**
 
 ## What is this?
 
